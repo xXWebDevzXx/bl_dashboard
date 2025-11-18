@@ -28,8 +28,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: Password123
       MYSQL_DATABASE: dashboard
-      MYSQL_USER: root
-      MYSQL_PASSWORD: Password123
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
