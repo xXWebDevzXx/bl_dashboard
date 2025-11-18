@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        String   @id @default(cuid()) @map("user_pk") @db.Char(36)
+  username  String   @map("user_username") @db.VarChar(20)
+  password  String   @map("user_password") @db.VarChar(50)
+  email     String   @map("user_email") @db.VarChar(50)
+  role      String   @map("user_role") @db.VarChar(20)
+  createdAt Int      @map("user_created_at")
+  updatedAt Int      @map("user_updated_at")
+
+  reports Report[]
+
+  @@map("user")
+}
+
+// Report model
+model Report {
+  id        String @id @default(cuid()) @map("report_pk") @db.Char(36)
+  name      String @map("report_name") @db.VarChar(255)
+  url       String @map("report_url") @db.VarChar(255)
+  createdAt Int    @map("report_created_at")
+  updatedAt Int    @map("report_updated_at")
+
+  @@map("report")
+}
+
+// TogglTime model
+model TogglTime {
+  id            String @id @default(cuid()) @map("toggl_time_pk") @db.Char(36)
+  linearTasksId String @map("toggl_time_linear_tasks_fk") @db.Char(36)
+  estimate      Int    @map("toggl_time_estimate")
+  createdAt     Int    @map("toggl_time_created_at")
+  updatedAt     Int    @map("toggl_time_updated_at")
+
+  linearTask LinearTask @relation(fields: [linearTasksId], references: [id])
+
+  @@map("toggl_time")
+}
+
+// LinearTask model
+model LinearTask {
+  id            String @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
+  name          String @map("linear_tasks_name") @db.VarChar(50)
+  estimatedTime Int    @map("linear_tasks_estimated_time")
+  createdAt     Int    @map("linear_tasks_created_at")
+  updatedAt     Int    @map("linear_tasks_updated_at")
+
+  togglTimes TogglTime[]
+  labels     LinearTaskLabel[]
+
+  @@map("linear_tasks")
+}
+
+// LinearLabel model
+model LinearLabel {
+  id        String @id @default(cuid()) @map("linear_labels_pk") @db.Char(36)
+  name      String @map("linear_labels_name") @db.VarChar(50)
+  createdAt Int    @map("linear_labels_created_at")
+  updatedAt Int    @map("linear_labels_updated_at")
+
+  tasks LinearTaskLabel[]
+
+  @@map("linear_labels")
+}
+
+// LinearTaskLabel junction table (many-to-many)
+model LinearTaskLabel {
+  linearTaskId  String @map("linear_task_label_linear_tasks_fk") @db.Char(36)
+  linearLabelId String @map("linear_task_label_linear_labels_fk") @db.Char(36)
+
+  linearTask  LinearTask  @relation(fields: [linearTaskId], references: [id])
+  linearLabel LinearLabel @relation(fields: [linearLabelId], references: [id])
+
+  @@id([linearTaskId, linearLabelId])
+  @@map("linear_task_label")
+}
+
