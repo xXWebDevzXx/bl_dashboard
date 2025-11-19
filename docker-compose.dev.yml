@@ -12,12 +12,15 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
+      - DATABASE_URL=mysql://root:Password123@db:3306/dashboard
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.next
     networks:
       - app-network
+    depends_on:
+      - db
 
 
   db:
@@ -32,16 +35,6 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - app-network
-
-  api:
-    build:
-      target: base
-    command: pnpm dev --filter=api
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
 
 volumes:
   mysql-data:
