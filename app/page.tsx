@@ -1,6 +1,15 @@
 import LoginForm from "@/components/LoginForm";
+import { auth0 } from "@/lib/auth0";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth0.getSession();
+
+  // If user is authenticated, redirect to dashboard
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-col items-center justify-center gap-4">
