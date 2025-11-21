@@ -8,8 +8,9 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
   const isAuthDemoPage = pathname === "/auth-demo";
+  const isRegisterPage = pathname === "/register";
 
-  if (isLoginPage || isAuthDemoPage) {
+  if (isLoginPage || isAuthDemoPage || isRegisterPage) {
     return <>{children}</>;
   }
 
