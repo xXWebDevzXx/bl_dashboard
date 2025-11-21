@@ -7,8 +7,9 @@ import AsideNav from "@/components/AsideNav";
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
+  const isAuthDemoPage = pathname === "/auth-demo";
 
-  if (isLoginPage) {
+  if (isLoginPage || isAuthDemoPage) {
     return <>{children}</>;
   }
 
