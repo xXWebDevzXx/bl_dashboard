@@ -1,12 +1,10 @@
-
-
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
       target: base
-    command: npm run dev
+    command: sh -c "npx prisma generate && npm run dev"
     ports:
       - "3000:3000"
     environment:
@@ -42,3 +40,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    name: bl_dashboard_app-network
