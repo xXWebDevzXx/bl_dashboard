@@ -11,15 +11,21 @@ services:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
       - DATABASE_URL=mysql://root:Password123@db:3306/dashboard
+      - AUTH0_SECRET=skdlfjghtyrhfjgurksldirkthfjghty
+      - APP_BASE_URL=http://localhost:3000
+      - AUTH0_DOMAIN=dev-eg8vvi4y6amdary0.us.auth0.com
+      - AUTH0_CLIENT_ID=udPlg7cyFnNfOfyKmYBXlP77WDGQZJWt
+      - AUTH0_CLIENT_SECRET=xfR-HfEyomVdfZXM-fQ69a2L3vvZ0Yh_w3YotHSgIPEUsJWBlDuLtko9yriRsXu-
+
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.next
+      - /app/app/generated/prisma
     networks:
       - app-network
     depends_on:
       - db
-
 
   db:
     image: mysql:8.0
