@@ -119,11 +119,24 @@ npm run dev
 
 ## How It Works
 
-1. **Universal Login**: Users are redirected to Auth0's hosted login page
-2. **Domain Validation**: Only @obsidianagency.com emails are allowed (enforced in Auth0 Action)
-3. **User Sync**: After successful login, user profile is synced to Prisma database
-4. **Session Management**: Auth0 handles session cookies and user authentication
-5. **Protected Routes**: Middleware protects all routes except login, register, and public assets
+1. **Universal Login**: Users are redirected to Auth0's hosted login page via `/api/auth/login`
+2. **OAuth Flow**: Auth0 redirects back to `/api/auth/callback` with authorization code
+3. **State Validation**: The OAuth state parameter is validated via transaction cookies
+4. **Domain Validation**: Only @obsidianagency.com emails are allowed (enforced in Auth0 Action)
+5. **User Sync**: After successful login, user profile is synced to Prisma database
+6. **Session Management**: Auth0 handles session cookies and user authentication
+7. **Protected Routes**: Middleware protects all routes except login, register, and public assets
+
+## Important Technical Details
+
+### Route Structure
+
+The Auth0 routes are handled by a catch-all dynamic route at `/app/api/auth/[...auth0]/route.ts`. This catches all Auth0-related paths:
+
+- `/api/auth/login` - Initiates Auth0 login
+- `/api/auth/callback` - OAuth callback endpoint
+- `/api/auth/logout` - Logs user out
+- `/api/auth/profile` - Returns user profile (if authenticated)
 
 ## Features
 

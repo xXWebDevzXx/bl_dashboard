@@ -5,9 +5,28 @@ import { auth0 } from "./lib/auth0";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for Auth0 API routes - let the route handler handle them
-  if (pathname.startsWith("/api/auth")) {
-    return NextResponse.next();
+  // Handle Auth0 routes through middleware
+  if (pathname.startsWith("/api/auth/")) {
+    try {
+      console.log("Auth0 route:", pathname);
+      const response = await auth0.middleware(request);
+      console.log("Auth0 response status:", response.status);
+      return response;
+    } catch (error) {
+      console.error("Auth0 middleware error:", error);
+      console.error(
+        "Error details:",
+        error instanceof Error ? error.message : String(error)
+      );
+      console.error("Error stack:", error instanceof Error ? error.stack : "");
+      return NextResponse.json(
+        {
+          error: "Authentication error",
+          details: error instanceof Error ? error.message : String(error),
+        },
+        { status: 500 }
+      );
+    }
   }
 
   // Public routes that don't require authentication
@@ -27,6 +46,11 @@ export async function middleware(request: NextRequest) {
     // Redirect to login if not authenticated
     const loginUrl = new URL("/login", request.url);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Allow access to verify-email page even if email is not verified
+  if (pathname === "/verify-email") {
+    return NextResponse.next();
   }
 
   return NextResponse.next();

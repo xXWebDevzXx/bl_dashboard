@@ -13,6 +13,11 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
+  // If email is not verified, redirect to verify-email page
+  if (!session.user.email_verified) {
+    redirect("/verify-email");
+  }
+
   // Sync user to database if not already synced
   // This runs in Node.js runtime, so Prisma works here
   await ensureUserSynced();
