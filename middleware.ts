@@ -5,10 +5,9 @@ import { auth0 } from "./lib/auth0";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Let Auth0 handle its own routes (/api/auth/*)
-  // This includes login, callback, logout, etc.
+  // Skip middleware for Auth0 API routes - let the route handler handle them
   if (pathname.startsWith("/api/auth")) {
-    return await auth0.middleware(request);
+    return NextResponse.next();
   }
 
   // Public routes that don't require authentication
