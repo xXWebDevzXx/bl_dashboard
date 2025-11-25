@@ -41,35 +41,45 @@ model Report {
 }
 
 model TogglTime {
-  id            String     @id @default(cuid()) @map("toggl_time_pk") @db.Char(36)
-  linearTasksId String     @map("toggl_time_linear_tasks_fk") @db.Char(36)
-  estimate      Int        @map("toggl_time_estimate")
-  createdAt     Int        @map("toggl_time_created_at")
-  updatedAt     Int        @map("toggl_time_updated_at")
-  linearTask    LinearTask @relation(fields: [linearTasksId], references: [id])
+  id              String @id @default(cuid()) @map("toggl_time_pk") @db.Char(36)
+  togglEntryId    BigInt @unique @map("toggl_time_entry_id")
+  linearTasksId   String @map("toggl_time_linear_tasks_fk") @db.VarChar(50)
+  duration        Int    @map("toggl_time_duration")
+  start           String @map("toggl_time_start") @db.VarChar(255)
+  stop            String @map("toggl_time_stop") @db.VarChar(255)
+  description     String @map("toggl_time_description") @db.VarChar(255)
+  createdAt       Int    @map("toggl_time_created_at")
+  updatedAt       Int    @map("toggl_time_updated_at")
 
-  @@index([linearTasksId], map: "toggl_time_toggl_time_linear_tasks_fk_fkey")
+  linearTask LinearTask @relation(fields: [linearTasksId], references: [taskId])
+
+  @@index([linearTasksId])
   @@map("toggl_time")
 }
 
 model LinearTask {
-  id            String            @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
-  name          String            @map("linear_tasks_name") @db.VarChar(50)
-  estimatedTime Int               @map("linear_tasks_estimated_time")
-  createdAt     Int               @map("linear_tasks_created_at")
-  updatedAt     Int               @map("linear_tasks_updated_at")
-  labels        LinearTaskLabel[]
-  togglTimes    TogglTime[]
+  id            String  @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
+  taskId        String  @unique @map("linear_tasks_task_id") @db.VarChar(50)
+  name          String  @map("linear_tasks_name") @db.VarChar(255)
+  estimatedTime Int     @map("linear_tasks_estimated_time")
+  delegateId    String? @map("linear_tasks_delegate_id") @db.VarChar(255)
+  delegateName  String? @map("linear_tasks_delegate_name") @db.VarChar(255)
+  createdAt     Int     @map("linear_tasks_created_at")
+  updatedAt     Int     @map("linear_tasks_updated_at")
+
+  togglTimes TogglTime[]
+  labels     LinearTaskLabel[]
 
   @@map("linear_tasks")
 }
 
 model LinearLabel {
-  id        String            @id @default(cuid()) @map("linear_labels_pk") @db.Char(36)
-  name      String            @map("linear_labels_name") @db.VarChar(50)
-  createdAt Int               @map("linear_labels_created_at")
-  updatedAt Int               @map("linear_labels_updated_at")
-  tasks     LinearTaskLabel[]
+  id        String @id @default(cuid()) @map("linear_labels_pk") @db.Char(36)
+  name      String @unique @map("linear_labels_name") @db.VarChar(255)
+  createdAt Int    @map("linear_labels_created_at")
+  updatedAt Int    @map("linear_labels_updated_at")
+
+  tasks LinearTaskLabel[]
 
   @@map("linear_labels")
 }
