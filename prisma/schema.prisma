@@ -25,6 +25,9 @@ model User {
   role      String  @map("user_role") @db.VarChar(20)
   createdAt Int     @map("user_created_at")
   updatedAt Int     @map("user_updated_at")
+  verifiedAt Int    @map("user_verified_at") @default(0)
+  verificationToken String? @map("user_verification_token") @db.VarChar(255)
+  isVerified       Boolean  @map("user_is_verified") @default(false)
 
   reports Report[]
 
