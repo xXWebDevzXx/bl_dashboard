@@ -15,11 +15,11 @@ export const auth0 = new Auth0Client({
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
   secret: process.env.AUTH0_SECRET!,
 
-  // Custom route configuration
+  // Custom route configuration - specify /api/auth prefix
   routes: {
     login: "/api/auth/login",
-    logout: "/api/auth/logout",
     callback: "/api/auth/callback",
+    logout: "/api/auth/logout",
   },
 
   // Session configuration - helps with cookie/state issues
@@ -29,6 +29,14 @@ export const auth0 = new Auth0Client({
     absoluteDuration: 7 * 24 * 60 * 60, // 7 days absolute session duration
     cookie: {
       sameSite: "lax", // Helps with cross-site cookie issues
+      domain: undefined, // Don't set a specific domain for localhost
     },
+  },
+
+  // Transaction cookie configuration - critical for OAuth state parameter
+  transactionCookie: {
+    sameSite: "lax",
+    secure: false, // Set to false for localhost/development
+    domain: undefined, // Don't set a specific domain for localhost
   },
 });
