@@ -24,12 +24,14 @@ This guide will help you configure Auth0 authentication for the Black Lemon Dash
 In your Auth0 application settings:
 
 ### Allowed Callback URLs
+
 ```
 http://localhost:3000/api/auth/callback
 https://yourdomain.com/api/auth/callback
 ```
 
 ### Allowed Logout URLs
+
 ```
 http://localhost:3000
 https://yourdomain.com
@@ -42,7 +44,7 @@ Create a `.env.local` file in the root of your project:
 ```bash
 # Auth0 Configuration
 AUTH0_SECRET=LONG_RANDOM_VALUE_HERE
-APP_BASE_URL=http://localhost:3000
+AUTH0_BASE_URL=http://localhost:3000
 AUTH0_DOMAIN=YOUR_AUTH0_DOMAIN.auth0.com
 AUTH0_CLIENT_ID=YOUR_AUTH0_CLIENT_ID
 AUTH0_CLIENT_SECRET=YOUR_AUTH0_CLIENT_SECRET
@@ -51,11 +53,17 @@ AUTH0_CLIENT_SECRET=YOUR_AUTH0_CLIENT_SECRET
 DATABASE_URL=mysql://root:Password123@localhost:3306/dashboard
 ```
 
-**Note**: Use `AUTH0_DOMAIN` (e.g., `yourapp.us.auth0.com`) and `APP_BASE_URL`, not `AUTH0_ISSUER_BASE_URL` or `AUTH0_BASE_URL`.
+**Note**:
+
+- `AUTH0_SECRET`: A long random string for session encryption
+- `AUTH0_BASE_URL`: Your application's base URL (e.g., `http://localhost:3000` for development)
+- `AUTH0_DOMAIN`: Your Auth0 domain (e.g., `yourapp.us.auth0.com`)
+- Alternatively, you can use `AUTH0_ISSUER_BASE_URL=https://yourapp.us.auth0.com` instead of `AUTH0_DOMAIN`
 
 ### Generate AUTH0_SECRET
 
 Run this command to generate a secure secret:
+
 ```bash
 openssl rand -hex 32
 ```
@@ -72,11 +80,13 @@ To enforce the @obsidianagency.com email domain restriction:
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
-  const allowedDomain = 'obsidianagency.com';
+  const allowedDomain = "obsidianagency.com";
   const userEmail = event.user.email;
-  
+
   if (!userEmail.endsWith(`@${allowedDomain}`)) {
-    api.access.deny(`Access restricted to ${allowedDomain} email addresses only.`);
+    api.access.deny(
+      `Access restricted to ${allowedDomain} email addresses only.`
+    );
   }
 };
 ```
@@ -128,16 +138,21 @@ npm run dev
 ## Troubleshooting
 
 ### "Environment variable not found: DATABASE_URL"
+
 Make sure you have `.env.local` file with the DATABASE_URL set, or use docker-compose.
 
 ### "Invalid email domain"
+
 Check that your Auth0 Action is properly deployed and added to the Login flow.
 
 ### "Callback URL mismatch"
+
 Ensure your Auth0 application's Allowed Callback URLs includes your application URL.
 
 ### Database connection issues
+
 Verify MySQL is running:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d db
 ```
@@ -149,4 +164,3 @@ docker-compose -f docker-compose.dev.yml up -d db
 3. Configure multi-factor authentication (MFA)
 4. Set up custom email templates
 5. Configure user roles and permissions
-
