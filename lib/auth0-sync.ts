@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 interface Auth0User {
   sub: string;
   email?: string;
+  email_verified?: boolean;
   name?: string;
   nickname?: string;
   [key: string]: any;
@@ -17,7 +18,7 @@ interface Auth0User {
  */
 export async function syncUserToDatabase(auth0User: Auth0User) {
   try {
-    const { sub: auth0Id, email, name, nickname } = auth0User;
+    const { sub: auth0Id, email, email_verified, name, nickname } = auth0User;
 
     if (!email) {
       throw new Error("User email is required");
@@ -28,20 +29,33 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
       throw new Error("Invalid email domain. Only @obsidianagency.com emails are allowed.");
     }
 
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
     // Check if user exists by auth0Id
     let user = await prisma.user.findUnique({
       where: { auth0Id },
     });
 
     if (user) {
+      // Prepare update data
+      const updateData: any = {
+        email,
+        username: nickname || name || email.split("@")[0],
+        updatedAt: currentTimestamp,
+      };
+
+      // If email is verified in Auth0 and not yet marked as verified in DB
+      if (email_verified && !user.isVerified) {
+        updateData.isVerified = true;
+        updateData.verifiedAt = currentTimestamp;
+        updateData.verificationToken = null; // Clear verification token
+        console.log(`Email verified for user: ${email}`);
+      }
+
       // Update existing user
       user = await prisma.user.update({
         where: { auth0Id },
-        data: {
-          email,
-          username: nickname || name || email.split("@")[0],
-          updatedAt: Math.floor(Date.now() / 1000),
-        },
+        data: updateData,
       });
       console.log(`Updated user in database: ${email}`);
     } else {
@@ -52,13 +66,23 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
 
       if (existingUserByEmail) {
         // Link Auth0 account to existing user
+        const linkData: any = {
+          auth0Id,
+          username: nickname || name || existingUserByEmail.username,
+          updatedAt: currentTimestamp,
+        };
+
+        // Sync verification status if verified in Auth0
+        if (email_verified && !existingUserByEmail.isVerified) {
+          linkData.isVerified = true;
+          linkData.verifiedAt = currentTimestamp;
+          linkData.verificationToken = null;
+          console.log(`Email verified for linked user: ${email}`);
+        }
+
         user = await prisma.user.update({
           where: { email },
-          data: {
-            auth0Id,
-            username: nickname || name || existingUserByEmail.username,
-            updatedAt: Math.floor(Date.now() / 1000),
-          },
+          data: linkData,
         });
         console.log(`Linked Auth0 account to existing user: ${email}`);
       } else {
@@ -69,11 +93,14 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
             email,
             username: nickname || name || email.split("@")[0],
             role: "user",
-            createdAt: Math.floor(Date.now() / 1000),
-            updatedAt: Math.floor(Date.now() / 1000),
+            createdAt: currentTimestamp,
+            updatedAt: currentTimestamp,
+            // Set verification status based on Auth0
+            isVerified: email_verified || false,
+            verifiedAt: email_verified ? currentTimestamp : 0,
           },
         });
-        console.log(`Created new user in database: ${email}`);
+        console.log(`Created new user in database: ${email} (verified: ${email_verified})`);
       }
     }
 
