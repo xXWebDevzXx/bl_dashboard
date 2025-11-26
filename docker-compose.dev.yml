@@ -10,6 +10,9 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+      - TURBOPACK=0
       - DATABASE_URL=mysql://root:Password123@db:3306/dashboard
       - AUTH0_SECRET=skdlfjghtyrhfjgurksldirkthfjghty
       - APP_BASE_URL=http://localhost:3000

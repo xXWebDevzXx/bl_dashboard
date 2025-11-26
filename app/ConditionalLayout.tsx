@@ -1,16 +1,22 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import Header from "@/components/Header";
 import AsideNav from "@/components/AsideNav";
+import Header from "@/components/Header";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { usePathname } from "next/navigation";
 
-export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
+export default function ConditionalLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user } = useAuthUser();
   const pathname = usePathname();
   const isLoginPage = pathname === "/login";
   const isAuthDemoPage = pathname === "/auth-demo";
   const isRegisterPage = pathname === "/register";
 
-  if (isLoginPage || isAuthDemoPage || isRegisterPage) {
+  if (isLoginPage || isAuthDemoPage || isRegisterPage || !user) {
     return <>{children}</>;
   }
 

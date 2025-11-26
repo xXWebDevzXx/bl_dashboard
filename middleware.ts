@@ -5,7 +5,14 @@ import { auth0 } from "./lib/auth0";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Handle Auth0 routes through middleware
+  // Allow custom Auth0 API routes to be handled by their route handlers
+  const customAuthRoutes = ["/api/auth/me", "/api/auth/profile", "/api/auth/refresh-session"];
+  if (customAuthRoutes.includes(pathname)) {
+    console.log(`=== Middleware: Allowing custom auth route: ${pathname} ===`);
+    return NextResponse.next();
+  }
+
+  // Handle Auth0 routes through middleware (login, logout, callback)
   if (pathname.startsWith("/api/auth/")) {
     try {
       console.log("Auth0 route:", pathname);

@@ -1,15 +1,18 @@
-
 "use client";
 
+import { useAuthUser } from "@/hooks/useAuthUser";
+import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 
 function Header() {
-    return (
-      <header className="bg-[#1A1F26] flex justify-between items-center text-white p-8 col-span-2">
-        <h1 className="text-4xl font-bold">AITracker</h1>
-        <LogoutButton />
-      </header>
-    );
+  const { user, isLoading } = useAuthUser();
+
+  return (
+    <header className="bg-[#1A1F26] flex justify-between items-center text-white p-8 col-span-2">
+      <h1 className="text-4xl font-bold">AITracker</h1>
+      {!isLoading && (user ? <LogoutButton /> : <LoginButton />)}
+    </header>
+  );
 }
 
 export default Header;
