@@ -1,100 +1,86 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider      = "prisma-client"
+  output        = "../app/generated/prisma"
   binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "mysql"
-   url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
-// User model
 model User {
-  id        String  @id @default(cuid()) @map("user_pk") @db.Char(36)
-  username  String  @map("user_username") @db.VarChar(20)
-  password  String? @map("user_password") @db.VarChar(255)
-  email     String  @map("user_email") @db.VarChar(50) @unique
-  auth0Id   String? @unique @map("user_auth0_id") @db.VarChar(255)
-  role      String  @map("user_role") @db.VarChar(20)
-  createdAt Int     @map("user_created_at")
-  updatedAt Int     @map("user_updated_at")
-  verifiedAt Int    @map("user_verified_at") @default(0)
-  verificationToken String? @map("user_verification_token") @db.VarChar(255)
-  isVerified       Boolean  @map("user_is_verified") @default(false)
-
-  reports Report[]
+  id                String   @id @default(cuid()) @map("user_pk") @db.Char(36)
+  username          String   @map("user_username") @db.VarChar(20)
+  password          String?  @map("user_password") @db.VarChar(255)
+  email             String   @unique @map("user_email") @db.VarChar(50)
+  role              String   @map("user_role") @db.VarChar(20)
+  createdAt         Int      @map("user_created_at")
+  updatedAt         Int      @map("user_updated_at")
+  auth0Id           String?  @unique @map("user_auth0_id") @db.VarChar(255)
+  verifiedAt        Int      @default(0) @map("user_verified_at")
+  isVerified        Boolean  @default(false) @map("user_is_verified")
+  verificationToken String?  @map("user_verification_token") @db.VarChar(255)
+  reports           Report[]
 
   @@index([auth0Id])
   @@map("user")
 }
 
-// Report model
 model Report {
   id        String  @id @default(cuid()) @map("report_pk") @db.Char(36)
   name      String  @map("report_name") @db.VarChar(255)
   url       String  @map("report_url") @db.VarChar(255)
   createdAt Int     @map("report_created_at")
   updatedAt Int     @map("report_updated_at")
-  user      User?   @relation(fields: [userId], references: [id])
   userId    String? @db.Char(36)
+  user      User?   @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "report_userId_fkey")
   @@map("report")
 }
 
-// TogglTime model
 model TogglTime {
-  id            String @id @default(cuid()) @map("toggl_time_pk") @db.Char(36)
-  linearTasksId String @map("toggl_time_linear_tasks_fk") @db.Char(36)
-  estimate      Int    @map("toggl_time_estimate")
-  createdAt     Int    @map("toggl_time_created_at")
-  updatedAt     Int    @map("toggl_time_updated_at")
+  id            String     @id @default(cuid()) @map("toggl_time_pk") @db.Char(36)
+  linearTasksId String     @map("toggl_time_linear_tasks_fk") @db.Char(36)
+  estimate      Int        @map("toggl_time_estimate")
+  createdAt     Int        @map("toggl_time_created_at")
+  updatedAt     Int        @map("toggl_time_updated_at")
+  linearTask    LinearTask @relation(fields: [linearTasksId], references: [id])
 
-  linearTask LinearTask @relation(fields: [linearTasksId], references: [id])
-
+  @@index([linearTasksId], map: "toggl_time_toggl_time_linear_tasks_fk_fkey")
   @@map("toggl_time")
 }
 
-// LinearTask model
 model LinearTask {
-  id            String @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
-  name          String @map("linear_tasks_name") @db.VarChar(50)
-  estimatedTime Int    @map("linear_tasks_estimated_time")
-  createdAt     Int    @map("linear_tasks_created_at")
-  updatedAt     Int    @map("linear_tasks_updated_at")
-
-  togglTimes TogglTime[]
-  labels     LinearTaskLabel[]
+  id            String            @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
+  name          String            @map("linear_tasks_name") @db.VarChar(50)
+  estimatedTime Int               @map("linear_tasks_estimated_time")
+  createdAt     Int               @map("linear_tasks_created_at")
+  updatedAt     Int               @map("linear_tasks_updated_at")
+  labels        LinearTaskLabel[]
+  togglTimes    TogglTime[]
 
   @@map("linear_tasks")
 }
 
-// LinearLabel model
 model LinearLabel {
-  id        String @id @default(cuid()) @map("linear_labels_pk") @db.Char(36)
-  name      String @map("linear_labels_name") @db.VarChar(50)
-  createdAt Int    @map("linear_labels_created_at")
-  updatedAt Int    @map("linear_labels_updated_at")
-
-  tasks LinearTaskLabel[]
+  id        String            @id @default(cuid()) @map("linear_labels_pk") @db.Char(36)
+  name      String            @map("linear_labels_name") @db.VarChar(50)
+  createdAt Int               @map("linear_labels_created_at")
+  updatedAt Int               @map("linear_labels_updated_at")
+  tasks     LinearTaskLabel[]
 
   @@map("linear_labels")
 }
 
-// LinearTaskLabel junction table (many-to-many)
 model LinearTaskLabel {
-  linearTaskId  String @map("linear_task_label_linear_tasks_fk") @db.Char(36)
-  linearLabelId String @map("linear_task_label_linear_labels_fk") @db.Char(36)
-
-  linearTask  LinearTask  @relation(fields: [linearTaskId], references: [id])
-  linearLabel LinearLabel @relation(fields: [linearLabelId], references: [id])
+  linearTaskId  String      @map("linear_task_label_linear_tasks_fk") @db.Char(36)
+  linearLabelId String      @map("linear_task_label_linear_labels_fk") @db.Char(36)
+  linearLabel   LinearLabel @relation(fields: [linearLabelId], references: [id])
+  linearTask    LinearTask  @relation(fields: [linearTaskId], references: [id])
 
   @@id([linearTaskId, linearLabelId])
+  @@index([linearLabelId], map: "linear_task_label_linear_task_label_linear_labels_fk_fkey")
   @@map("linear_task_label")
 }

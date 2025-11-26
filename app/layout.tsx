@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConditionalLayout from "./ConditionalLayout";
 import { Auth0Provider } from "@auth0/nextjs-auth0/client";
+import { Toaster } from "@/components/ui/sonner";
 
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
         <Auth0Provider>
           <ConditionalLayout>{children}</ConditionalLayout>
         </Auth0Provider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
