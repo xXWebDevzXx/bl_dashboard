@@ -1,9 +1,9 @@
 "use client";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function Profile() {
-  const { user, isLoading } = useUser();
+  const { user, isLoading } = useAuthUser();
 
   if (isLoading) {
     return (

@@ -25,9 +25,9 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
     }
 
     // Validate email domain
-    if (!email.endsWith("@obsidianagency.com")) {
-      throw new Error("Invalid email domain. Only @obsidianagency.com emails are allowed.");
-    }
+    // if (!email.endsWith("@obsidianagency.com")) {
+    //   throw new Error("Invalid email domain. Only @obsidianagency.com emails are allowed.");
+    // }
 
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
@@ -100,7 +100,9 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
             verifiedAt: email_verified ? currentTimestamp : 0,
           },
         });
-        console.log(`Created new user in database: ${email} (verified: ${email_verified})`);
+        console.log(
+          `Created new user in database: ${email} (verified: ${email_verified})`
+        );
       }
     }
 
@@ -128,4 +130,3 @@ export async function getUserByAuth0Id(auth0Id: string) {
     return null;
   }
 }
-
