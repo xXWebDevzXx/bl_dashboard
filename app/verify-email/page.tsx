@@ -1,8 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
+import { VerifyEmailButton } from "./VerifyEmailButton";
+import { VerifyEmailToast } from "./VerifyEmailToast";
 
-export default async function VerifyEmailPage() {
+export default async function VerifyEmailPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const session = await auth0.getSession();
 
   // If not logged in, redirect to login
@@ -15,8 +21,11 @@ export default async function VerifyEmailPage() {
     redirect("/dashboard");
   }
 
+  const params = await searchParams;
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <VerifyEmailToast status={params.status} />
       <main className="flex flex-col items-center justify-center gap-4">
         <Card className="w-full max-w-md">
           <CardHeader className="flex flex-col items-center justify-center">
@@ -49,12 +58,7 @@ export default async function VerifyEmailPage() {
                 <p className="text-sm text-gray-600">
                   After verifying your email, click the button below:
                 </p>
-                <a
-                  href="/api/auth/refresh-session"
-                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-center"
-                >
-                  I&apos;ve verified my email - Continue →
-                </a>
+                <VerifyEmailButton />
                 <p className="text-xs text-gray-500">
                   This will refresh your session and redirect you to the
                   dashboard

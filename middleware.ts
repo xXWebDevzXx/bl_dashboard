@@ -60,6 +60,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Check if email is verified for all other protected routes
+  if (!session.user.email_verified) {
+    const verifyUrl = new URL("/verify-email", request.url);
+    // Add a parameter to indicate the user tried to access a protected route
+    verifyUrl.searchParams.set("status", "not-verified");
+    return NextResponse.redirect(verifyUrl);
+  }
+
   return NextResponse.next();
 }
 
