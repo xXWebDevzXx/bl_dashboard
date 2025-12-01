@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server';
 
 // Types
+interface LinearLabel {
+  id: string;
+  name: string;
+}
+
+interface LinearIssue {
+  id: string;
+  title: string;
+  identifier: string;
+  state: {
+    name: string;
+  };
+  labels: {
+    nodes: LinearLabel[];
+  };
+}
+
 interface LinearProject {
   id: string;
   name: string;
@@ -12,6 +29,9 @@ interface LinearProject {
     id: string;
     name: string;
   } | null;
+  issues: {
+    nodes: LinearIssue[];
+  };
 }
 
 interface TogglProject {
@@ -177,53 +197,91 @@ export async function GET() {
   }
 }
 
-// Fetch projects from Linear
+// Fetch projects from Linear with their issues (with pagination)
 async function fetchLinearProjects(): Promise<LinearProject[]> {
   try {
     const apiKey = process.env.LINEAR_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('LINEAR_API_KEY environment variable is not set');
     }
 
-    const response = await fetch('https://api.linear.app/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `${apiKey}`,
-      },
-      body: JSON.stringify({
-        query: `
-          query {
-            team(id: "BLE") {
-              projects {
-                nodes {
-                  id
-                  name
-                  description
-                  state
-                  startDate
-                  targetDate
+    let allProjects: LinearProject[] = [];
+    let hasNextPage = true;
+    let afterCursor: string | null = null;
+
+    // Fetch projects in batches to avoid complexity limits
+    while (hasNextPage) {
+      const response = await fetch('https://api.linear.app/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${apiKey}`,
+        },
+        body: JSON.stringify({
+          query: `
+            query($after: String) {
+              team(id: "BLE") {
+                projects(first: 10, after: $after) {
+                  pageInfo {
+                    hasNextPage
+                    endCursor
+                  }
+                  nodes {
+                    id
+                    name
+                    description
+                    state
+                    startDate
+                    targetDate
+                    issues(first: 50) {
+                      nodes {
+                        id
+                        title
+                        identifier
+                        state {
+                          name
+                        }
+                        labels {
+                          nodes {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
-          }
-        `,
-      }),
-    });
+          `,
+          variables: {
+            after: afterCursor,
+          },
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Linear API error (${response.status}): ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Linear API error (${response.status}): ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.errors) {
+        throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
+      }
+
+      const projectsData = data.data.team.projects;
+      allProjects = [...allProjects, ...projectsData.nodes];
+
+      hasNextPage = projectsData.pageInfo.hasNextPage;
+      afterCursor = projectsData.pageInfo.endCursor;
+
+      console.log(`  Fetched ${projectsData.nodes.length} projects (total: ${allProjects.length})`);
     }
 
-    const data = await response.json();
-    
-    if (data.errors) {
-      throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
-    }
-
-    return data.data.team.projects.nodes;
+    return allProjects;
   } catch (error) {
     console.error('Linear API Error:', error);
     throw error;
@@ -342,7 +400,26 @@ async function fetchTogglTimeEntries(taskIds: number[]): Promise<TogglTimeEntry[
       throw new Error(`Toggl Reports API error (${response.status}): ${errorText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    // Toggl Reports API v3 returns data in a different format
+    // The response might be an array or an object with a property containing the array
+    let timeEntries: TogglTimeEntry[] = [];
+
+    if (Array.isArray(data)) {
+      timeEntries = data;
+    } else if (data && Array.isArray(data.time_entries)) {
+      timeEntries = data.time_entries;
+    } else {
+      console.warn('Unexpected Toggl Reports API response format:', JSON.stringify(data).substring(0, 500));
+      return [];
+    }
+
+    // Debug: log first time entry structure
+    if (timeEntries.length > 0) {
+      console.log('First time entry sample:', JSON.stringify(timeEntries[0], null, 2));
+    }
+
+    return timeEntries;
   } catch (error) {
     console.error('Toggl Reports API Error:', error);
     throw error;
