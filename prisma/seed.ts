@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-import 'dotenv/config';
-import { PrismaClient } from "../app/generated/prisma/client";
-=======
-import { PrismaClient } from "../app/generated/prisma/client";
 import { config } from "dotenv";
+import { PrismaClient } from "../app/generated/prisma/client";
 
 // Load environment variables from .env and .env.local files
 config({ path: ".env" });
 config({ path: ".env.local", override: true });
->>>>>>> b771a4d (Toggl time with linear task)
 
 const prisma = new PrismaClient();
 
@@ -23,26 +18,6 @@ interface TogglTimeEntry {
   user_id: number;
 }
 
-<<<<<<< HEAD
-interface LinearLabel {
-  id: string;
-  name: string;
-}
-
-interface LinearIssue {
-  id: string;
-  title: string;
-  identifier: string;
-  state: {
-    name: string;
-  };
-  labels: {
-    nodes: LinearLabel[];
-  };
-}
-
-=======
->>>>>>> b771a4d (Toggl time with linear task)
 interface LinearProject {
   id: string;
   name: string;
@@ -54,12 +29,6 @@ interface LinearProject {
     id: string;
     name: string;
   } | null;
-<<<<<<< HEAD
-  issues: {
-    nodes: LinearIssue[];
-  };
-=======
->>>>>>> b771a4d (Toggl time with linear task)
 }
 
 interface TogglProject {
@@ -75,8 +44,6 @@ interface TogglTask {
   project_id: number;
 }
 
-<<<<<<< HEAD
-=======
 interface LinearIssue {
   id: string;
   number: number;
@@ -108,7 +75,6 @@ interface LinearLabel {
   color: string;
 }
 
->>>>>>> b771a4d (Toggl time with linear task)
 interface SyncResponse {
   success: boolean;
   data: Array<{
@@ -118,133 +84,42 @@ interface SyncResponse {
   }>;
   developmentTaskIds: number[];
   timeEntries: TogglTimeEntry[];
-<<<<<<< HEAD
-=======
   linearIssues: LinearIssue[];
   labels: LinearLabel[];
->>>>>>> b771a4d (Toggl time with linear task)
   summary: {
     totalLinearProjects: number;
     matchedProjects: number;
     projectsWithDevelopmentTask: number;
     totalTimeEntries: number;
     totalDuration: number;
-<<<<<<< HEAD
-=======
     totalIssues: number;
     totalLabels: number;
->>>>>>> b771a4d (Toggl time with linear task)
   };
 }
 
 async function main() {
-  console.log('Starting seed...');
+  console.log("Starting seed...");
 
-<<<<<<< HEAD
-  // Call the sync API route handler directly to avoid HTTP timeout issues
-  console.log('Syncing data from Linear and Toggl (this may take several minutes)...');
-
-  const { GET } = await import('../app/api/sync-projects/route');
-  const response = await GET();
-=======
   // Fetch data from the sync API
-  console.log('Fetching data from sync API...');
-  const response = await fetch('http://localhost:3000/api/sync-projects');
+  console.log("Fetching data from sync API...");
+  const response = await fetch("http://localhost:3000/api/sync-projects");
 
   if (!response.ok) {
     throw new Error(`API request failed: ${response.statusText}`);
   }
 
->>>>>>> b771a4d (Toggl time with linear task)
   const syncData: SyncResponse = await response.json();
 
   if (!syncData.success) {
-    throw new Error('Sync API returned unsuccessful response');
+    throw new Error("Sync API returned unsuccessful response");
   }
 
-<<<<<<< HEAD
-  console.log(`Found ${syncData.timeEntries.length} time entry groups`);
-
-  // Flatten the nested time_entries structure from Toggl Reports API v3
-  const flattenedEntries: Array<{ task_id: number; seconds: number }> = [];
-  for (const group of syncData.timeEntries as any[]) {
-    if (group.time_entries && Array.isArray(group.time_entries)) {
-      for (const entry of group.time_entries) {
-        flattenedEntries.push({
-          task_id: group.task_id,
-          seconds: entry.seconds || 0,
-        });
-      }
-    }
-  }
-
-  console.log(`Flattened to ${flattenedEntries.length} individual time entries`);
-
-  // Build a map of Toggl task IDs to their time entries
-  const togglTaskTimeMap = new Map<number, { totalSeconds: number; entryCount: number }>();
-
-  for (const entry of flattenedEntries) {
-    const existing = togglTaskTimeMap.get(entry.task_id) || { totalSeconds: 0, entryCount: 0 };
-    togglTaskTimeMap.set(entry.task_id, {
-      totalSeconds: existing.totalSeconds + entry.seconds,
-      entryCount: existing.entryCount + 1,
-    });
-  }
-
-  // Create a list of Linear issues to process
-  interface IssueToProcess {
-    issue: LinearIssue;
-    projectName: string;
-    developmentTaskId: number | null;
-  }
-
-  const issuesToProcess: IssueToProcess[] = [];
-
-  for (const match of syncData.data) {
-    if (match.linearProject.issues && match.linearProject.issues.nodes.length > 0) {
-      for (const issue of match.linearProject.issues.nodes) {
-        issuesToProcess.push({
-          issue,
-          projectName: match.linearProject.name,
-          developmentTaskId: match.developmentTask?.id || null,
-        });
-      }
-    }
-  }
-
-  console.log(`Processing ${issuesToProcess.length} Linear issues`);
-
-  let processedCount = 0;
-  let withTimeCount = 0;
-
-  // Insert data into database - one LinearTask per Linear issue
-  for (const item of issuesToProcess) {
-    const { issue, projectName, developmentTaskId } = item;
-
-    // Truncate title to fit database column (max 50 chars)
-    const truncatedTitle = issue.title.length > 50
-      ? issue.title.substring(0, 47) + '...'
-      : issue.title;
-
-    // Create or update the Linear task (issue)
-    const linearTask = await prisma.linearTask.upsert({
-      where: { id: issue.id },
-      update: {
-        name: truncatedTitle,
-        estimatedTime: 0,
-        updatedAt: Math.floor(Date.now() / 1000),
-      },
-      create: {
-        id: issue.id,
-        name: truncatedTitle,
-        estimatedTime: 0,
-=======
   console.log(`Found ${syncData.linearIssues.length} Linear issues`);
   console.log(`Found ${syncData.labels.length} unique labels`);
   console.log(`Found ${syncData.timeEntries.length} time entries`);
 
   // Step 1: Seed all unique labels
-  console.log('\n=== Step 1: Seeding Labels ===');
+  console.log("\n=== Step 1: Seeding Labels ===");
   const labelMap = new Map<string, string>(); // Map linear label ID to prisma ID
 
   for (const label of syncData.labels) {
@@ -264,12 +139,13 @@ async function main() {
   }
 
   // Step 2: Seed Linear issues as LinearTask
-  console.log('\n=== Step 2: Seeding Linear Issues ===');
+  console.log("\n=== Step 2: Seeding Linear Issues ===");
   for (const issue of syncData.linearIssues) {
     // Truncate title if it's too long (max 255 characters)
-    const taskName = issue.title.length > 255
-      ? issue.title.substring(0, 252) + '...'
-      : issue.title;
+    const taskName =
+      issue.title.length > 255
+        ? issue.title.substring(0, 252) + "..."
+        : issue.title;
 
     // Create or update the LinearTask using identifier as taskId
     const linearTask = await prisma.linearTask.upsert({
@@ -287,101 +163,11 @@ async function main() {
         estimatedTime: issue.estimate || 0,
         delegateId: issue.delegate?.id || null,
         delegateName: issue.delegate?.name || null,
->>>>>>> b771a4d (Toggl time with linear task)
         createdAt: Math.floor(Date.now() / 1000),
         updatedAt: Math.floor(Date.now() / 1000),
       },
     });
 
-<<<<<<< HEAD
-    console.log(`✓ Upserted LinearTask: ${issue.identifier} - ${linearTask.name} (from ${projectName})`);
-    processedCount++;
-
-    // Handle labels for this issue
-    if (issue.labels && issue.labels.nodes.length > 0) {
-      for (const label of issue.labels.nodes) {
-        // Truncate label name to fit database column (max 50 chars)
-        const truncatedLabelName = label.name.length > 50
-          ? label.name.substring(0, 47) + '...'
-          : label.name;
-
-        // Create or update the LinearLabel
-        await prisma.linearLabel.upsert({
-          where: { id: label.id },
-          update: {
-            name: truncatedLabelName,
-            updatedAt: Math.floor(Date.now() / 1000),
-          },
-          create: {
-            id: label.id,
-            name: truncatedLabelName,
-            createdAt: Math.floor(Date.now() / 1000),
-            updatedAt: Math.floor(Date.now() / 1000),
-          },
-        });
-
-        // Create the LinearTaskLabel relationship (if it doesn't exist)
-        const existingRelation = await prisma.linearTaskLabel.findUnique({
-          where: {
-            linearTaskId_linearLabelId: {
-              linearTaskId: linearTask.id,
-              linearLabelId: label.id,
-            },
-          },
-        });
-
-        if (!existingRelation) {
-          await prisma.linearTaskLabel.create({
-            data: {
-              linearTaskId: linearTask.id,
-              linearLabelId: label.id,
-            },
-          });
-        }
-      }
-      console.log(`  ✓ Attached ${issue.labels.nodes.length} label(s)`);
-    }
-
-    // If this project has a development task with time entries, attach them
-    if (developmentTaskId && togglTaskTimeMap.has(developmentTaskId)) {
-      const timeData = togglTaskTimeMap.get(developmentTaskId)!;
-
-      // Find existing TogglTime entry or create new one
-      const existingTogglTime = await prisma.togglTime.findFirst({
-        where: { linearTasksId: linearTask.id }
-      });
-
-      if (existingTogglTime) {
-        await prisma.togglTime.update({
-          where: { id: existingTogglTime.id },
-          data: {
-            estimate: timeData.totalSeconds,
-            updatedAt: Math.floor(Date.now() / 1000),
-          },
-        });
-      } else {
-        await prisma.togglTime.create({
-          data: {
-            linearTasksId: linearTask.id,
-            estimate: timeData.totalSeconds,
-            createdAt: Math.floor(Date.now() / 1000),
-            updatedAt: Math.floor(Date.now() / 1000),
-          },
-        });
-      }
-
-      const hours = (timeData.totalSeconds / 3600).toFixed(2);
-      console.log(`  ✓ Attached TogglTime: ${hours} hours (${timeData.entryCount} entries)`);
-      withTimeCount++;
-    }
-  }
-
-  console.log('\n=== Seed Summary ===');
-  console.log(`Linear Issues Processed: ${processedCount}`);
-  console.log(`Issues with Time Data: ${withTimeCount}`);
-  console.log(`Total Time Entries: ${syncData.timeEntries.length}`);
-  console.log(`Total Duration: ${(syncData.summary.totalDuration / 3600).toFixed(2)} hours`);
-=======
     console.log(`✓ Upserted LinearTask: ${issue.identifier} - ${issue.title}`);
 
     // Step 3: Connect labels to this task
@@ -409,7 +195,7 @@ async function main() {
   }
 
   // Step 4: Connect Toggl time entries to Linear tasks
-  console.log('\n=== Step 3: Connecting Toggl Time Entries ===');
+  console.log("\n=== Step 3: Connecting Toggl Time Entries ===");
 
   // Create a map of Linear identifiers
   const issueIdentifierMap = new Map<string, string>();
@@ -475,20 +261,23 @@ async function main() {
   }
 
   console.log(`\n✓ Created ${createdCount} new time entries`);
-  console.log(`⚠ Skipped ${skippedCount} entries (no duration or no Linear ID)`);
-  console.log(`⚠ ${notFoundCount} entries couldn't be linked (Linear task not found)`);
+  console.log(
+    `⚠ Skipped ${skippedCount} entries (no duration or no Linear ID)`
+  );
+  console.log(
+    `⚠ ${notFoundCount} entries couldn't be linked (Linear task not found)`
+  );
 
-  console.log('\n=== Seed Summary ===');
+  console.log("\n=== Seed Summary ===");
   console.log(`Linear Issues: ${syncData.linearIssues.length}`);
   console.log(`Labels: ${syncData.labels.length}`);
   console.log(`Total Time Entries from Toggl: ${syncData.timeEntries.length}`);
   console.log(`Time Entries Created in DB: ${createdCount}`);
->>>>>>> b771a4d (Toggl time with linear task)
 }
 
 main()
   .catch((e) => {
-    console.error('Error seeding database:', e);
+    console.error("Error seeding database:", e);
     process.exit(1);
   })
   .finally(async () => {

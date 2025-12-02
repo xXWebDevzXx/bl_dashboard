@@ -6,7 +6,11 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow custom Auth0 API routes to be handled by their route handlers
-  const customAuthRoutes = ["/api/auth/me", "/api/auth/profile", "/api/auth/refresh-session"];
+  const customAuthRoutes = [
+    "/api/auth/me",
+    "/api/auth/profile",
+    "/api/auth/refresh-session",
+  ];
   if (customAuthRoutes.includes(pathname)) {
     console.log(`=== Middleware: Allowing custom auth route: ${pathname} ===`);
     return NextResponse.next();

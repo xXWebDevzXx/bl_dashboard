@@ -7,6 +7,8 @@ services:
     command: sh -c "npx prisma generate && npm run dev"
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=local
       - WATCHPACK_POLLING=true
