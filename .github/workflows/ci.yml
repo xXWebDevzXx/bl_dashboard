@@ -26,16 +26,19 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run:
-          npm ci
+        run: npm ci
 
-          # Validate Prisma schema
+      # Validate Prisma schema
       - name: Validate Prisma schema
         run: npx prisma validate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # Generate Prisma client
       - name: Generate Prisma client
         run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # Run linting
       - name: Run ESLint
@@ -50,5 +53,5 @@ jobs:
         run: npm run build
         env:
           # Add any required environment variables for build
-          # These should be added as GitHub secrets
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SKIP_ENV_VALIDATION: true
