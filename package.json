@@ -9,7 +9,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "prisma:validate": "prisma validate",
+    "prisma:generate": "prisma generate",
+    "ci": "npm run lint && npm run type-check && npm run prisma:validate && npm run build"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.13.1",
