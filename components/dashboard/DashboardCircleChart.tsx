@@ -3,16 +3,17 @@ import React from "react";
 import dynamic from "next/dynamic";
 
 interface props {
+  linearTasksWithTime: number;
   className?: string;
 }
 
 // Dynamically import the chart with SSR disabled
 const ChartContent = dynamic(() => import("./DashboardCircleChartContent"), { ssr: false });
 
-export default function DashboardCircleChart({ className }: props) {
+export default function DashboardCircleChart({ linearTasksWithTime, className }: props) {
   return (
     <div className={className}>
-      <ChartContent />
+      <ChartContent linearTasksWithTime={linearTasksWithTime} />
     </div>
   );
 }
