@@ -1,8 +1,12 @@
-export default function DashboardCircleChartContent() {
-  const percentage = 18;
+interface props {
+  linearTasksWithTime: number;
+}
+
+export default function DashboardCircleChartContent({ linearTasksWithTime }: props) {
+  const percentage = linearTasksWithTime.toFixed(0);
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const strokeDashoffset = circumference - (parseInt(percentage) / 100) * circumference;
 
   return (
     <div className="relative flex items-center justify-center w-[200px] h-[200px]">
