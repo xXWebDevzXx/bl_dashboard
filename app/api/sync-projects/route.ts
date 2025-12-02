@@ -42,6 +42,25 @@ interface TogglTimeEntry {
   // Add other fields as needed
 }
 
+// Toggl Reports API response structure (nested)
+interface TogglReportEntry {
+  description: string;
+  task_id: number;
+  project_id: number;
+  user_id: number;
+  time_entries?: Array<{
+    id: number;
+    start: string;
+    stop: string;
+    seconds: number;
+  }>;
+}
+
+interface LinearResponse<T> {
+  data: T;
+  errors?: Array<{ message: string }>;
+}
+
 interface LinearIssue {
   id: string;
   number: number;
@@ -380,7 +399,7 @@ async function fetchTogglTimeEntries(
     const startDate = "2025-01-01";
     const endDate = "2025-12-31";
 
-    let allData: any[] = [];
+    let allData: TogglReportEntry[] = [];
     let firstRowNumber = 1;
     let hasMoreData = true;
     const pageSize = 1000;
@@ -477,7 +496,7 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
     let endCursor: string | null = null;
 
     while (hasNextPage) {
-      const response = await fetch("https://api.linear.app/graphql", {
+      const response: Response = await fetch("https://api.linear.app/graphql", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -541,7 +560,12 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
         throw new Error(`Linear API error (${response.status}): ${errorText}`);
       }
 
-      const data = await response.json();
+      const data: LinearResponse<{
+        issues: {
+          nodes: LinearIssue[];
+          pageInfo: { hasNextPage: boolean; endCursor: string | null };
+        };
+      }> = await response.json();
 
       if (data.errors) {
         throw new Error(

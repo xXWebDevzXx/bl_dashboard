@@ -4,7 +4,7 @@ import { GET_PROJECTS } from "@/lib/linear/queries";
 import { ProjectsResponse, LinearProject } from "@/lib/linear/types";
 
 export async function GET(
-  request: NextRequest
+  _request: NextRequest
 ): Promise<NextResponse<LinearProject[] | { error: string }>> {
   try {
     const data = await linearClient.query<ProjectsResponse>(GET_PROJECTS);

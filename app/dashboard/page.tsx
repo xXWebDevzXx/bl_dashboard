@@ -5,6 +5,9 @@ import { auth0 } from "@/lib/auth0";
 import { ensureUserSynced } from "@/lib/ensure-user-synced";
 import { redirect } from "next/navigation";
 
+// Force dynamic rendering for auth and database operations
+export const dynamic = "force-dynamic";
+
 export default async function Dashboard() {
   const session = await auth0.getSession();
 

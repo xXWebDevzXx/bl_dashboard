@@ -9,10 +9,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { issueId: string } }
+  { params }: { params: Promise<{ issueId: string }> }
 ): Promise<NextResponse<LinearIssue | { error: string }>> {
   try {
-    const variables: IssueByIdVariables = { id: params.issueId };
+    const { issueId } = await params;
+    const variables: IssueByIdVariables = { id: issueId };
     const data = await linearClient.query<IssueResponse>(
       GET_ISSUE_BY_ID,
       variables

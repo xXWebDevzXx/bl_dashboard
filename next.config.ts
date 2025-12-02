@@ -2,11 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Disable Turbopack to use webpack with polling for Docker compatibility
-  experimental: {
-    turbo: undefined,
-  },
+  
+  // Empty turbopack config to silence the warning about webpack config
+  turbopack: {},
+  
   // Enable file watching in Docker with polling
+  // This is crucial for Docker on Windows where file system events don't propagate properly
   webpack: (config, { dev }) => {
     if (dev) {
       config.watchOptions = {

@@ -11,13 +11,12 @@ services:
       - .env.local
     environment:
       - NODE_ENV=local
-      # File watching configuration for Docker (especially Windows)
+      # Aggressive file watching for Windows Docker
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=1000
-      # Force webpack instead of Turbopack for better Windows Docker compatibility
+      - CHOKIDAR_INTERVAL=500
+      # Force webpack for better Windows compatibility
       - TURBOPACK=0
-      # Next.js specific polling settings
       - NEXT_PRIVATE_LOCAL_WEBPACK=true
       # Database
       - DATABASE_URL=mysql://root:Password123@db:3306/dashboard
@@ -29,7 +28,8 @@ services:
       - AUTH0_CLIENT_SECRET=xfR-HfEyomVdfZXM-fQ69a2L3vvZ0Yh_w3YotHSgIPEUsJWBlDuLtko9yriRsXu-
 
     volumes:
-      - .:/app
+      # Use delegated consistency for better Windows performance
+      - .:/app:delegated
       - /app/node_modules
       - /app/.next
       - /app/app/generated/prisma
@@ -58,3 +58,4 @@ networks:
   app-network:
     driver: bridge
     name: bl_dashboard_app-network
+
