@@ -32,13 +32,13 @@ jobs:
       - name: Validate Prisma schema
         run: npx prisma validate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mysql://user:password@localhost:3306/test_db' }}
 
       # Generate Prisma client
       - name: Generate Prisma client
         run: npx prisma generate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mysql://user:password@localhost:3306/test_db' }}
 
       # Run linting
       - name: Run ESLint
@@ -52,6 +52,18 @@ jobs:
       - name: Build Next.js application
         run: npm run build
         env:
-          # Add any required environment variables for build
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Database
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mysql://user:password@localhost:3306/test_db' }}
+
+          # Auth0 - use secrets or dummy values for build
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN || 'dummy.auth0.com' }}
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID || 'dummy_client_id' }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET || 'dummy_client_secret' }}
+          AUTH0_SECRET: ${{ secrets.AUTH0_SECRET || 'dummy_secret_at_least_32_characters_long_for_build_process' }}
+          AUTH0_BASE_URL: ${{ secrets.AUTH0_BASE_URL || 'http://localhost:3000' }}
+          AUTH0_ISSUER_BASE_URL: ${{ secrets.AUTH0_ISSUER_BASE_URL || 'https://dummy.auth0.com' }}
+
+          # Linear API - not required at build time with lazy initialization
+          LINEAR_API_TOKEN: ${{ secrets.LINEAR_API_TOKEN || 'dummy_token' }}
+
           SKIP_ENV_VALIDATION: true
