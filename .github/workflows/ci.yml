@@ -21,12 +21,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       # Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run:
+          npm ci
+
+          # Validate Prisma schema
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      # Generate Prisma client
+      - name: Generate Prisma client
+        run: npx prisma generate
 
       # Run linting
       - name: Run ESLint
@@ -36,14 +45,6 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
 
-      # Validate Prisma schema
-      - name: Validate Prisma schema
-        run: npx prisma validate
-
-      # Generate Prisma client
-      - name: Generate Prisma client
-        run: npx prisma generate
-
       # Build the application
       - name: Build Next.js application
         run: npm run build
@@ -51,4 +52,3 @@ jobs:
           # Add any required environment variables for build
           # These should be added as GitHub secrets
           SKIP_ENV_VALIDATION: true
-
