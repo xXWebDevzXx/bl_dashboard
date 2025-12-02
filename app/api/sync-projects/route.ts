@@ -1,26 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 // Types
-<<<<<<< HEAD
-interface LinearLabel {
-  id: string;
-  name: string;
-}
-
-interface LinearIssue {
-  id: string;
-  title: string;
-  identifier: string;
-  state: {
-    name: string;
-  };
-  labels: {
-    nodes: LinearLabel[];
-  };
-}
-
-=======
->>>>>>> b771a4d (Toggl time with linear task)
 interface LinearProject {
   id: string;
   name: string;
@@ -32,12 +12,6 @@ interface LinearProject {
     id: string;
     name: string;
   } | null;
-<<<<<<< HEAD
-  issues: {
-    nodes: LinearIssue[];
-  };
-=======
->>>>>>> b771a4d (Toggl time with linear task)
 }
 
 interface TogglProject {
@@ -68,8 +42,6 @@ interface TogglTimeEntry {
   // Add other fields as needed
 }
 
-<<<<<<< HEAD
-=======
 interface LinearIssue {
   id: string;
   number: number;
@@ -101,7 +73,6 @@ interface LinearLabel {
   color: string;
 }
 
->>>>>>> b771a4d (Toggl time with linear task)
 interface ProjectWithTask {
   linearProject: LinearProject;
   togglProject: TogglProject;
@@ -113,87 +84,52 @@ interface SyncResult {
   data: ProjectWithTask[];
   developmentTaskIds: number[];
   timeEntries: TogglTimeEntry[];
-<<<<<<< HEAD
-=======
   linearIssues: LinearIssue[];
   labels: LinearLabel[];
->>>>>>> b771a4d (Toggl time with linear task)
   summary: {
     totalLinearProjects: number;
     matchedProjects: number;
     projectsWithDevelopmentTask: number;
     totalTimeEntries: number;
     totalDuration: number; // in seconds
-<<<<<<< HEAD
-=======
     totalIssues: number;
     totalLabels: number;
->>>>>>> b771a4d (Toggl time with linear task)
   };
 }
 
 export async function GET() {
   try {
     // Step 1: Fetch projects from Linear
-    console.log('Step 1: Fetching Linear projects...');
-<<<<<<< HEAD
-    const linearProjects = await fetchLinearProjects();
-=======
+    console.log("Step 1: Fetching Linear projects...");
     const { projects: linearProjects, teamId } = await fetchLinearProjects();
->>>>>>> b771a4d (Toggl time with linear task)
     console.log(`✓ Found ${linearProjects.length} Linear projects`);
 
-    
-    
     // Step 2: Fetch all Toggl projects
-    console.log('Step 2: Fetching Toggl projects...');
+    console.log("Step 2: Fetching Toggl projects...");
     const togglProjects = await fetchTogglProjects();
     console.log(`✓ Found ${togglProjects.length} Toggl projects`);
 
-    
-    
     // Step 3: Match Linear projects with Toggl projects and find development tasks
-    console.log('Step 3: Matching projects and finding development tasks...');
+    console.log("Step 3: Matching projects and finding development tasks...");
     const results: ProjectWithTask[] = [];
     const developmentTaskIds: number[] = [];
 
-<<<<<<< HEAD
-    console.dir(linearProjects, { depth: null, maxArrayLength: null });
-    console.dir(togglProjects, { depth: null, maxArrayLength: null });
-    
-=======
->>>>>>> b771a4d (Toggl time with linear task)
     for (const linearProject of linearProjects) {
       // Find matching Toggl project by name
-      const togglProject = togglProjects.find(
-        (tp) => {
-          return tp.name.toLowerCase().includes(linearProject.name.toLowerCase())
-        }
-      );
+      const togglProject = togglProjects.find((tp) => {
+        return tp.name.toLowerCase().includes(linearProject.name.toLowerCase());
+      });
 
-<<<<<<< HEAD
-      console.log("Toggl project: ", togglProject?.name);
-      
-      if (togglProject) {
-        try {
-          // Fetch tasks for this Toggl project
-
-          console.log(togglProject.id);
-          const tasks = await fetchTogglProjectTasks(togglProject.id);
-          
-          console.log("Tasks: ", tasks);
-=======
       if (togglProject) {
         try {
           // Fetch tasks for this Toggl project
           const tasks = await fetchTogglProjectTasks(togglProject.id);
 
->>>>>>> b771a4d (Toggl time with linear task)
           // Find the development task
           const developmentTask = tasks.find(
-            (task) => task.name.toLowerCase() === 'development'
+            (task) => task.name.toLowerCase() === "development"
           );
-          
+
           results.push({
             linearProject,
             togglProject,
@@ -205,40 +141,45 @@ export async function GET() {
             developmentTaskIds.push(developmentTask.id);
           }
         } catch (error) {
-          console.error(`Error fetching tasks for project ${togglProject.name}:`, error);
+          console.error(
+            `Error fetching tasks for project ${togglProject.name}:`,
+            error
+          );
           // Continue with other projects
         }
       }
     }
-    
-    console.log(`✓ Matched ${results.length} projects, found ${developmentTaskIds.length} development tasks`);
-    
+
+    console.log(
+      `✓ Matched ${results.length} projects, found ${developmentTaskIds.length} development tasks`
+    );
+
     // Step 4: Fetch time entries for all development tasks
     let timeEntries: TogglTimeEntry[] = [];
     if (developmentTaskIds.length > 0) {
-      console.log('Step 4: Fetching time entries...');
+      console.log("Step 4: Fetching time entries...");
       try {
         timeEntries = await fetchTogglTimeEntries(developmentTaskIds);
         console.log(`✓ Found ${timeEntries.length} time entries`);
       } catch (error) {
-        console.error('Error fetching time entries:', error);
+        console.error("Error fetching time entries:", error);
         // Continue without time entries
       }
     }
 
     // Calculate total duration
-    const totalDuration = timeEntries.reduce((sum, entry) => sum + entry.duration, 0);
-<<<<<<< HEAD
-    
-=======
+    const totalDuration = timeEntries.reduce(
+      (sum, entry) => sum + entry.duration,
+      0
+    );
 
     // Step 5: Fetch Linear issues with labels
-    console.log('Step 5: Fetching Linear issues with labels...');
+    console.log("Step 5: Fetching Linear issues with labels...");
     const linearIssues = await fetchLinearIssues(teamId);
     console.log(`✓ Found ${linearIssues.length} Linear issues`);
 
     // Step 6: Extract unique labels from all issues
-    console.log('Step 6: Extracting unique labels...');
+    console.log("Step 6: Extracting unique labels...");
     const labelsMap = new Map<string, LinearLabel>();
     for (const issue of linearIssues) {
       for (const label of issue.labels.nodes) {
@@ -250,150 +191,60 @@ export async function GET() {
     const uniqueLabels = Array.from(labelsMap.values());
     console.log(`✓ Found ${uniqueLabels.length} unique labels`);
 
->>>>>>> b771a4d (Toggl time with linear task)
     const response: SyncResult = {
       success: true,
       data: results,
       developmentTaskIds,
       timeEntries,
-<<<<<<< HEAD
-=======
       linearIssues,
       labels: uniqueLabels,
->>>>>>> b771a4d (Toggl time with linear task)
       summary: {
         totalLinearProjects: linearProjects.length,
         matchedProjects: results.length,
         projectsWithDevelopmentTask: developmentTaskIds.length,
         totalTimeEntries: timeEntries.length,
         totalDuration,
-<<<<<<< HEAD
-      }
-    };
-    
-=======
         totalIssues: linearIssues.length,
         totalLabels: uniqueLabels.length,
-      }
+      },
     };
 
->>>>>>> b771a4d (Toggl time with linear task)
-    console.log('✓ Sync completed successfully');
+    console.log("✓ Sync completed successfully");
     return NextResponse.json(response);
-    
   } catch (error) {
-    console.error('Error syncing projects:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    
+    console.error("Error syncing projects:", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: errorMessage,
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );
   }
 }
 
-<<<<<<< HEAD
-// Fetch projects from Linear with their issues (with pagination)
-async function fetchLinearProjects(): Promise<LinearProject[]> {
-=======
 // Fetch projects from Linear
-async function fetchLinearProjects(): Promise<{ projects: LinearProject[], teamId: string }> {
->>>>>>> b771a4d (Toggl time with linear task)
+async function fetchLinearProjects(): Promise<{
+  projects: LinearProject[];
+  teamId: string;
+}> {
   try {
     const apiKey = process.env.LINEAR_API_KEY;
 
     if (!apiKey) {
-      throw new Error('LINEAR_API_KEY environment variable is not set');
+      throw new Error("LINEAR_API_KEY environment variable is not set");
     }
 
-<<<<<<< HEAD
-    let allProjects: LinearProject[] = [];
-    let hasNextPage = true;
-    let afterCursor: string | null = null;
-
-    // Fetch projects in batches to avoid complexity limits
-    while (hasNextPage) {
-      const response = await fetch('https://api.linear.app/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${apiKey}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query($after: String) {
-              team(id: "BLE") {
-                projects(first: 10, after: $after) {
-                  pageInfo {
-                    hasNextPage
-                    endCursor
-                  }
-                  nodes {
-                    id
-                    name
-                    description
-                    state
-                    startDate
-                    targetDate
-                    issues(first: 50) {
-                      nodes {
-                        id
-                        title
-                        identifier
-                        state {
-                          name
-                        }
-                        labels {
-                          nodes {
-                            id
-                            name
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          `,
-          variables: {
-            after: afterCursor,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Linear API error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.errors) {
-        throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
-      }
-
-      const projectsData = data.data.team.projects;
-      allProjects = [...allProjects, ...projectsData.nodes];
-
-      hasNextPage = projectsData.pageInfo.hasNextPage;
-      afterCursor = projectsData.pageInfo.endCursor;
-
-      console.log(`  Fetched ${projectsData.nodes.length} projects (total: ${allProjects.length})`);
-    }
-
-    return allProjects;
-=======
-    const response = await fetch('https://api.linear.app/graphql', {
-      method: 'POST',
+    const response = await fetch("https://api.linear.app/graphql", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `${apiKey}`,
+        "Content-Type": "application/json",
+        Authorization: `${apiKey}`,
       },
       body: JSON.stringify({
         query: `
@@ -431,24 +282,23 @@ async function fetchLinearProjects(): Promise<{ projects: LinearProject[], teamI
       projects: data.data.team.projects.nodes,
       teamId: data.data.team.id,
     };
->>>>>>> b771a4d (Toggl time with linear task)
   } catch (error) {
-    console.error('Linear API Error:', error);
+    console.error("Linear API Error:", error);
     throw error;
   }
 }
 
 async function fetchTogglProjects(): Promise<TogglProject[]> {
   try {
-    const workspaceId = '2404074';
+    const workspaceId = "2404074";
     const apiToken = process.env.TOGGL_API_TOKEN;
-    
+
     if (!apiToken) {
-      throw new Error('TOGGL_API_TOKEN environment variable is not set');
+      throw new Error("TOGGL_API_TOKEN environment variable is not set");
     }
 
     const authString = `${apiToken}:api_token`;
-    const base64Auth = Buffer.from(authString).toString('base64');
+    const base64Auth = Buffer.from(authString).toString("base64");
 
     let allProjects: TogglProject[] = [];
     let page = 1;
@@ -457,11 +307,11 @@ async function fetchTogglProjects(): Promise<TogglProject[]> {
 
     while (hasMore) {
       const url = `https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/projects?page=${page}&per_page=${perPage}`;
-      
+
       const response = await fetch(url, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${base64Auth}`,
+          "Content-Type": "application/json",
+          Authorization: `Basic ${base64Auth}`,
         },
       });
 
@@ -471,17 +321,11 @@ async function fetchTogglProjects(): Promise<TogglProject[]> {
       }
 
       const projects = await response.json();
-      
+
       if (projects.length === 0) {
         hasMore = false;
       } else {
         allProjects = [...allProjects, ...projects];
-<<<<<<< HEAD
-        console.log(`  Fetched page ${page}: ${projects.length} projects (total: ${allProjects.length})`);
-        
-=======
-
->>>>>>> b771a4d (Toggl time with linear task)
         // If we got fewer than perPage, we're on the last page
         if (projects.length < perPage) {
           hasMore = false;
@@ -493,20 +337,22 @@ async function fetchTogglProjects(): Promise<TogglProject[]> {
 
     return allProjects;
   } catch (error) {
-    console.error('Toggl API Error:', error);
+    console.error("Toggl API Error:", error);
     throw error;
   }
 }
 
 // Fetch tasks for a specific Toggl project
 async function fetchTogglProjectTasks(projectId: number): Promise<TogglTask[]> {
-  const workspaceId = '2404074';
+  const workspaceId = "2404074";
   const response = await fetch(
     `https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/projects/${projectId}/tasks`,
     {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(`${process.env.TOGGL_API_TOKEN}:api_token`).toString('base64')}`,
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.TOGGL_API_TOKEN}:api_token`
+        ).toString("base64")}`,
       },
     }
   );
@@ -519,71 +365,20 @@ async function fetchTogglProjectTasks(projectId: number): Promise<TogglTask[]> {
 }
 
 // Fetch time entries for development tasks from Toggl Reports API
-async function fetchTogglTimeEntries(taskIds: number[]): Promise<TogglTimeEntry[]> {
+async function fetchTogglTimeEntries(
+  taskIds: number[]
+): Promise<TogglTimeEntry[]> {
   try {
-    const workspaceId = '2404074';
+    const workspaceId = "2404074";
     const apiToken = process.env.TOGGL_API_TOKEN;
-<<<<<<< HEAD
-    
-    if (!apiToken) {
-      throw new Error('TOGGL_API_TOKEN environment variable is not set');
-    }
-    
-    // Get current year date range (you can modify these as needed)
-    const startDate = '2025-01-01';
-    const endDate = '2025-12-31';
-    
-    const response = await fetch(
-      `https://api.track.toggl.com/reports/api/v3/workspace/${workspaceId}/search/time_entries`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${Buffer.from(`${apiToken}:api_token`).toString('base64')}`,
-        },
-        body: JSON.stringify({
-          task_ids: taskIds,
-          start_date: startDate,
-          end_date: endDate,
-          page_size: 1000,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Toggl Reports API error (${response.status}): ${errorText}`);
-    }
-
-    const data = await response.json();
-    // Toggl Reports API v3 returns data in a different format
-    // The response might be an array or an object with a property containing the array
-    let timeEntries: TogglTimeEntry[] = [];
-
-    if (Array.isArray(data)) {
-      timeEntries = data;
-    } else if (data && Array.isArray(data.time_entries)) {
-      timeEntries = data.time_entries;
-    } else {
-      console.warn('Unexpected Toggl Reports API response format:', JSON.stringify(data).substring(0, 500));
-      return [];
-    }
-
-    // Debug: log first time entry structure
-    if (timeEntries.length > 0) {
-      console.log('First time entry sample:', JSON.stringify(timeEntries[0], null, 2));
-    }
-
-    return timeEntries;
-=======
 
     if (!apiToken) {
-      throw new Error('TOGGL_API_TOKEN environment variable is not set');
+      throw new Error("TOGGL_API_TOKEN environment variable is not set");
     }
 
     // Get current year date range (you can modify these as needed)
-    const startDate = '2025-01-01';
-    const endDate = '2025-12-31';
+    const startDate = "2025-01-01";
+    const endDate = "2025-12-31";
 
     let allData: any[] = [];
     let firstRowNumber = 1;
@@ -594,10 +389,12 @@ async function fetchTogglTimeEntries(taskIds: number[]): Promise<TogglTimeEntry[
       const response = await fetch(
         `https://api.track.toggl.com/reports/api/v3/workspace/${workspaceId}/search/time_entries`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Basic ${Buffer.from(`${apiToken}:api_token`).toString('base64')}`,
+            "Content-Type": "application/json",
+            Authorization: `Basic ${Buffer.from(
+              `${apiToken}:api_token`
+            ).toString("base64")}`,
           },
           body: JSON.stringify({
             task_ids: taskIds,
@@ -611,14 +408,18 @@ async function fetchTogglTimeEntries(taskIds: number[]): Promise<TogglTimeEntry[
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Toggl Reports API error (${response.status}): ${errorText}`);
+        throw new Error(
+          `Toggl Reports API error (${response.status}): ${errorText}`
+        );
       }
 
       const data = await response.json();
 
       if (data && data.length > 0) {
         allData = [...allData, ...data];
-        console.log(`  Fetched ${data.length} time entry groups (total: ${allData.length})`);
+        console.log(
+          `  Fetched ${data.length} time entry groups (total: ${allData.length})`
+        );
 
         // Check if we got a full page - if not, we're done
         if (data.length < pageSize) {
@@ -651,13 +452,10 @@ async function fetchTogglTimeEntries(taskIds: number[]): Promise<TogglTimeEntry[
     }
 
     return flattenedEntries;
->>>>>>> b771a4d (Toggl time with linear task)
   } catch (error) {
-    console.error('Toggl Reports API Error:', error);
+    console.error("Toggl Reports API Error:", error);
     throw error;
   }
-<<<<<<< HEAD
-=======
 }
 
 // Fetch Linear issues with labels
@@ -666,7 +464,7 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
     const apiKey = process.env.LINEAR_API_KEY;
 
     if (!apiKey) {
-      throw new Error('LINEAR_API_KEY environment variable is not set');
+      throw new Error("LINEAR_API_KEY environment variable is not set");
     }
 
     // Calculate date 6 months ago
@@ -679,11 +477,11 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
     let endCursor: string | null = null;
 
     while (hasNextPage) {
-      const response = await fetch('https://api.linear.app/graphql', {
-        method: 'POST',
+      const response = await fetch("https://api.linear.app/graphql", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${apiKey}`,
+          "Content-Type": "application/json",
+          Authorization: `${apiKey}`,
         },
         body: JSON.stringify({
           query: `
@@ -746,7 +544,9 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
       const data = await response.json();
 
       if (data.errors) {
-        throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
+        throw new Error(
+          `Linear GraphQL errors: ${JSON.stringify(data.errors)}`
+        );
       }
 
       const issues = data.data.issues.nodes;
@@ -762,8 +562,7 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
 
     return allIssues;
   } catch (error) {
-    console.error('Linear Issues API Error:', error);
+    console.error("Linear Issues API Error:", error);
     throw error;
   }
->>>>>>> b771a4d (Toggl time with linear task)
 }
