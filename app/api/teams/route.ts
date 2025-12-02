@@ -4,7 +4,7 @@ import { GET_TEAMS } from "@/lib/linear/queries";
 import { TeamsResponse, LinearTeam } from "@/lib/linear/types";
 
 export async function GET(
-  request: NextRequest
+  _request: NextRequest
 ): Promise<NextResponse<LinearTeam[] | { error: string }>> {
   try {
     const data = await linearClient.query<TeamsResponse>(GET_TEAMS);

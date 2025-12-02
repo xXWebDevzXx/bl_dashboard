@@ -126,9 +126,11 @@ export interface IssueFilter {
 export interface IssuesVariables {
   first: number;
   filter?: IssueFilter;
+  [key: string]: unknown;
 }
 
 export interface IssueByIdVariables {
   id: string;
+  [key: string]: unknown;
 }
 

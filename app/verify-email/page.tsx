@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { VerifyEmailButton } from "./VerifyEmailButton";
 import { VerifyEmailToast } from "./VerifyEmailToast";
 
+// Force dynamic rendering for auth operations
+export const dynamic = 'force-dynamic';
+
 export default async function VerifyEmailPage({
   searchParams,
 }: {

@@ -8,7 +8,7 @@ interface Auth0User {
   email_verified?: boolean;
   name?: string;
   nickname?: string;
-  [key: string]: any;
+  [key: string]: string | boolean | undefined;
 }
 
 /**
@@ -38,7 +38,14 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
 
     if (user) {
       // Prepare update data
-      const updateData: any = {
+      const updateData: {
+        email: string;
+        username: string;
+        updatedAt: number;
+        isVerified?: boolean;
+        verifiedAt?: number;
+        verificationToken?: null;
+      } = {
         email,
         username: nickname || name || email.split("@")[0],
         updatedAt: currentTimestamp,
@@ -66,7 +73,14 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
 
       if (existingUserByEmail) {
         // Link Auth0 account to existing user
-        const linkData: any = {
+        const linkData: {
+          auth0Id: string;
+          username: string;
+          updatedAt: number;
+          isVerified?: boolean;
+          verifiedAt?: number;
+          verificationToken?: null;
+        } = {
           auth0Id,
           username: nickname || name || existingUserByEmail.username,
           updatedAt: currentTimestamp,

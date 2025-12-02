@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     // this should be quick (SSO) and will refresh the session with updated email_verified status
     return await auth0.startInteractiveLogin({
       returnTo,
-      authorizationParams: {
+      authorizationParameters: {
         prompt: 'none', // Silent authentication - no login UI if already authenticated
         max_age: 0, // Force fresh authentication check
       }

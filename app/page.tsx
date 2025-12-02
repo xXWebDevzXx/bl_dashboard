@@ -2,6 +2,9 @@ import LoginForm from "@/components/LoginForm";
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
 
+// Force dynamic rendering for auth operations
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const session = await auth0.getSession();
 

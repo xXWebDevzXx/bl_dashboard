@@ -1,6 +1,6 @@
 interface LinearResponse<T> {
     data?: T;
-    errors?: Array<{ message: string; extensions?: any }>;
+    errors?: Array<{ message: string; extensions?: Record<string, unknown> }>;
 }
 
 export class LinearClient {
@@ -19,7 +19,7 @@ export class LinearClient {
         console.log("✅ Linear client initialized successfully");
     }
 
-    async query<T>(query: string, variables?: Record<string, any>): Promise<T> {
+    async query<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
         const response = await fetch(this.endpoint, {
             method: "POST",
             headers: {
