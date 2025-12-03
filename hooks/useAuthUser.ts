@@ -16,6 +16,7 @@ export function useAuthUser() {
     data: user,
     error,
     isLoading,
+    mutate,
   } = useSWR("/api/auth/me", fetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
@@ -25,5 +26,6 @@ export function useAuthUser() {
     user: user || null,
     error,
     isLoading,
+    mutate,
   };
 }
