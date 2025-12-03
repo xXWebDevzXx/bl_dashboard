@@ -59,7 +59,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
   if (!task) {
     return (
       <div className="p-8">
-        <Link href="/tasks" className="text-blue-500 hover:underline flex items-center gap-2 mb-4">
+        <Link href="/tasks" className="text-blue-500 hover:underline flex items-center gap-2 mb-4 w-fit">
           <ArrowLeft size={16} />
           Tilbage til tasks
         </Link>
@@ -71,15 +71,14 @@ export default async function TaskPage({ params }: TaskPageProps) {
     );
   }
 
-  const estimatedHours = task.estimatedTime / 3600;
+  const estimatedHours = task.estimatedTime;
   const trackedHours = task.totalTrackedTime / 3600;
-  const timeComparison = estimatedHours > 0
-    ? ((trackedHours / estimatedHours) * 100).toFixed(1)
-    : null;
+  console.log(estimatedHours, trackedHours);
+  const timeComparison = estimatedHours > 0 ? ((trackedHours / estimatedHours) * 100).toFixed(0) : null;
 
   return (
     <div className="p-8">
-      <Link href="/tasks" className="text-blue-500 hover:underline flex items-center gap-2 mb-6">
+      <Link href="/tasks" className="text-blue-500 hover:underline flex items-center gap-2 mb-6 w-fit">
         <ArrowLeft size={16} />
         Tilbage til tasks
       </Link>
@@ -130,9 +129,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
             <Clock size={20} className="text-blue-500" />
             <h3 className="text-gray-400 text-sm">Estimeret tid</h3>
           </div>
-          <p className="text-3xl text-white font-semibold">
-            {task.estimatedTime}h
-          </p>
+          <p className="text-3xl text-white font-semibold">{estimatedHours}h</p>
         </div>
 
         <div className="bg-[#1A1F26] p-6 rounded-sm">

@@ -1,9 +1,11 @@
 import DashboardAreaChart from "@/components/dashboard/DashboardAreaChart";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import DashboardCircleChart from "@/components/dashboard/DashboardCircleChart";
+import EstimationAccuracyChart from "@/components/dashboard/EstimationAccuracyChart";
 import { auth0 } from "@/lib/auth0";
 import { getDashboardStats } from "@/lib/dashboard-stats";
 import { ensureUserSynced } from "@/lib/ensure-user-synced";
+import { getTimeChartData } from "@/lib/time-chart-data";
 import { redirect } from "next/navigation";
 
 // Force dynamic rendering for auth and database operations
@@ -43,6 +45,17 @@ export default async function Dashboard() {
     linearTasksWithDelegatePercentage,
   } = await getDashboardStats();
 
+  // Fetch time chart data for the mini line charts
+  const timeChartData = await getTimeChartData();
+
+  // Calculate total hours and prepare trend data (last 30 days)
+  const last30Days = timeChartData.slice(-30);
+
+  // Prepare mini chart data (simplified)
+  const totalHoursChartData = last30Days.map(day => ({
+    value: day.aiTasksHours + day.nonAiTasksHours
+  }));
+
   return (
     <div className="p-8">
       <div className="grid grid-cols-4 gap-8 mb-8">
@@ -60,17 +73,16 @@ export default async function Dashboard() {
           className="rounded-sm"
           bigText={`${averageTogglTimeHours.toFixed(2)} hrs`}
           smallText="gennemsnitlig tid pr. task"
-        ></DashboardCard>
-        <DashboardCard
-          className="rounded-sm"
-          bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}%`}
-          smallText="AI-assisteret opgaver"
-        ></DashboardCard>
+          chartData={totalHoursChartData}
+          lineColor="#4876DE"
+          showChart={true}
+        />
+        <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}%`} smallText="AI-assisteret opgaver"></DashboardCard>
       </div>
       <div className="grid grid-cols-2 gap-8">
         <div className="grid gap-8 auto-rows-auto mb-8">
           <DashboardAreaChart className="bg-[#1A1F26] p-4 rounded-sm"></DashboardAreaChart>
-          <DashboardCard className="rounded-sm"></DashboardCard>
+          <EstimationAccuracyChart />
         </div>
 
         <div className="grid gap-8 auto-rows-min">
