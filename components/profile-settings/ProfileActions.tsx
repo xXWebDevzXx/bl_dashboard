@@ -12,12 +12,14 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { KeyRound, Loader2, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DeleteAccountDialog } from "./DeleteAccountDialog";
 import { ProfileEditModal } from "./ProfileEditModal";
 
 export function ProfileActions() {
   const { user } = useAuthUser();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleChangePassword = async () => {
     if (!user?.email) {
@@ -53,10 +55,8 @@ export function ProfileActions() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    toast.warning("Account deletion coming soon!", {
-      description: "This feature requires additional confirmation steps.",
-    });
+  const handleDeleteAccount = () => {
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -108,6 +108,12 @@ export function ProfileActions() {
       <ProfileEditModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
+      />
+
+      <DeleteAccountDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        userEmail={user?.email}
       />
     </>
   );

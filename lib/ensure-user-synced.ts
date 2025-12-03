@@ -21,6 +21,13 @@ export async function ensureUserSynced() {
     return user;
   } catch (error) {
     console.error('Error ensuring user is synced:', error);
+    
+    // Re-throw account deleted errors so pages can handle them
+    const err = error as { accountDeleted?: boolean; message?: string };
+    if (err?.accountDeleted || err?.message === 'ACCOUNT_DELETED') {
+      throw error;
+    }
+    
     return null;
   }
 }

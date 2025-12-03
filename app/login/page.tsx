@@ -1,8 +1,13 @@
 import LoginForm from "@/components/LoginForm";
+import { AccountDeletedHandler } from "@/components/AccountDeletedHandler";
+import { Suspense } from "react";
 
 function login() {
-    return (
+  return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <Suspense fallback={null}>
+        <AccountDeletedHandler />
+      </Suspense>
       <main className="flex flex-col items-center justify-center gap-4">
         <h1 className="text-4xl font-bold">Black Lemon Dashboard</h1>
         <LoginForm />
