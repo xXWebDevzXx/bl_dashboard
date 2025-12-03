@@ -66,9 +66,6 @@ export async function DELETE() {
     }
 
     const auth0Id = session.user.sub;
-    const email = session.user.email;
-
-    console.log(`Deleting account for user: ${email}`);
 
     // Soft delete from database (set deletedAt timestamp)
     const currentTimestamp = Math.floor(Date.now() / 1000);
@@ -81,7 +78,6 @@ export async function DELETE() {
           updatedAt: currentTimestamp,
         },
       });
-      console.log(`Soft deleted user from database: ${email}`);
     } catch (dbError) {
       console.error("Failed to soft delete user from database:", dbError);
       // Continue to delete from Auth0 even if DB update fails
@@ -91,11 +87,9 @@ export async function DELETE() {
     try {
       const accessToken = await getManagementApiToken();
       await deleteAuth0User(auth0Id, accessToken);
-      console.log(`Deleted user from Auth0: ${email}`);
     } catch (auth0Error) {
       console.error("Failed to delete user from Auth0:", auth0Error);
       // Even if Auth0 deletion fails, continue - the soft delete from DB prevents access
-      console.log("Account soft deleted from database, continuing despite Auth0 error");
     }
 
     return NextResponse.json({
@@ -110,4 +104,3 @@ export async function DELETE() {
     );
   }
 }
-

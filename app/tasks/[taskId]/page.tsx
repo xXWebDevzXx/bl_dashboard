@@ -73,7 +73,6 @@ export default async function TaskPage({ params }: TaskPageProps) {
 
   const estimatedHours = task.estimatedTime;
   const trackedHours = task.totalTrackedTime / 3600;
-  console.log(estimatedHours, trackedHours);
   const timeComparison = estimatedHours > 0 ? ((trackedHours / estimatedHours) * 100).toFixed(0) : null;
 
   return (

@@ -18,11 +18,6 @@ export default function LogoutButton() {
     return null;
   }
 
-  // Extract username from email (part before @)
-  const displayName = isUserLoggedIn.includes("@")
-    ? isUserLoggedIn.split("@")[0]
-    : isUserLoggedIn;
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
     await logout();
@@ -35,7 +30,7 @@ export default function LogoutButton() {
       disabled={isLoggingOut}
       className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white rounded transition-colors"
     >
-      {isLoggingOut ? "Logging out..." : `Log Out ${displayName}`}
+      {isLoggingOut ? "Logging out..." : `Log Out`}
     </button>
   );
 }

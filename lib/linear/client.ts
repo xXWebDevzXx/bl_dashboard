@@ -22,7 +22,6 @@ export class LinearClient {
     }
     this.apiToken = token;
     this.initialized = true;
-    console.log("✅ Linear client initialized successfully");
   }
 
   async query<T>(
