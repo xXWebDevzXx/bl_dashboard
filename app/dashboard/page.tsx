@@ -61,23 +61,26 @@ export default async function Dashboard() {
       <div className="grid grid-cols-4 gap-8 mb-8">
         <DashboardCard
           className="rounded-sm"
-          bigText={`${linearTasksCount} tasks`}
+          bigText={`${linearTasksCount}`}
+          unit="issues"
           smallText="seneste år"
         ></DashboardCard>
         <DashboardCard
           className="rounded-sm"
-          bigText={`${linearTasksWithTogglTimePercentage.toFixed(2)}%`}
+          bigText={`${linearTasksWithTogglTimePercentage.toFixed(2)}`}
+          unit="%"
           smallText="AI tasks vs non-AI tasks"
         ></DashboardCard>
         <DashboardCard
           className="rounded-sm"
-          bigText={`${averageTogglTimeHours.toFixed(2)} hrs`}
+          bigText={`${averageTogglTimeHours.toFixed(2)}`}
+          unit="hrs"
           smallText="gennemsnitlig tid pr. task"
           chartData={totalHoursChartData}
           lineColor="#4876DE"
           showChart={true}
         />
-        <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}%`} smallText="AI-assisteret opgaver"></DashboardCard>
+        <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}`} unit="%" smallText="AI-assisteret opgaver"></DashboardCard>
       </div>
       <div className="grid grid-cols-2 gap-8">
         <div className="grid gap-8 auto-rows-auto mb-8">
