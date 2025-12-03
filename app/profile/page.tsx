@@ -1,9 +1,4 @@
-import {
-  AccountDetailsCard,
-  ProfileActions,
-  ProfileCard,
-  ProfileHeader,
-} from "@/components/profile-settings";
+import { ProfileContent, ProfileHeader } from "@/components/profile-settings";
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
 
@@ -14,7 +9,6 @@ export default async function Profile() {
     redirect("/login");
   }
 
-  const user = session.user;
   const memberSince = new Date().toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -30,23 +24,7 @@ export default async function Profile() {
           subtitle="Manage your account information and preferences"
         />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <ProfileCard
-            name={user.name}
-            email={user.email}
-            picture={user.picture}
-            emailVerified={user.email_verified}
-          />
-
-          <AccountDetailsCard
-            name={user.name}
-            email={user.email}
-            emailVerified={user.email_verified}
-            memberSince={memberSince}
-          />
-
-          <ProfileActions />
-        </div>
+        <ProfileContent memberSince={memberSince} />
       </div>
     </div>
   );

@@ -107,6 +107,9 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
+    // Return success response
+    // Note: The Auth0 user has been updated via Management API
+    // The session will refresh automatically on the next page load
     return NextResponse.json({
       success: true,
       message: "Profile updated successfully",

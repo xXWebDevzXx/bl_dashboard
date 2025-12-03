@@ -17,7 +17,7 @@ model User {
   role              String   @map("user_role") @db.VarChar(20)
   createdAt         Int      @map("user_created_at")
   updatedAt         Int      @map("user_updated_at")
-  deletedAt         Int      @map("user_deleted_at")
+  deletedAt         Int      @default(0) @map("user_deleted_at")
   auth0Id           String?  @unique @map("user_auth0_id") @db.VarChar(255)
   verifiedAt        Int      @default(0) @map("user_verified_at")
   isVerified        Boolean  @default(false) @map("user_is_verified")

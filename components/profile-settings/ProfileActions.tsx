@@ -54,7 +54,6 @@ export function ProfileActions() {
   };
 
   const handleDeleteAccount = async () => {
-    // TODO: Implement account deletion with confirmation
     toast.warning("Account deletion coming soon!", {
       description: "This feature requires additional confirmation steps.",
     });

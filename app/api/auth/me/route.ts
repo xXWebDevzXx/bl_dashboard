@@ -1,4 +1,5 @@
 import { auth0 } from "@/lib/auth0";
+import { prisma } from "@/lib/prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -14,10 +15,33 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    console.log("Returning user data:", session.user.email);
-    return NextResponse.json(session.user);
+    // Get the latest user data from database to include any updates
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { auth0Id: session.user.sub },
+      });
+
+      if (dbUser) {
+        // Merge database user data with session data
+        const userData = {
+          ...session.user,
+          name: dbUser.username, // Use database username as the source of truth
+          nickname: dbUser.username,
+        };
+        console.log(
+          "Returning merged user data with DB username:",
+          dbUser.username
+        );
+        return NextResponse.json(userData);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
   } catch (error) {
-    console.error("Me endpoint error:", error);
-    return NextResponse.json({ error: "Failed to get user" }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -109,6 +109,7 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
             role: "user",
             createdAt: currentTimestamp,
             updatedAt: currentTimestamp,
+            deletedAt: 0,
             // Set verification status based on Auth0
             isVerified: email_verified || false,
             verifiedAt: email_verified ? currentTimestamp : 0,
