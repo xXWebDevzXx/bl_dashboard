@@ -1,4 +1,5 @@
 export { AccountDetailsCard } from "./AccountDetailsCard";
+export { DeleteAccountDialog } from "./DeleteAccountDialog";
 export { InfoItem } from "./InfoItem";
 export { ProfileActions } from "./ProfileActions";
 export { ProfileAvatar } from "./ProfileAvatar";

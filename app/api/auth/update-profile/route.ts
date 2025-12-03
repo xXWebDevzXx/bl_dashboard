@@ -22,6 +22,7 @@ async function getManagementApiToken(): Promise<string> {
       client_secret: clientSecret,
       audience: `https://${domain}/api/v2/`,
       grant_type: "client_credentials",
+      scope: "update:users",
     }),
   });
 

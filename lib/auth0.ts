@@ -39,4 +39,9 @@ export const auth0 = new Auth0Client({
     secure: false, // Set to false for localhost/development
     domain: undefined, // Don't set a specific domain for localhost
   },
+
+  // Authorization parameters
+  authorizationParameters: {
+    scope: "openid profile email offline_access",
+  },
 });

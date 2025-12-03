@@ -37,6 +37,13 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
     });
 
     if (user) {
+      // Check if user is soft deleted
+      if (user.deletedAt && user.deletedAt > 0) {
+        const error = new Error("ACCOUNT_DELETED") as Error & { accountDeleted: boolean };
+        error.accountDeleted = true;
+        throw error;
+      }
+
       // Prepare update data
       const updateData: {
         email: string;
@@ -72,6 +79,13 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
       });
 
       if (existingUserByEmail) {
+        // Check if existing user is soft deleted
+        if (existingUserByEmail.deletedAt && existingUserByEmail.deletedAt > 0) {
+          const error = new Error("ACCOUNT_DELETED") as Error & { accountDeleted: boolean };
+          error.accountDeleted = true;
+          throw error;
+        }
+
         // Link Auth0 account to existing user
         const linkData: {
           auth0Id: string;

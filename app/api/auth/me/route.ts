@@ -22,6 +22,15 @@ export async function GET() {
       });
 
       if (dbUser) {
+        // Check if account is deleted
+        if (dbUser.deletedAt && dbUser.deletedAt > 0) {
+          console.log("Account is deleted, returning 403");
+          return NextResponse.json(
+            { error: "Account deleted", accountDeleted: true },
+            { status: 403 }
+          );
+        }
+
         // Merge database user data with session data
         const userData = {
           ...session.user,
