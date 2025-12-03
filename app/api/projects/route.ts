@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { linearClient } from "@/lib/linear/client";
 import { GET_PROJECTS } from "@/lib/linear/queries";
 import { ProjectsResponse, LinearProject } from "@/lib/linear/types";
 
-export async function GET(
-  _request: NextRequest
-): Promise<NextResponse<LinearProject[] | { error: string }>> {
+export async function GET(): Promise<
+  NextResponse<LinearProject[] | { error: string }>
+> {
   try {
     const data = await linearClient.query<ProjectsResponse>(GET_PROJECTS);
     return NextResponse.json(data.projects.nodes);
