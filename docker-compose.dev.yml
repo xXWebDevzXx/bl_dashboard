@@ -6,27 +6,27 @@ services:
       target: base
     command: sh -c "npx prisma generate && npm run dev"
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     env_file:
       - .env.local
     environment:
       - NODE_ENV=local
       # File watching configuration for Docker (especially Windows)
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=1000
+      - WATCHPACK_POLLING=${WATCHPACK_POLLING:-true}
+      - CHOKIDAR_USEPOLLING=${CHOKIDAR_USEPOLLING:-true}
+      - CHOKIDAR_INTERVAL=${CHOKIDAR_INTERVAL:-1000}
       # Force webpack instead of Turbopack for better Windows Docker compatibility
-      - TURBOPACK=0
+      - TURBOPACK=${TURBOPACK:-0}
       # Next.js specific polling settings
-      - NEXT_PRIVATE_LOCAL_WEBPACK=true
+      - NEXT_PRIVATE_LOCAL_WEBPACK=${NEXT_PRIVATE_LOCAL_WEBPACK:-true}
       # Database
-      - DATABASE_URL=mysql://root:Password123@db:3306/dashboard
+      - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE:-dashboard}
       # Auth0
-      - AUTH0_SECRET=skdlfjghtyrhfjgurksldirkthfjghty
-      - APP_BASE_URL=http://localhost:3000
-      - AUTH0_DOMAIN=dev-eg8vvi4y6amdary0.us.auth0.com
-      - AUTH0_CLIENT_ID=udPlg7cyFnNfOfyKmYBXlP77WDGQZJWt
-      - AUTH0_CLIENT_SECRET=xfR-HfEyomVdfZXM-fQ69a2L3vvZ0Yh_w3YotHSgIPEUsJWBlDuLtko9yriRsXu-
+      - AUTH0_SECRET=${AUTH0_SECRET}
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:3000}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
 
     volumes:
       - .:/app
@@ -42,10 +42,10 @@ services:
     image: mysql:8.0
     restart: always
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: Password123
-      MYSQL_DATABASE: dashboard
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-dashboard}
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
