@@ -1,4 +1,7 @@
+"use client"
+
 import * as React from "react"
+import Link from "next/link"
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -39,17 +42,20 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 
 type PaginationLinkProps = {
   isActive?: boolean
+  href: string
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  Omit<React.ComponentProps<typeof Link>, "href">
 
 function PaginationLink({
   className,
   isActive,
   size = "icon",
+  href,
   ...props
 }: PaginationLinkProps) {
   return (
-    <a
+    <Link
+      href={href}
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}

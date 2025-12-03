@@ -2,8 +2,9 @@ import { config } from "dotenv";
 import { PrismaClient } from "../app/generated/prisma/client";
 
 // Load environment variables from .env and .env.local files
+// Don't override existing environment variables (Docker sets DATABASE_URL)
 config({ path: ".env" });
-config({ path: ".env.local", override: true });
+config({ path: ".env.local" });
 
 const prisma = new PrismaClient();
 
