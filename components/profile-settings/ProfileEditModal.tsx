@@ -67,9 +67,9 @@ export function ProfileEditModal({
         description: "Your name has been updated successfully.",
       });
 
-      // Refresh user data
+      // Refresh user data from API - this will update the displayed name immediately
       if (mutate) {
-        mutate();
+        await mutate();
       }
 
       onSuccess?.();
