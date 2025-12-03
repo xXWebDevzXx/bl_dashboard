@@ -12,7 +12,11 @@ const fetcher = async (url: string) => {
 };
 
 export function useAuthUser() {
-  const { data: user, error, isLoading } = useSWR("/api/auth/me", fetcher, {
+  const {
+    data: user,
+    error,
+    isLoading,
+  } = useSWR("/api/auth/me", fetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });
@@ -23,8 +27,3 @@ export function useAuthUser() {
     isLoading,
   };
 }
-
-
-
-
-
