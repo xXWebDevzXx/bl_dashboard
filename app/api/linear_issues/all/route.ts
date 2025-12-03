@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-       const searchParams = request.nextUrl.searchParams;
+    const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     
@@ -15,6 +15,17 @@ export async function GET(request: NextRequest) {
       prisma.linearTask.findMany({
         skip,
         take: limit,
+        select: {
+          id: true,
+          name: true,
+          taskId: true,
+          estimatedTime: true,
+          delegateId: true,
+          delegateName: true,
+          projectName: true,
+          createdAt: true,
+          updatedAt: true,
+        },
         orderBy: {
           id: 'desc'
         }
