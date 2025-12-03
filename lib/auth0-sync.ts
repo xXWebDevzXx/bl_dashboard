@@ -63,7 +63,6 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
         updateData.isVerified = true;
         updateData.verifiedAt = currentTimestamp;
         updateData.verificationToken = null; // Clear verification token
-        console.log(`Email verified for user: ${email}`);
       }
 
       // Update existing user
@@ -71,7 +70,6 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
         where: { auth0Id },
         data: updateData,
       });
-      console.log(`Updated user in database: ${email}`);
     } else {
       // Check if user exists by email (legacy user)
       const existingUserByEmail = await prisma.user.findUnique({
@@ -105,14 +103,12 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
           linkData.isVerified = true;
           linkData.verifiedAt = currentTimestamp;
           linkData.verificationToken = null;
-          console.log(`Email verified for linked user: ${email}`);
         }
 
         user = await prisma.user.update({
           where: { email },
           data: linkData,
         });
-        console.log(`Linked Auth0 account to existing user: ${email}`);
       } else {
         // Create new user
         user = await prisma.user.create({
@@ -129,9 +125,6 @@ export async function syncUserToDatabase(auth0User: Auth0User) {
             verifiedAt: email_verified ? currentTimestamp : 0,
           },
         });
-        console.log(
-          `Created new user in database: ${email} (verified: ${email_verified})`
-        );
       }
     }
 

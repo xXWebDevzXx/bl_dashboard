@@ -3,18 +3,6 @@ import { NextResponse, NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
-interface LinearIssue {
-  id: string;
-  name: string;
-  taskId: string;
-  estimatedTime: number;
-  delegateId: string | null;
-  delegateName: string | null;
-  projectName: string | null;
-  createdAt: number;
-  updatedAt: number;
-}
-
 export async function GET(request: NextRequest) {
   try {
        const searchParams = request.nextUrl.searchParams;

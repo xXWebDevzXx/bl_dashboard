@@ -119,17 +119,12 @@ interface SyncResult {
 export async function GET() {
   try {
     // Step 1: Fetch projects from Linear
-    console.log("Step 1: Fetching Linear projects...");
     const { projects: linearProjects, teamId } = await fetchLinearProjects();
-    console.log(`✓ Found ${linearProjects.length} Linear projects`);
 
     // Step 2: Fetch all Toggl projects
-    console.log("Step 2: Fetching Toggl projects...");
     const togglProjects = await fetchTogglProjects();
-    console.log(`✓ Found ${togglProjects.length} Toggl projects`);
 
     // Step 3: Match Linear projects with Toggl projects and find development tasks
-    console.log("Step 3: Matching projects and finding development tasks...");
     const results: ProjectWithTask[] = [];
     const developmentTaskIds: number[] = [];
 
@@ -169,17 +164,11 @@ export async function GET() {
       }
     }
 
-    console.log(
-      `✓ Matched ${results.length} projects, found ${developmentTaskIds.length} development tasks`
-    );
-
     // Step 4: Fetch time entries for all development tasks
     let timeEntries: TogglTimeEntry[] = [];
     if (developmentTaskIds.length > 0) {
-      console.log("Step 4: Fetching time entries...");
       try {
         timeEntries = await fetchTogglTimeEntries(developmentTaskIds);
-        console.log(`✓ Found ${timeEntries.length} time entries`);
       } catch (error) {
         console.error("Error fetching time entries:", error);
         // Continue without time entries
@@ -193,12 +182,9 @@ export async function GET() {
     );
 
     // Step 5: Fetch Linear issues with labels
-    console.log("Step 5: Fetching Linear issues with labels...");
     const linearIssues = await fetchLinearIssues(teamId);
-    console.log(`✓ Found ${linearIssues.length} Linear issues`);
 
     // Step 6: Extract unique labels from all issues
-    console.log("Step 6: Extracting unique labels...");
     const labelsMap = new Map<string, LinearLabel>();
     for (const issue of linearIssues) {
       for (const label of issue.labels.nodes) {
@@ -208,7 +194,6 @@ export async function GET() {
       }
     }
     const uniqueLabels = Array.from(labelsMap.values());
-    console.log(`✓ Found ${uniqueLabels.length} unique labels`);
 
     const response: SyncResult = {
       success: true,
@@ -228,7 +213,6 @@ export async function GET() {
       },
     };
 
-    console.log("✓ Sync completed successfully");
     return NextResponse.json(response);
   } catch (error) {
     console.error("Error syncing projects:", error);
@@ -436,9 +420,6 @@ async function fetchTogglTimeEntries(
 
       if (data && data.length > 0) {
         allData = [...allData, ...data];
-        console.log(
-          `  Fetched ${data.length} time entry groups (total: ${allData.length})`
-        );
 
         // Check if we got a full page - if not, we're done
         if (data.length < pageSize) {
@@ -578,10 +559,6 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
 
       hasNextPage = data.data.issues.pageInfo.hasNextPage;
       endCursor = data.data.issues.pageInfo.endCursor;
-
-      if (hasNextPage) {
-        console.log(`  Fetched ${allIssues.length} issues so far...`);
-      }
     }
 
     return allIssues;

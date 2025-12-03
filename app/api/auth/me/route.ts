@@ -4,14 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    console.log("=== /api/auth/me endpoint called ===");
     const session = await auth0.getSession();
 
-    console.log("Session exists?:", !!session);
-    console.log("Session user:", session?.user?.email);
-
     if (!session) {
-      console.log("No session found, returning 401");
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
@@ -24,7 +19,6 @@ export async function GET() {
       if (dbUser) {
         // Check if account is deleted
         if (dbUser.deletedAt && dbUser.deletedAt > 0) {
-          console.log("Account is deleted, returning 403");
           return NextResponse.json(
             { error: "Account deleted", accountDeleted: true },
             { status: 403 }
@@ -37,10 +31,6 @@ export async function GET() {
           name: dbUser.username, // Use database username as the source of truth
           nickname: dbUser.username,
         };
-        console.log(
-          "Returning merged user data with DB username:",
-          dbUser.username
-        );
         return NextResponse.json(userData);
       }
     } catch (error) {
