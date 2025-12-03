@@ -27,10 +27,8 @@ export default async function Profile() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0D1117] p-8">
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-transparent to-cyan-950/20 pointer-events-none" />
-
-      <div className="relative z-10 max-w-4xl mx-auto">
+    <div className="p-8">
+      <div className="max-w-4xl mx-auto">
         <ProfileHeader
           title="Profile Settings"
           subtitle="Manage your account information and preferences"
