@@ -7,7 +7,7 @@ import { getDashboardStats } from "@/lib/dashboard-stats";
 import { ensureUserSynced } from "@/lib/ensure-user-synced";
 import { getTimeChartData } from "@/lib/time-chart-data";
 import { redirect } from "next/navigation";
-
+import { SquareCheckBig } from "lucide-react";
 // Force dynamic rendering for auth and database operations
 export const dynamic = "force-dynamic";
 
@@ -62,8 +62,8 @@ export default async function Dashboard() {
         <DashboardCard
           className="rounded-sm"
           bigText={`${linearTasksCount}`}
-          unit="issues"
-          smallText="seneste år"
+          unit={<SquareCheckBig className="inline-block mb-[5.6px]" size={25} />}
+          smallText="issues seneste år"
         ></DashboardCard>
         <DashboardCard
           className="rounded-sm"
@@ -84,14 +84,14 @@ export default async function Dashboard() {
       </div>
       <div className="grid grid-cols-2 gap-8">
         <div className="grid gap-8 auto-rows-auto mb-8">
-          <DashboardAreaChart className="bg-[#1A1F26] p-4 rounded-sm"></DashboardAreaChart>
+          <DashboardAreaChart className="bg-[#1A1F26] p-4 rounded-sm shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.2s_both]"></DashboardAreaChart>
           <EstimationAccuracyChart />
         </div>
 
         <div className="grid gap-8 auto-rows-min">
           <DashboardCircleChart
             linearTasksWithTime={linearTasksWithTogglTimePercentage}
-            className="bg-[#1A1F26] p-4 rounded-sm flex items-center max-h-fit"
+            className="bg-[#1A1F26] p-4 rounded-sm flex items-center max-h-fit shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.3s_both]"
           ></DashboardCircleChart>
           <DashboardCard className="rounded-sm"></DashboardCard>
         </div>

@@ -50,7 +50,7 @@ export default function EstimationAccuracyChart({ className }: Props) {
 
   if (loading) {
     return (
-      <div className={cn("bg-[#1A1F26] p-6 rounded-sm", className)}>
+      <div className={cn("bg-[#1A1F26] p-6 rounded-sm shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.2s_both]", className)}>
         <h2 className="text-xl font-bold text-white mb-4">Estimation Accuracy</h2>
         <p className="text-gray-400">Loading...</p>
       </div>
@@ -78,7 +78,7 @@ export default function EstimationAccuracyChart({ className }: Props) {
   ];
 
   return (
-    <div className={cn("bg-[#1A1F26] p-6 rounded-sm", className)}>
+    <div className={cn("bg-[#1A1F26] p-6 rounded-sm shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.2s_both]", className)}>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-2">Estimation Accuracy</h2>
         <p className="text-sm text-gray-400">Estimated vs Actual hours per task</p>

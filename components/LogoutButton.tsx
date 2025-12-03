@@ -3,6 +3,8 @@
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { logout } from "@/lib/logout";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { LogOut, Loader2 } from "lucide-react";
 
 export default function LogoutButton() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -25,12 +27,18 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
+    <Button
       onClick={handleLogout}
       disabled={isLoggingOut}
-      className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white rounded transition-colors"
+      variant="outline"
+      className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-600/5 hover:to-cyan-600/5 hover:text-white hover:border-emerald-600/10 cursor-pointer transition-all ease-in-out"
     >
-      {isLoggingOut ? "Logging out..." : `Log Out`}
-    </button>
+      {isLoggingOut ? (
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      ) : (
+        <LogOut className="w-4 h-4 mr-2" />
+      )}
+      {isLoggingOut ? "Logging out..." : "Log Out"}
+    </Button>
   );
 }
