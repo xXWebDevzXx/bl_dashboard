@@ -7,6 +7,7 @@ interface DashboardCardProps {
   className?: string;
   bigText?: string;
   smallText?: string;
+  unit?: string;
   chartData?: Array<{ value: number }>;
   lineColor?: string;
   showChart?: boolean;
@@ -17,17 +18,21 @@ function DashboardCard({
   className,
   bigText,
   smallText,
+  unit,
   chartData,
   lineColor = "#4876DE",
   showChart = false,
 }: DashboardCardProps) {
   return (
     <div className={cn("bg-[#1A1F26] p-8 h-fit text-white relative overflow-hidden", className)}>
-      <h1 className="text-5xl font-bold relative z-10">{bigText}</h1>
-      <p className="relative z-10 text-xs font-semibold">{smallText}</p>
+     <div className="flex items-baseline space-x-1">
+        <h1 className="text-5xl font-bold relative z-10">{bigText}</h1>
+        <p className="text-3xl font-bold">{unit}</p>
+      </div>
+      <p className="text-xs font-semibold">{smallText}</p>
 
       {showChart && chartData && (
-        <div className="absolute bottom-2 h-10 w-30 right-0">
+        <div className="absolute pointer-events-none bottom-2 h-10 w-30 right-0">
           <svg width="0" height="0">
             <defs>
               <linearGradient id={`lineGradient-${lineColor}`} x1="55%" y1="0%" x2="90%" y2="0%">
