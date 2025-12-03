@@ -155,6 +155,7 @@ async function main() {
         estimatedTime: issue.estimate || 0,
         delegateId: issue.delegate?.id || null,
         delegateName: issue.delegate?.name || null,
+        projectName: issue.project?.name || null,
         updatedAt: Math.floor(Date.now() / 1000),
       },
       create: {
@@ -163,6 +164,7 @@ async function main() {
         estimatedTime: issue.estimate || 0,
         delegateId: issue.delegate?.id || null,
         delegateName: issue.delegate?.name || null,
+        projectName: issue.project?.name || null,
         createdAt: Math.floor(Date.now() / 1000),
         updatedAt: Math.floor(Date.now() / 1000),
       },
