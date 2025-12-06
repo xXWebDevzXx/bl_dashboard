@@ -61,7 +61,7 @@ export function ProfileActions() {
 
   return (
     <>
-      <Card className="lg:col-span-3 bg-[#161B22] border-zinc-800/60 shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
+      <Card className="lg:col-span-3 bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
         <CardHeader>
           <CardTitle className="text-white">Quick Actions</CardTitle>
           <CardDescription className="text-zinc-400">

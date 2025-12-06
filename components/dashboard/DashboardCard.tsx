@@ -24,7 +24,7 @@ function DashboardCard({
   showChart = false,
 }: DashboardCardProps) {
   return (
-    <div className={cn("bg-[#1A1F26] p-8 h-fit text-white relative overflow-hidden shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.1s_both]", className)}>
+    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-8 h-fit text-white relative overflow-hidden shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.1s_both]", className)}>
      <div className="flex items-baseline space-x-1">
         <h1 className="text-5xl font-bold relative z-10">{bigText}</h1>
         <p className="text-3xl font-bold">{unit}</p>
