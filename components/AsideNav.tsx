@@ -16,22 +16,20 @@ function AsideNav() {
 
   return (
     <div className="hidden desktop:flex bg-[#161B22] border-r border-zinc-800/60 flex-col w-fit min-h-full p-8 text-white">
-      <nav className="flex flex-col gap-4">
+      <nav className="flex flex-col gap-2">
         {navItems.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;
           return (
             <Link
               key={href}
               href={href}
-              className={`flex w-fit items-center gap-2 relative group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-gradient-to-r after:from-emerald-500 after:to-cyan-500 after:transition-all after:duration-300 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
                 isActive
-                  ? "text-emerald-400 after:w-full"
-                  : "after:w-0 hover:after:w-full"
+                  ? "bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 text-emerald-400"
+                  : "text-white hover:bg-zinc-800"
               }`}
             >
-              <Icon className={`w-4 h-4 transition-colors duration-300 ${
-                isActive ? "text-emerald-400" : "group-hover:text-emerald-400"
-              }`} />
+              <Icon className="w-5 h-5" />
               {label}
             </Link>
           );

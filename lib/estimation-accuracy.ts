@@ -89,8 +89,10 @@ function calculateMetrics(tasks: TaskWithTogglTimes[]) {
   const averageEstimated = totalEstimated / tasks.length;
   const averageActual = totalActual / tasks.length;
 
-  // Calculate accuracy: how close actual is to estimated
-  // 100% = perfect match, <100% = under estimated, >100% = over estimated
+  // Calculate accuracy percentage: (actual / estimated) * 100
+  // 100% = perfect match
+  // <100% = completed faster than estimated (good)
+  // >100% = took longer than estimated (needs improvement)
   const accuracyPercentage = averageEstimated > 0
     ? (averageActual / averageEstimated) * 100
     : 0;
