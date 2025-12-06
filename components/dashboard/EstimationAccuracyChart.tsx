@@ -50,9 +50,9 @@ export default function EstimationAccuracyChart({ className }: Props) {
 
   if (loading) {
     return (
-      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both]", className)}>
-        <h2 className="text-xl font-bold text-white mb-4">Estimation Accuracy</h2>
-        <p className="text-gray-400">Loading...</p>
+      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
+        <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Estimation Accuracy</h2>
+        <p className="text-gray-400 text-sm">Loading...</p>
       </div>
     );
   }
@@ -78,68 +78,70 @@ export default function EstimationAccuracyChart({ className }: Props) {
   ];
 
   return (
-    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both]", className)}>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Estimation Accuracy</h2>
-        <p className="text-sm text-gray-400">Estimated vs Actual hours per task</p>
+    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
+      <div className="mb-4 sm:mb-6">
+        <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-2">Estimation Accuracy</h2>
+        <p className="text-xs sm:text-sm text-gray-400">Estimated vs Actual hours per task</p>
       </div>
 
       {/* Key Insights */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-[#0D1117] p-4 rounded">
-          <p className="text-xs text-gray-400 mb-1">AI Tasks Accuracy</p>
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <div className="bg-[#0D1117] p-2 sm:p-3 desktop:p-4 rounded">
+          <p className="text-[10px] sm:text-xs text-gray-400 mb-1">AI Tasks Accuracy</p>
           {data.aiTasks.taskCount > 0 ? (
             <>
-              <p className="text-2xl font-bold text-emerald-500">
+              <p className="text-lg sm:text-xl desktop:text-2xl font-bold text-emerald-500">
                 {data.aiTasks.accuracyPercentage.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-500">{data.aiTasks.taskCount} tasks</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">{data.aiTasks.taskCount} tasks</p>
             </>
           ) : (
-            <p className="text-sm text-gray-500 italic">No data available</p>
+            <p className="text-xs sm:text-sm text-gray-500 italic">No data</p>
           )}
         </div>
-        <div className="bg-[#0D1117] p-4 rounded">
-          <p className="text-xs text-gray-400 mb-1">Non-AI Tasks Accuracy</p>
+        <div className="bg-[#0D1117] p-2 sm:p-3 desktop:p-4 rounded">
+          <p className="text-[10px] sm:text-xs text-gray-400 mb-1">Non-AI Tasks Accuracy</p>
           {data.nonAiTasks.taskCount > 0 ? (
             <>
-              <p className="text-2xl font-bold text-cyan-500">
+              <p className="text-lg sm:text-xl desktop:text-2xl font-bold text-cyan-500">
                 {data.nonAiTasks.accuracyPercentage.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-500">{data.nonAiTasks.taskCount} tasks</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">{data.nonAiTasks.taskCount} tasks</p>
             </>
           ) : (
-            <p className="text-sm text-gray-500 italic">No data available</p>
+            <p className="text-xs sm:text-sm text-gray-500 italic">No data</p>
           )}
         </div>
       </div>
 
       {/* Bar Chart */}
-      <div className="h-[250px] w-full">
+      <div className="h-[180px] sm:h-[220px] desktop:h-[250px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
             <XAxis
               dataKey="name"
               stroke="#9CA3AF"
-              tick={{ fill: "#9CA3AF" }}
+              tick={{ fill: "#9CA3AF", fontSize: 12 }}
             />
             <YAxis
               stroke="#9CA3AF"
-              tick={{ fill: "#9CA3AF" }}
-              label={{ value: "Hours", angle: -90, position: "insideLeft", fill: "#9CA3AF" }}
+              tick={{ fill: "#9CA3AF", fontSize: 12 }}
+              width={35}
+              label={{ value: "Hrs", angle: -90, position: "insideLeft", fill: "#9CA3AF", fontSize: 11 }}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: "#1A1F26",
                 border: "1px solid #374151",
                 borderRadius: "4px",
+                fontSize: "12px",
               }}
               labelStyle={{ color: "#fff" }}
               itemStyle={{ color: "#9CA3AF" }}
             />
             <Legend
-              wrapperStyle={{ color: "#9CA3AF" }}
+              wrapperStyle={{ color: "#9CA3AF", fontSize: "12px" }}
             />
             <Bar dataKey="Actual" fill="#0891b2" radius={[4, 4, 0, 0]} />
             <Bar dataKey="Estimated" fill="#059669" radius={[4, 4, 0, 0]} />
@@ -148,8 +150,8 @@ export default function EstimationAccuracyChart({ className }: Props) {
       </div>
 
       {/* Interpretation */}
-      <div className="mt-4 p-3 bg-[#0D1117] rounded">
-        <p className="text-xs text-gray-400">
+      <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-[#0D1117] rounded">
+        <p className="text-[10px] sm:text-xs text-gray-400">
           {data.aiTasks.taskCount === 0
             ? "ℹ Add estimated time to AI tasks to see accuracy metrics"
             : data.aiTasks.accuracyPercentage < 100

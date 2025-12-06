@@ -9,9 +9,34 @@ interface props {
 export default function DashboardCircleChartContent({ linearTasksWithTime }: props) {
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
   const percentage = linearTasksWithTime.toFixed(1);
-  const radius = 80;
+
+  // Responsive radius based on screen size
+  const [radius, setRadius] = useState(60);
+  const [svgSize, setSvgSize] = useState(160);
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth < 640) {
+        setRadius(50);
+        setSvgSize(140);
+      } else if (window.innerWidth < 1100) {
+        setRadius(65);
+        setSvgSize(180);
+      } else {
+        setRadius(80);
+        setSvgSize(220);
+      }
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
+  const center = svgSize / 2;
+  const strokeWidth = window.innerWidth < 640 ? 12 : 16;
 
   // Animate the percentage counter on mount
   useEffect(() => {
@@ -35,18 +60,18 @@ export default function DashboardCircleChartContent({ linearTasksWithTime }: pro
   }, [percentage]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full p-6">
-      <h2 className="text-xl font-bold text-white mb-6">Tasks med Tidsregistrering</h2>
+    <div className="flex flex-col items-center justify-center w-full p-2 sm:p-4 desktop:p-6">
+      <h2 className="text-base sm:text-lg desktop:text-xl font-bold text-white mb-3 sm:mb-4 desktop:mb-6">Tasks med Tidsregistrering</h2>
 
-      <div className="relative flex items-center justify-center w-[220px] h-[220px]">
-        <svg className="transform -rotate-90" width="220" height="220">
+      <div className={`relative flex items-center justify-center`} style={{ width: svgSize, height: svgSize }}>
+        <svg className="transform -rotate-90" width={svgSize} height={svgSize}>
           {/* Background circle */}
           <circle
-            cx="110"
-            cy="110"
+            cx={center}
+            cy={center}
             r={radius}
             stroke="#1e293b"
-            strokeWidth="16"
+            strokeWidth={strokeWidth}
             fill="none"
           />
 
@@ -69,11 +94,11 @@ export default function DashboardCircleChartContent({ linearTasksWithTime }: pro
 
           {/* Progress circle with animation */}
           <circle
-            cx="110"
-            cy="110"
+            cx={center}
+            cy={center}
             r={radius}
             stroke="url(#circleGradient)"
-            strokeWidth="16"
+            strokeWidth={strokeWidth}
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -87,10 +112,10 @@ export default function DashboardCircleChartContent({ linearTasksWithTime }: pro
 
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold text-white mb-1">
+          <span className="text-3xl sm:text-4xl desktop:text-5xl font-bold text-white mb-1">
             {animatedPercentage.toFixed(1)}%
           </span>
-          <span className="text-sm text-gray-400">tracked</span>
+          <span className="text-xs sm:text-sm text-gray-400">tracked</span>
         </div>
       </div>
     </div>
