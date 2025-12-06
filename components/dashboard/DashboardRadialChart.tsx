@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RadialBarChart, RadialBar, Legend, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell } from "recharts";
 import { cn } from "@/lib/utils";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartConfig } from "@/components/ui/chart";
 
 interface RadialChartData {
   labelTaskCounts: { label: string; count: number }[];
@@ -16,6 +17,7 @@ interface Props {
 export default function DashboardRadialChart({ className }: Props) {
   const [data, setData] = useState<RadialChartData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -46,26 +48,57 @@ export default function DashboardRadialChart({ className }: Props) {
   }
 
   // Prepare data for radial chart
-  // Use colors that match the dashboard theme
+  // Use emerald and cyan color scheme - lightest (center) to darkest (outer)
   const colors = [
-    "#38bdf8", // sky-400
+    "#6ee7b7", // emerald-300 (lightest - center)
+    "#5eead4", // teal-300
+    "#67e8f9", // cyan-300
     "#34d399", // emerald-400
-    "#fbbf24", // amber-400
-    "#6366f1", // indigo-500
-    "#f43f5e", // rose-500
-    "#a21caf", // purple-700
-    "#e11d48", // rose-600
-    "#84cc16", // lime-500
-    "#0891b2", // cyan-600
-    "#f59e42", // orange-400
+    "#2dd4bf", // teal-400
+    "#22d3ee", // cyan-400
+    "#10b981", // emerald-500
+    "#14b8a6", // teal-500
+    "#06b6d4", // cyan-500
+    "#059669", // emerald-600
+    "#0d9488", // teal-600
+    "#0891b2", // cyan-600 (darkest - outer)
   ];
-  // Sort so largest is last (innermost ring)
-  const sortedChartData = [...data.labelTaskCounts].sort((a, b) => a.count - b.count);
+
+  // Gradient end colors (slightly darker for each)
+  const gradientEndColors = [
+    "#34d399", // emerald-400
+    "#2dd4bf", // teal-400
+    "#22d3ee", // cyan-400
+    "#10b981", // emerald-500
+    "#14b8a6", // teal-500
+    "#06b6d4", // cyan-500
+    "#059669", // emerald-600
+    "#0d9488", // teal-600
+    "#0891b2", // cyan-600
+    "#047857", // emerald-700
+    "#0f766e", // teal-700
+    "#0e7490", // cyan-700
+  ];
+
+  // Sort by largest first for better visualization
+  const sortedChartData = [...data.labelTaskCounts].sort((a, b) => b.count - a.count);
   const chartData = sortedChartData.map((item, idx) => ({
     name: item.label,
     value: item.count,
-    fill: colors[idx % colors.length],
+    baseColor: colors[idx % colors.length],
+    endColor: gradientEndColors[idx % gradientEndColors.length],
+    fill: `var(--color-${item.label.toLowerCase().replace(/\s+/g, '-')})`,
   }));
+
+  // Create chart config for shadcn
+  const chartConfig = sortedChartData.reduce((config, item, idx) => {
+    const key = item.label.toLowerCase().replace(/\s+/g, '-');
+    config[key] = {
+      label: item.label,
+      color: colors[idx % colors.length],
+    };
+    return config;
+  }, {} as ChartConfig);
 
   return (
     <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
@@ -75,56 +108,115 @@ export default function DashboardRadialChart({ className }: Props) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {sortedChartData.map((item, idx) => (
-          <div key={item.label} className="bg-[#0D1117] p-3 sm:p-4 rounded">
-            <p className="text-xs text-gray-400 mb-1">{item.label}</p>
-            <p className="text-2xl sm:text-3xl font-bold" style={{ color: colors[idx % colors.length] }}>{item.count}</p>
-            <p className="text-xs text-gray-500">{((item.count / data.totalTasks) * 100).toFixed(1)}%</p>
+      <div className="grid grid-cols-2 gap-4 mb-6" onMouseLeave={() => setActiveIndex(-1)}>
+        {chartData.map((item, idx) => (
+          <div
+            key={item.name}
+            className="bg-[#0D1117] p-3 sm:p-4 rounded border border-zinc-800/40 hover:border-zinc-700/60 transition-all hover:shadow-lg"
+            style={{
+              boxShadow: activeIndex === idx ? `0 10px 15px -3px ${item.baseColor}20, 0 4px 6px -2px ${item.baseColor}10` : undefined,
+              borderColor: activeIndex === idx ? `${item.baseColor}60` : undefined,
+            }}
+            onMouseEnter={() => setActiveIndex(idx)}
+          >
+            <p className="text-xs text-gray-400 mb-1">{item.name}</p>
+            <p className="text-2xl sm:text-3xl font-bold" style={{ color: item.baseColor }}>{item.value}</p>
+            <p className="text-xs text-gray-500">{((item.value / data.totalTasks) * 100).toFixed(1)}%</p>
           </div>
         ))}
       </div>
 
-      {/* Radial Chart */}
-      <div className="h-[220px] sm:h-[260px] w-full flex items-center justify-center bg-[#0D1117] rounded-lg border border-zinc-800/60 shadow-inner">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadialBarChart
-            cx="50%"
-            cy="50%"
-            innerRadius="35%"
-            outerRadius="90%"
-            barSize={18}
-            data={chartData}
-            startAngle={90}
-            endAngle={-270}
-          >
-            <RadialBar
-              background={{ fill: "#161B22" }}
+      {/* Pie Chart */}
+      <div
+        className="h-80 sm:h-[360px] w-full bg-[#0D1117] rounded-lg border border-zinc-800/60 shadow-inner"
+        onMouseLeave={() => setActiveIndex(-1)}
+      >
+        <ChartContainer config={chartConfig} className="h-full w-full">
+          <PieChart>
+            <defs>
+              {chartData.map((item, idx) => (
+                <linearGradient
+                  key={`pieGradient-${idx}`}
+                  id={`pieGradient-${idx}`}
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor={item.baseColor} stopOpacity={0.4} />
+                  <stop offset="50%" stopColor={item.baseColor} stopOpacity={0.25} />
+                  <stop offset="100%" stopColor={item.endColor} stopOpacity={0.1} />
+                </linearGradient>
+              ))}
+            </defs>
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            <Pie
+              data={chartData}
               dataKey="value"
-              cornerRadius={12}
-              label={{ position: "insideStart", fill: "#e5e7eb", fontSize: 13, fontWeight: 500 }}
-            />
-            <Legend
-              iconSize={12}
-              layout="horizontal"
-              verticalAlign="bottom"
-              align="center"
-              wrapperStyle={{
-                fontSize: "13px",
-                color: "#d1d5db",
-                marginTop: "8px",
-                fontWeight: 500,
-                letterSpacing: "0.02em",
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius="45%"
+              outerRadius="75%"
+              strokeWidth={2}
+              onMouseEnter={(_, index) => setActiveIndex(index)}
+              label={(props: { cx?: number; cy?: number; midAngle?: number; outerRadius?: number; name?: string; percent?: number; index?: number }) => {
+                const { cx, cy, midAngle, outerRadius, name, percent, index } = props;
+                if (!cx || !cy || !outerRadius || !name || index === undefined) return null;
+                if (!midAngle) return null;
+
+                const RADIAN = Math.PI / 180;
+                // Expand radius for active slice
+                const isActive = activeIndex === index;
+                const adjustedRadius = isActive ? outerRadius + 10 : outerRadius;
+                const radius = adjustedRadius + 30;
+                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                const entry = chartData[index];
+
+                return (
+                  <text
+                    x={x}
+                    y={y}
+                    fill={entry.baseColor}
+                    textAnchor={x > cx ? 'start' : 'end'}
+                    dominantBaseline="central"
+                    fontSize={12}
+                    fontWeight={600}
+                  >
+                    {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  </text>
+                );
               }}
-            />
-          </RadialBarChart>
-        </ResponsiveContainer>
+              labelLine={{
+                stroke: "#9CA3AF",
+                strokeWidth: 1,
+              }}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={`url(#pieGradient-${index})`}
+                  stroke={entry.baseColor}
+                  strokeWidth={1}
+                  style={{
+                    filter: activeIndex === index ? 'brightness(1.2)' : undefined,
+                    transform: activeIndex === index ? 'scale(1.05)' : undefined,
+                    transformOrigin: 'center',
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+              ))}
+            </Pie>
+            <ChartLegend content={<ChartLegendContent />} />
+          </PieChart>
+        </ChartContainer>
       </div>
 
       {/* Total */}
-      <div className="mt-4 p-3 bg-[#0D1117] rounded text-center">
-        <p className="text-xs text-gray-400">Total Tasks</p>
-        <p className="text-3xl font-bold text-white">{data.totalTasks}</p>
+      <div className="mt-4 p-3 sm:p-4 bg-[#0D1117] rounded-lg border border-zinc-800/40 text-center hover:border-zinc-700/60 transition-colors">
+        <p className="text-xs sm:text-sm text-gray-400 font-medium mb-1">Total Tasks</p>
+        <p className="text-3xl sm:text-4xl font-bold text-white">{data.totalTasks}</p>
       </div>
     </div>
   );
