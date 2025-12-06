@@ -1,6 +1,7 @@
 import DashboardAreaChart from "@/components/dashboard/DashboardAreaChart";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import DashboardCircleChart from "@/components/dashboard/DashboardCircleChart";
+import DashboardRadialChart from "@/components/dashboard/DashboardRadialChart";
 import EstimationAccuracyChart from "@/components/dashboard/EstimationAccuracyChart";
 import { auth0 } from "@/lib/auth0";
 import { getDashboardStats } from "@/lib/dashboard-stats";
@@ -57,8 +58,8 @@ export default async function Dashboard() {
   }));
 
   return (
-    <div className="p-8">
-      <div className="grid grid-cols-4 gap-8 mb-8">
+    <div className="p-4 sm:p-6 desktop:p-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 desktop:grid-cols-4 gap-4 sm:gap-6 desktop:gap-8 mb-4 sm:mb-6 desktop:mb-8">
         <DashboardCard
           className="rounded-sm"
           bigText={`${linearTasksCount}`}
@@ -82,18 +83,18 @@ export default async function Dashboard() {
         />
         <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}`} unit="%" smallText="AI-assisteret opgaver"></DashboardCard>
       </div>
-      <div className="grid grid-cols-2 gap-8">
-        <div className="grid gap-8 auto-rows-auto mb-8">
-          <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-4 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both]"></DashboardAreaChart>
+      <div className="grid grid-cols-1 desktop:grid-cols-2 gap-4 sm:gap-6 desktop:gap-8">
+        <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-auto mb-4 sm:mb-6 desktop:mb-8">
+          <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
           <EstimationAccuracyChart />
         </div>
 
-        <div className="grid gap-8 auto-rows-min">
+        <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
           <DashboardCircleChart
             linearTasksWithTime={linearTasksWithTogglTimePercentage}
-            className="bg-[#161B22] border border-zinc-800/60 p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.3s_both]"
+            className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
           ></DashboardCircleChart>
-          <DashboardCard className="rounded-sm"></DashboardCard>
+          <DashboardRadialChart />
         </div>
       </div>
     </div>

@@ -24,12 +24,12 @@ function DashboardCard({
   showChart = false,
 }: DashboardCardProps) {
   return (
-    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-8 h-fit text-white relative overflow-hidden shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.1s_both]", className)}>
+    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 desktop:p-8 h-fit text-white relative overflow-hidden shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.1s_both]", className)}>
      <div className="flex items-baseline space-x-1">
-        <h1 className="text-5xl font-bold relative z-10">{bigText}</h1>
-        <p className="text-3xl font-bold">{unit}</p>
+        <h1 className="text-3xl sm:text-4xl desktop:text-5xl font-bold relative z-10">{bigText}</h1>
+        <p className="text-xl sm:text-2xl desktop:text-3xl font-bold">{unit}</p>
       </div>
-      <p className="text-xs font-semibold">{smallText}</p>
+      <p className="text-xs sm:text-sm font-semibold mt-1">{smallText}</p>
 
       {showChart && chartData && (
         <div className="absolute pointer-events-none bottom-2 h-10 w-30 right-0">

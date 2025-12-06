@@ -57,20 +57,20 @@ export default function DashboardAreaChartContent() {
 
   if (loading) {
     return (
-      <div className="p-4">
-        <h1 className="text-2xl font-bold text-white mb-4">AI vs Non-AI tasks</h1>
-        <p className="text-white">Loading...</p>
+      <div className="p-2 sm:p-4">
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">AI vs Non-AI tasks</h1>
+        <p className="text-white text-sm">Loading...</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="p-4 mb-4">
-        <h1 className="text-2xl font-bold text-white">AI vs Non-AI tasks</h1>
+      <div className="p-2 sm:p-4 mb-2 sm:mb-4">
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">AI vs Non-AI tasks</h1>
       </div>
-      <ChartContainer config={chartConfig} className="h-[200px] w-full">
-        <AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12, top: 12, bottom: 12 }}>
+      <ChartContainer config={chartConfig} className="h-[150px] sm:h-[180px] desktop:h-[200px] w-full">
+        <AreaChart accessibilityLayer data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
           <defs>
             <linearGradient id="gradientAiTasks" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#84B2FF" stopOpacity={0.8} />
@@ -82,10 +82,23 @@ export default function DashboardAreaChartContent() {
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} stroke="white" opacity="0.04" />
-          <XAxis dataKey="formattedDate" tickLine={false} axisLine={false} tickMargin={8} />
-          <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => `${value}h`} width={30} />
+          <XAxis
+            dataKey="formattedDate"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            className="text-xs sm:text-sm"
+          />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => `${value}h`}
+            width={25}
+            className="text-xs sm:text-sm"
+          />
           <Tooltip content={<ChartTooltipContent />} />
-          <ChartLegend className="text-white" content={ChartLegendContent as unknown as ContentType} />
+          <ChartLegend className="text-white text-xs sm:text-sm" content={ChartLegendContent as unknown as ContentType} />
           <Area dataKey="aiTasksHours" type="linear" fill="url(#gradientAiTasks)" stroke="var(--color-aiTasksHours)" stackId="a" />
           <Area dataKey="nonAiTasksHours" type="linear" fill="url(#gradientNonAiTasks)" stroke="var(--color-nonAiTasksHours)" stackId="b" />
         </AreaChart>
