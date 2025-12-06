@@ -84,14 +84,14 @@ export default async function Dashboard() {
       </div>
       <div className="grid grid-cols-2 gap-8">
         <div className="grid gap-8 auto-rows-auto mb-8">
-          <DashboardAreaChart className="bg-[#1A1F26] p-4 rounded-sm shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.2s_both]"></DashboardAreaChart>
+          <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-4 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both]"></DashboardAreaChart>
           <EstimationAccuracyChart />
         </div>
 
         <div className="grid gap-8 auto-rows-min">
           <DashboardCircleChart
             linearTasksWithTime={linearTasksWithTogglTimePercentage}
-            className="bg-[#1A1F26] p-4 rounded-sm flex items-center max-h-fit shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.3s_both]"
+            className="bg-[#161B22] border border-zinc-800/60 p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.3s_both]"
           ></DashboardCircleChart>
           <DashboardCard className="rounded-sm"></DashboardCard>
         </div>
