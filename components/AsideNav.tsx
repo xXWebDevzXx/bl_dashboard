@@ -9,9 +9,9 @@ function AsideNav() {
           <LayoutDashboard className="w-4 h-4 transition-colors duration-300 group-hover:text-emerald-400" />
           Dashboard
         </Link>
-        <Link href="/tasks" className="flex w-fit items-center gap-2 relative group after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-emerald-500 after:to-cyan-500 hover:after:w-full after:transition-all after:duration-300">
+        <Link href="/issues" className="flex w-fit items-center gap-2 relative group after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-emerald-500 after:to-cyan-500 hover:after:w-full after:transition-all after:duration-300">
           <ListTodo className="w-4 h-4 transition-colors duration-300 group-hover:text-emerald-400" />
-          Tasks
+          Issues
         </Link>
         <Link href="/compare" className="flex w-fit items-center gap-2 relative group after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-emerald-500 after:to-cyan-500 hover:after:w-full after:transition-all after:duration-300">
           <GitCompare className="w-4 h-4 transition-colors duration-300 group-hover:text-emerald-400" />
