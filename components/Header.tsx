@@ -10,7 +10,9 @@ function Header() {
 
   return (
     <header className="bg-[#1A1F26] flex justify-between items-center text-white p-8 col-span-2">
-      <Link href="/dashboard" className="text-4xl font-bold">AITracker</Link>
+      <Link href="/dashboard" className="text-5xl font-bold bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+        AITracker
+      </Link>
       {!isLoading && (user ? <LogoutButton /> : <LoginButton />)}
     </header>
   );

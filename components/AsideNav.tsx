@@ -9,9 +9,9 @@ function AsideNav() {
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
         </Link>
-        <Link href="/tasks" className="flex items-center gap-2 hover:underline">
+        <Link href="/issues" className="flex items-center gap-2 hover:underline">
           <ListTodo className="w-4 h-4" />
-          Tasks
+          Issues
         </Link>
         <Link href="/compare" className="flex items-center gap-2 hover:underline">
           <GitCompare className="w-4 h-4" />
