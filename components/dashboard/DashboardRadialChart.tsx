@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell } from "recharts";
 import { cn } from "@/lib/utils";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartConfig } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartLegend, ChartLegendContent, ChartConfig } from "@/components/ui/chart";
 
 interface RadialChartData {
   labelTaskCounts: { label: string; count: number }[];
@@ -36,8 +36,8 @@ export default function DashboardRadialChart({ className }: Props) {
 
   if (loading) {
     return (
-      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
-        <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">Task Distribution by Label</h2>
+      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
+        <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">Issue Distribution by Label</h2>
         <p className="text-gray-400 text-sm">Loading...</p>
       </div>
     );
@@ -101,10 +101,10 @@ export default function DashboardRadialChart({ className }: Props) {
   }, {} as ChartConfig);
 
   return (
-    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
+    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
       <div className="mb-4">
-        <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-2">Task Distribution by Label</h2>
-        <p className="text-xs sm:text-sm text-gray-400">How tasks are distributed across labels</p>
+        <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-2">Issue Distribution by Label</h2>
+        <p className="text-xs sm:text-sm text-gray-400">How issues are distributed across labels</p>
       </div>
 
       {/* Stats */}
@@ -149,7 +149,29 @@ export default function DashboardRadialChart({ className }: Props) {
                 </linearGradient>
               ))}
             </defs>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              content={({ active, payload }) => {
+                if (!active || !payload || !payload[0]) return null;
+                const sliceData = payload[0].payload;
+                return (
+                  <div className="bg-[#1A1F26] border border-zinc-700/60 rounded-lg p-3 shadow-xl">
+                    <p className="text-white font-semibold mb-1">{sliceData.name}</p>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: sliceData.baseColor }}
+                      />
+                      <p className="text-gray-300 text-sm">
+                        <span className="font-bold">{sliceData.value}</span> issues
+                      </p>
+                    </div>
+                    <p className="text-gray-400 text-xs mt-1">
+                      {((sliceData.value / data.totalTasks) * 100).toFixed(1)}% of total
+                    </p>
+                  </div>
+                );
+              }}
+            />
             <Pie
               data={chartData}
               dataKey="value"
@@ -160,16 +182,15 @@ export default function DashboardRadialChart({ className }: Props) {
               outerRadius="75%"
               strokeWidth={2}
               onMouseEnter={(_, index) => setActiveIndex(index)}
+              isAnimationActive={false}
               label={(props: { cx?: number; cy?: number; midAngle?: number; outerRadius?: number; name?: string; percent?: number; index?: number }) => {
                 const { cx, cy, midAngle, outerRadius, name, percent, index } = props;
                 if (!cx || !cy || !outerRadius || !name || index === undefined) return null;
                 if (!midAngle) return null;
 
                 const RADIAN = Math.PI / 180;
-                // Expand radius for active slice
-                const isActive = activeIndex === index;
-                const adjustedRadius = isActive ? outerRadius + 10 : outerRadius;
-                const radius = adjustedRadius + 30;
+                // Keep constant radius so labels don't move
+                const radius = outerRadius + 30;
                 const x = cx + radius * Math.cos(-midAngle * RADIAN);
                 const y = cy + radius * Math.sin(-midAngle * RADIAN);
                 const entry = chartData[index];
@@ -183,6 +204,7 @@ export default function DashboardRadialChart({ className }: Props) {
                     dominantBaseline="central"
                     fontSize={12}
                     fontWeight={600}
+                    pointerEvents="none"
                   >
                     {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                   </text>
@@ -191,6 +213,7 @@ export default function DashboardRadialChart({ className }: Props) {
               labelLine={{
                 stroke: "#9CA3AF",
                 strokeWidth: 1,
+                pointerEvents: "none",
               }}
             >
               {chartData.map((entry, index) => (
@@ -215,7 +238,7 @@ export default function DashboardRadialChart({ className }: Props) {
 
       {/* Total */}
       <div className="mt-4 p-3 sm:p-4 bg-[#0D1117] rounded-lg border border-zinc-800/40 text-center hover:border-zinc-700/60 transition-colors">
-        <p className="text-xs sm:text-sm text-gray-400 font-medium mb-1">Total Tasks</p>
+        <p className="text-xs sm:text-sm text-gray-400 font-medium mb-1">Total Issues</p>
         <p className="text-3xl sm:text-4xl font-bold text-white">{data.totalTasks}</p>
       </div>
     </div>

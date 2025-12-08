@@ -28,6 +28,37 @@ interface Props {
   className?: string;
 }
 
+// Custom bar shape with gradient and border (top and sides only, no bottom) - defined outside component
+const GradientBar = (props: { fill?: string; x?: number; y?: number; width?: number; height?: number; payload?: unknown }) => {
+  const { fill, x, y, width, height } = props;
+  if (!fill || x === undefined || y === undefined || width === undefined || height === undefined) return null;
+
+  // Determine border color based on which data key this is
+  const isCyan = fill.includes("actualGradient");
+  const strokeColor = isCyan ? "#22d3ee" : "#34d399";
+
+  return (
+    <g>
+      {/* Main fill rectangle */}
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={fill}
+        rx={0}
+      />
+      {/* Border lines - left, top, right (no bottom) */}
+      <path
+        d={`M ${x} ${y + height} L ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height}`}
+        fill="none"
+        stroke={strokeColor}
+        strokeWidth={1.5}
+      />
+    </g>
+  );
+};
+
 export default function EstimationAccuracyChart({ className }: Props) {
   const [data, setData] = useState<EstimationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +81,7 @@ export default function EstimationAccuracyChart({ className }: Props) {
 
   if (loading) {
     return (
-      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
+      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
         <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Estimation Accuracy</h2>
         <p className="text-gray-400 text-sm">Loading...</p>
       </div>
@@ -64,80 +95,49 @@ export default function EstimationAccuracyChart({ className }: Props) {
   // Prepare data for bar chart
   const chartData = [
     {
-      name: "AI Tasks",
+      name: "AI Issues",
       Estimated: data.aiTasks.averageEstimated,
       Actual: data.aiTasks.averageActual,
       count: data.aiTasks.taskCount,
     },
     {
-      name: "Non-AI Tasks",
+      name: "Non-AI Issues",
       Estimated: data.nonAiTasks.averageEstimated,
       Actual: data.nonAiTasks.averageActual,
       count: data.nonAiTasks.taskCount,
     },
   ];
 
-  // Custom bar shape with gradient and border (top and sides only, no bottom)
-  const GradientBar = (props: { fill?: string; x?: number; y?: number; width?: number; height?: number; payload?: unknown }) => {
-    const { fill, x, y, width, height } = props;
-    if (!fill || x === undefined || y === undefined || width === undefined || height === undefined) return null;
-
-    // Determine border color based on which data key this is
-    const isCyan = fill.includes("actualGradient");
-    const strokeColor = isCyan ? "#22d3ee" : "#34d399";
-
-    return (
-      <g>
-        {/* Main fill rectangle */}
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={fill}
-          rx={0}
-        />
-        {/* Border lines - left, top, right (no bottom) */}
-        <path
-          d={`M ${x} ${y + height} L ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height}`}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={1.5}
-        />
-      </g>
-    );
-  };
-
   return (
-    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
+    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 desktop:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden", className)}>
       <div className="mb-4 sm:mb-6">
         <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-2">Estimation Accuracy</h2>
-        <p className="text-xs sm:text-sm text-gray-400">Estimated vs Actual hours per task</p>
+        <p className="text-xs sm:text-sm text-gray-400">Estimated vs Actual hours per issue</p>
       </div>
 
       {/* Key Insights */}
       <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <div className="bg-[#0D1117] p-2 sm:p-3 desktop:p-4 rounded-lg border border-zinc-800/40 hover:border-emerald-500/30 transition-all hover:shadow-lg hover:shadow-emerald-500/10">
-          <p className="text-[10px] sm:text-xs text-gray-400 mb-1 font-medium">AI Tasks Accuracy</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 mb-1 font-medium">AI Issues Accuracy</p>
           {data.aiTasks.taskCount > 0 ? (
             <>
               <p className="text-lg sm:text-xl desktop:text-2xl font-bold text-emerald-400">
                 {data.aiTasks.accuracyPercentage.toFixed(1)}%
               </p>
-              <p className="text-[10px] sm:text-xs text-gray-500">{data.aiTasks.taskCount} tasks</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">{data.aiTasks.taskCount} issues</p>
             </>
           ) : (
             <p className="text-xs sm:text-sm text-gray-500 italic">No data</p>
           )}
         </div>
         <div className="bg-[#0D1117] p-2 sm:p-3 desktop:p-4 rounded-lg border border-zinc-800/40 hover:border-cyan-500/30 transition-all hover:shadow-lg hover:shadow-cyan-500/10">
-          <p className="text-[10px] sm:text-xs text-gray-400 mb-1 font-medium">Non-AI Tasks Accuracy</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 mb-1 font-medium">Non-AI Issues Accuracy</p>
           {data.nonAiTasks.taskCount > 0 ? (
             <>
               <p className="text-lg sm:text-xl desktop:text-2xl font-bold text-cyan-400">
                 {data.nonAiTasks.accuracyPercentage.toFixed(1)}%
               </p>
-              <p className="text-[10px] sm:text-xs text-gray-500">{data.nonAiTasks.taskCount} tasks</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">{data.nonAiTasks.taskCount} issues</p>
             </>
           ) : (
             <p className="text-xs sm:text-sm text-gray-500 italic">No data</p>
@@ -174,6 +174,7 @@ export default function EstimationAccuracyChart({ className }: Props) {
               label={{ value: "Hrs", angle: -90, position: "insideLeft", fill: "#9CA3AF", fontSize: 11 }}
             />
             <Tooltip
+              cursor={{ fill: "transparent" }}
               contentStyle={{
                 backgroundColor: "#1A1F26",
                 border: "1px solid #374151",
@@ -197,12 +198,12 @@ export default function EstimationAccuracyChart({ className }: Props) {
       <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-[#0D1117] rounded-lg border border-zinc-800/40">
         <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed">
           {data.aiTasks.taskCount === 0
-            ? "ℹ Add estimated time to AI tasks to see accuracy metrics"
+            ? "ℹ Add estimated time to AI issues to see accuracy metrics"
             : data.aiTasks.accuracyPercentage < 100
-            ? "✓ AI tasks are completed faster than estimated"
+            ? "✓ AI issues are completed faster than estimated"
             : data.aiTasks.accuracyPercentage > 110
-            ? "⚠ AI tasks are taking longer than estimated"
-            : "✓ AI task estimates are accurate"}
+            ? "⚠ AI issues are taking longer than estimated"
+            : "✓ AI issue estimates are accurate"}
         </p>
       </div>
     </div>

@@ -3,6 +3,7 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import DashboardCircleChart from "@/components/dashboard/DashboardCircleChart";
 import DashboardRadialChart from "@/components/dashboard/DashboardRadialChart";
 import EstimationAccuracyChart from "@/components/dashboard/EstimationAccuracyChart";
+import DashboardClientWrapper from "@/components/dashboard/DashboardClientWrapper";
 import { auth0 } from "@/lib/auth0";
 import { getDashboardStats } from "@/lib/dashboard-stats";
 import { ensureUserSynced } from "@/lib/ensure-user-synced";
@@ -42,6 +43,7 @@ export default async function Dashboard() {
   const {
     linearTasksCount,
     linearTasksWithTogglTimePercentage,
+    linearTasksWithTogglTimeCount,
     averageTogglTimeHours,
     linearTasksWithDelegatePercentage,
   } = await getDashboardStats();
@@ -58,45 +60,49 @@ export default async function Dashboard() {
   }));
 
   return (
-    <div className="p-4 sm:p-6 desktop:p-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 desktop:grid-cols-4 gap-4 sm:gap-6 desktop:gap-8 mb-4 sm:mb-6 desktop:mb-8">
+    <DashboardClientWrapper>
+      <div className="p-4 sm:p-6 desktop:p-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 desktop:grid-cols-4 gap-4 sm:gap-6 desktop:gap-8 mb-4 sm:mb-6 desktop:mb-8">
         <DashboardCard
           className="rounded-sm"
           bigText={`${linearTasksCount}`}
           unit={<SquareCheckBig className="inline-block mb-[5.6px]" size={25} />}
-          smallText="issues seneste år"
+          smallText="issues last year"
         ></DashboardCard>
         <DashboardCard
           className="rounded-sm"
           bigText={`${linearTasksWithTogglTimePercentage.toFixed(2)}`}
           unit="%"
-          smallText="AI tasks vs non-AI tasks"
+          smallText="AI issues vs non-AI issues"
         ></DashboardCard>
         <DashboardCard
           className="rounded-sm"
           bigText={`${averageTogglTimeHours.toFixed(2)}`}
           unit="hrs"
-          smallText="gennemsnitlig tid pr. task"
+          smallText="average time per issue"
           chartData={totalHoursChartData}
           lineColor="#4876DE"
           showChart={true}
         />
-        <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}`} unit="%" smallText="AI-assisteret opgaver"></DashboardCard>
+        <DashboardCard className="rounded-sm" bigText={`${linearTasksWithDelegatePercentage.toFixed(2)}`} unit="%" smallText="AI-assisted issues"></DashboardCard>
       </div>
       <div className="grid grid-cols-1 desktop:grid-cols-2 gap-4 sm:gap-6 desktop:gap-8">
         <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-auto mb-4 sm:mb-6 desktop:mb-8">
-          <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
+          <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
           <EstimationAccuracyChart />
         </div>
 
         <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
           <DashboardCircleChart
             linearTasksWithTime={linearTasksWithTogglTimePercentage}
-            className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/20 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
+            trackedCount={linearTasksWithTogglTimeCount}
+            totalCount={linearTasksCount}
+            className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
           ></DashboardCircleChart>
           <DashboardRadialChart />
         </div>
       </div>
     </div>
+    </DashboardClientWrapper>
   );
 }

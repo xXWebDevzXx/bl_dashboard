@@ -41,6 +41,7 @@ export async function getDashboardStats() {
     return {
       linearTasksCount,
       linearTasksWithTogglTimePercentage,
+      linearTasksWithTogglTimeCount: linearTasksWithTime.length,
       averageTogglTimeHours,
       linearTasksWithDelegatePercentage,
     };
