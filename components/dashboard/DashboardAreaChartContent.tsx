@@ -7,11 +7,11 @@ import { useEffect, useState } from "react";
 
 const chartConfig = {
   aiTasksHours: {
-    label: "AI Tasks",
+    label: "AI Issues",
     color: "#059669",
   },
   nonAiTasksHours: {
-    label: "Non-AI Tasks",
+    label: "Non-AI Issues",
     color: "#0891b2",
   },
 } satisfies ChartConfig;
@@ -58,7 +58,7 @@ export default function DashboardAreaChartContent() {
   if (loading) {
     return (
       <div className="p-2 sm:p-4">
-        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">AI vs Non-AI tasks</h1>
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">AI vs Non-AI issues</h1>
         <p className="text-white text-sm">Loading...</p>
       </div>
     );
@@ -67,10 +67,10 @@ export default function DashboardAreaChartContent() {
   return (
     <>
       <div className="p-2 sm:p-4 mb-2 sm:mb-4">
-        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">AI vs Non-AI tasks</h1>
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">AI vs Non-AI issues</h1>
       </div>
-      <ChartContainer config={chartConfig} className="h-[150px] sm:h-[180px] desktop:h-[200px] w-full">
-        <AreaChart accessibilityLayer data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+      <ChartContainer config={chartConfig} className="h-[150px] sm:h-[180px] desktop:h-[300px] w-full pb-0">
+        <AreaChart accessibilityLayer data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
           <defs>
             <linearGradient id="gradientAiTasks" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#84B2FF" stopOpacity={0.8} />

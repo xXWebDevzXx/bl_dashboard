@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 
 interface props {
   linearTasksWithTime: number;
+  trackedCount: number;
+  totalCount: number;
 }
 
-export default function DashboardCircleChartContent({ linearTasksWithTime }: props) {
+export default function DashboardCircleChartContent({ linearTasksWithTime, trackedCount, totalCount }: props) {
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
   const percentage = linearTasksWithTime.toFixed(1);
 
@@ -59,9 +61,11 @@ export default function DashboardCircleChartContent({ linearTasksWithTime }: pro
     return () => clearInterval(timer);
   }, [percentage]);
 
+  const untrackedCount = totalCount - trackedCount;
+
   return (
     <div className="flex flex-col items-center justify-center w-full p-2 sm:p-4 desktop:p-6">
-      <h2 className="text-base sm:text-lg desktop:text-xl font-bold text-white mb-3 sm:mb-4 desktop:mb-6">Tasks med Tidsregistrering</h2>
+      <h2 className="text-base sm:text-lg desktop:text-xl font-bold text-white mb-3 sm:mb-4 desktop:mb-6">Issues with Time Tracking</h2>
 
       <div className={`relative flex items-center justify-center`} style={{ width: svgSize, height: svgSize }}>
         <svg className="transform -rotate-90" width={svgSize} height={svgSize}>
@@ -117,6 +121,31 @@ export default function DashboardCircleChartContent({ linearTasksWithTime }: pro
           </span>
           <span className="text-xs sm:text-sm text-gray-400">tracked</span>
         </div>
+      </div>
+
+      {/* Additional stats below the circle */}
+      <div className="w-full mt-4 sm:mt-6 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-xs text-gray-400">Tracked</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-white">{trackedCount}</p>
+            <p className="text-xs text-emerald-400 mt-1">issues</p>
+          </div>
+
+          <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 rounded-full bg-zinc-500" />
+              <span className="text-xs text-gray-400">Untracked</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-bold text-white">{untrackedCount}</p>
+            <p className="text-xs text-zinc-400 mt-1">issues</p>
+          </div>
+        </div>
+
+        
       </div>
     </div>
   );

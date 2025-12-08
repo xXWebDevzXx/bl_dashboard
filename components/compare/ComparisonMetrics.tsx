@@ -1,0 +1,282 @@
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+interface Task {
+  estimatedTime: number;
+  actualTime: number;
+  delegateId: string | null;
+  togglEntries: unknown[];
+}
+
+interface Metrics {
+  task1: {
+    accuracy: number;
+    variance: number;
+    variancePercentage: number;
+    entriesCount: number;
+    isAI: boolean;
+  };
+  task2: {
+    accuracy: number;
+    variance: number;
+    variancePercentage: number;
+    entriesCount: number;
+    isAI: boolean;
+  };
+  comparison: {
+    accuracyDiff: number;
+    timeDiff: number;
+    estimateDiff: number;
+    entriesDiff: number;
+  };
+}
+
+interface Props {
+  task1: Task;
+  task2: Task;
+  metrics: Metrics;
+}
+
+export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
+  const getComparisonIndicator = (diff: number) => {
+    if (Math.abs(diff) < 0.01) {
+      return { text: "Equal", color: "text-gray-400", icon: "=" };
+    }
+    return diff > 0
+      ? { text: "Higher", color: "text-emerald-400", icon: "↑" }
+      : { text: "Lower", color: "text-cyan-400", icon: "↓" };
+  };
+
+  const getAccuracyColor = (accuracy: number) => {
+    if (accuracy >= 90 && accuracy <= 110) return "text-emerald-400";
+    if (accuracy >= 80 && accuracy <= 120) return "text-yellow-400";
+    return "text-red-400";
+  };
+
+  return (
+    <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold text-white">Comparison Metrics</CardTitle>
+      </CardHeader>
+      <CardContent>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Estimated Time */}
+        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+          <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
+            Estimated Time
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-lg font-bold text-white">
+                {task1.estimatedTime}h
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-lg font-bold text-white">
+                {task2.estimatedTime}h
+              </span>
+            </div>
+            <div className="pt-2 border-t border-zinc-800/60">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Difference</span>
+                <span
+                  className={`text-sm font-semibold ${
+                    getComparisonIndicator(metrics.comparison.estimateDiff).color
+                  }`}
+                >
+                  {getComparisonIndicator(metrics.comparison.estimateDiff).icon}{" "}
+                  {Math.abs(metrics.comparison.estimateDiff).toFixed(2)}h
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Actual Time */}
+        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+          <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
+            Actual Time
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-lg font-bold text-white">
+                {task1.actualTime.toFixed(2)}h
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-lg font-bold text-white">
+                {task2.actualTime.toFixed(2)}h
+              </span>
+            </div>
+            <div className="pt-2 border-t border-zinc-800/60">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Difference</span>
+                <span
+                  className={`text-sm font-semibold ${
+                    getComparisonIndicator(metrics.comparison.timeDiff).color
+                  }`}
+                >
+                  {getComparisonIndicator(metrics.comparison.timeDiff).icon}{" "}
+                  {Math.abs(metrics.comparison.timeDiff).toFixed(2)}h
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Accuracy */}
+        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+          <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
+            Accuracy
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-emerald-400">Task 1</span>
+              <span
+                className={`text-lg font-bold ${getAccuracyColor(
+                  metrics.task1.accuracy
+                )}`}
+              >
+                {metrics.task1.accuracy.toFixed(1)}%
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-cyan-400">Task 2</span>
+              <span
+                className={`text-lg font-bold ${getAccuracyColor(
+                  metrics.task2.accuracy
+                )}`}
+              >
+                {metrics.task2.accuracy.toFixed(1)}%
+              </span>
+            </div>
+            <div className="pt-2 border-t border-zinc-800/60">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Difference</span>
+                <span
+                  className={`text-sm font-semibold ${
+                    getComparisonIndicator(metrics.comparison.accuracyDiff).color
+                  }`}
+                >
+                  {getComparisonIndicator(metrics.comparison.accuracyDiff).icon}{" "}
+                  {Math.abs(metrics.comparison.accuracyDiff).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Time Entries */}
+        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+          <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
+            Time Entries
+          </p>
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-lg font-bold text-white">
+                {metrics.task1.entriesCount}
+              </span>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-lg font-bold text-white">
+                {metrics.task2.entriesCount}
+              </span>
+            </div>
+            <div className="pt-2 border-t border-zinc-800/60">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">Difference</span>
+                <span
+                  className={`text-sm font-semibold ${
+                    getComparisonIndicator(metrics.comparison.entriesDiff).color
+                  }`}
+                >
+                  {getComparisonIndicator(metrics.comparison.entriesDiff).icon}{" "}
+                  {Math.abs(metrics.comparison.entriesDiff)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Variance Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <Card className="bg-linear-to-r from-emerald-900/20 to-emerald-800/10 border-emerald-800/40">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-emerald-400">
+                Issue 1 Variance
+              </span>
+              {metrics.task1.isAI && (
+                <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  AI
+                </Badge>
+              )}
+            </div>
+          <div className="flex items-baseline gap-2">
+            <span
+              className={`text-2xl font-bold ${
+                Math.abs(metrics.task1.variance) < 1
+                  ? "text-emerald-400"
+                  : metrics.task1.variance > 0
+                  ? "text-red-400"
+                  : "text-green-400"
+              }`}
+            >
+              {metrics.task1.variance > 0 ? "+" : ""}
+              {metrics.task1.variance.toFixed(2)}h
+            </span>
+            <span className="text-sm text-gray-400">
+              ({metrics.task1.variance > 0 ? "+" : ""}
+              {metrics.task1.variancePercentage.toFixed(1)}%)
+            </span>
+          </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-linear-to-r from-cyan-900/20 to-cyan-800/10 border-cyan-800/40">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-cyan-400">
+                Issue 2 Variance
+              </span>
+              {metrics.task2.isAI && (
+                <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  AI
+                </Badge>
+              )}
+            </div>
+          <div className="flex items-baseline gap-2">
+            <span
+              className={`text-2xl font-bold ${
+                Math.abs(metrics.task2.variance) < 1
+                  ? "text-cyan-400"
+                  : metrics.task2.variance > 0
+                  ? "text-red-400"
+                  : "text-green-400"
+              }`}
+            >
+              {metrics.task2.variance > 0 ? "+" : ""}
+              {metrics.task2.variance.toFixed(2)}h
+            </span>
+            <span className="text-sm text-gray-400">
+              ({metrics.task2.variance > 0 ? "+" : ""}
+              {metrics.task2.variancePercentage.toFixed(1)}%)
+            </span>
+          </div>
+          </CardContent>
+        </Card>
+      </div>
+      </CardContent>
+    </Card>
+  );
+}
