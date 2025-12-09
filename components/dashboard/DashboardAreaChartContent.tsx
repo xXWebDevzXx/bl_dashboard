@@ -39,6 +39,14 @@ export default function DashboardAreaChartContent() {
       try {
         const response = await fetch("/api/dashboard/time-chart");
         const data = await response.json();
+
+        // Check if the response is an error or not an array
+        if (!response.ok || !Array.isArray(data)) {
+          console.error("API returned error:", data);
+          setChartData([]);
+          return;
+        }
+
         // Format dates for display
         const formattedData = data.map((item: ChartData) => ({
           ...item,
@@ -47,6 +55,7 @@ export default function DashboardAreaChartContent() {
         setChartData(formattedData);
       } catch (error) {
         console.error("Error fetching chart data:", error);
+        setChartData([]);
       } finally {
         setLoading(false);
       }

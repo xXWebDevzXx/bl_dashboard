@@ -22,8 +22,20 @@ async function getAvailableTasks() {
     // Removed limit to fetch all tasks
   });
 
-  return tasks.map((task) => {
-    const totalTrackedSeconds = task.togglTimes.reduce((sum: number, entry) => sum + entry.duration, 0);
+  return tasks.map((task: {
+    id: string;
+    taskId: string;
+    name: string;
+    estimatedTime: string;
+    delegateId: string | null;
+    delegateName: string | null;
+    projectName: string | null;
+    createdAt: number;
+    updatedAt: number;
+    togglTimes: Array<{ duration: number; id: string; description: string; start: string; stop: string }>;
+    labels: Array<{ linearLabel: { id: string; name: string } }>;
+  }) => {
+    const totalTrackedSeconds = task.togglTimes.reduce((sum: number, entry: { duration: number }) => sum + entry.duration, 0);
     const totalTrackedHours = totalTrackedSeconds / 3600;
 
     return {
@@ -37,11 +49,11 @@ async function getAvailableTasks() {
       projectName: task.projectName,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
-      labels: task.labels.map((l) => ({
+      labels: task.labels.map((l: { linearLabel: { id: string; name: string } }) => ({
         id: l.linearLabel.id,
         name: l.linearLabel.name,
       })),
-      togglEntries: task.togglTimes.map((t) => ({
+      togglEntries: task.togglTimes.map((t: { id: string; description: string; duration: number; start: string; stop: string }) => ({
         id: t.id,
         description: t.description,
         duration: t.duration,

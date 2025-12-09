@@ -1,4 +1,4 @@
-import { PrismaClient, LinearTask, TogglTime } from "@/app/generated/prisma/client";
+import { PrismaClient, LinearTask, TogglTime } from "@prisma/client";
 import { parseEstimateToNumber } from "./estimate-utils";
 
 interface TaskWithTogglTimes extends LinearTask {
