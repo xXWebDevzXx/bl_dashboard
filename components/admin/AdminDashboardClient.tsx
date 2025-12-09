@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DownloadCloud,
   Edit,
   Mail,
   RefreshCw,
@@ -47,6 +48,7 @@ interface User {
   isVerified: boolean;
   verifiedAt: number;
   auth0Id: string;
+  deletedAt?: number;
 }
 
 interface UsersResponse {
@@ -59,7 +61,10 @@ interface UsersResponse {
   };
 }
 
+type TabType = "active" | "deleted";
+
 export default function AdminDashboardClient() {
+  const [activeTab, setActiveTab] = useState<TabType>("active");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -73,8 +78,11 @@ export default function AdminDashboardClient() {
   });
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [undeleteUser, setUndeleteUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUndeleteDialogOpen, setIsUndeleteDialogOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [editForm, setEditForm] = useState({
     username: "",
     email: "",
@@ -88,6 +96,7 @@ export default function AdminDashboardClient() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "50",
+        deleted: activeTab === "deleted" ? "true" : "false",
       });
       if (search) params.append("search", search);
       if (roleFilter) params.append("role", roleFilter);
@@ -111,7 +120,11 @@ export default function AdminDashboardClient() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, roleFilter]);
+  }, [page, search, roleFilter, activeTab]);
+
+  useEffect(() => {
+    setPage(1); // Reset to first page when tab changes
+  }, [activeTab]);
 
   useEffect(() => {
     fetchUsers();
@@ -197,6 +210,76 @@ export default function AdminDashboardClient() {
     }
   };
 
+  const handleUndelete = (user: User) => {
+    setUndeleteUser(user);
+    setIsUndeleteDialogOpen(true);
+  };
+
+  const handleConfirmUndelete = async () => {
+    if (!undeleteUser) return;
+
+    try {
+      const response = await fetch(
+        `/api/admin/users/${undeleteUser.id}/undelete`,
+        {
+          method: "POST",
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to undelete user");
+      }
+
+      toast.success("User restored successfully");
+      setIsUndeleteDialogOpen(false);
+      setUndeleteUser(null);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error undeleting user:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to restore user"
+      );
+    }
+  };
+
+  const handleSyncAuth0 = async () => {
+    try {
+      setIsSyncing(true);
+      const response = await fetch("/api/admin/users/sync-auth0", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to sync users from Auth0");
+      }
+
+      const { stats, message } = data;
+      toast.success(message, {
+        description: `Created: ${stats.created}, Updated: ${
+          stats.updated
+        }, Skipped: ${stats.skipped}${
+          stats.errors > 0 ? `, Errors: ${stats.errors}` : ""
+        }`,
+        duration: 5000,
+      });
+
+      // Refresh the user list
+      fetchUsers();
+    } catch (error) {
+      console.error("Error syncing Auth0 users:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to sync users from Auth0"
+      );
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const formatDate = (timestamp: number) => {
     if (!timestamp || timestamp === 0) return "Never";
     return new Date(timestamp * 1000).toLocaleDateString();
@@ -204,6 +287,30 @@ export default function AdminDashboardClient() {
 
   return (
     <div className="space-y-6">
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-zinc-800">
+        <button
+          onClick={() => setActiveTab("active")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "active"
+              ? "text-emerald-400 border-b-2 border-emerald-400"
+              : "text-zinc-400 hover:text-white"
+          }`}
+        >
+          Active Users
+        </button>
+        <button
+          onClick={() => setActiveTab("deleted")}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === "deleted"
+              ? "text-emerald-400 border-b-2 border-emerald-400"
+              : "text-zinc-400 hover:text-white"
+          }`}
+        >
+          Deleted Users
+        </button>
+      </div>
+
       {/* Filters */}
       <Card className="bg-[#161B22] border-zinc-800/60">
         <CardHeader>
@@ -251,23 +358,40 @@ export default function AdminDashboardClient() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-white">Users</CardTitle>
+              <CardTitle className="text-white">
+                {activeTab === "active" ? "Active Users" : "Deleted Users"}
+              </CardTitle>
               <CardDescription className="text-zinc-400">
-                {pagination.total} total users
+                {pagination.total}{" "}
+                {activeTab === "active" ? "active" : "deleted"} users
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchUsers()}
-              disabled={loading}
-              className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
-            >
-              <RefreshCw
-                className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncAuth0}
+                disabled={loading || isSyncing}
+                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+              >
+                <DownloadCloud
+                  className={`w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
+                />
+                Sync Auth0
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchUsers()}
+                disabled={loading}
+                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -298,6 +422,11 @@ export default function AdminDashboardClient() {
                       <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
                         Created
                       </th>
+                      {activeTab === "deleted" && (
+                        <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                          Deleted
+                        </th>
+                      )}
                       <th className="text-right py-3 px-4 text-sm font-medium text-zinc-400">
                         Actions
                       </th>
@@ -355,24 +484,44 @@ export default function AdminDashboardClient() {
                         <td className="py-3 px-4 text-zinc-400 text-sm">
                           {formatDate(user.createdAt)}
                         </td>
+                        {activeTab === "deleted" && (
+                          <td className="py-3 px-4 text-zinc-400 text-sm">
+                            {user.deletedAt
+                              ? formatDate(user.deletedAt)
+                              : "N/A"}
+                          </td>
+                        )}
                         <td className="py-3 px-4">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEdit(user)}
-                              className="text-zinc-400 hover:text-white hover:bg-zinc-800"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(user)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {activeTab === "active" ? (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEdit(user)}
+                                  className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDelete(user)}
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUndelete(user)}
+                                className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -546,6 +695,53 @@ export default function AdminDashboardClient() {
               className="bg-red-600 hover:bg-red-700"
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Undelete Dialog */}
+      <Dialog
+        open={isUndeleteDialogOpen}
+        onOpenChange={setIsUndeleteDialogOpen}
+      >
+        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Restore User</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Are you sure you want to restore this user? They will be able to
+              access their account again.
+            </DialogDescription>
+          </DialogHeader>
+          {undeleteUser && (
+            <div className="py-4">
+              <div className="bg-zinc-900/50 rounded-md p-4 space-y-2">
+                <div className="text-sm">
+                  <span className="text-zinc-400">Username: </span>
+                  <span className="text-white font-medium">
+                    {undeleteUser.username}
+                  </span>
+                </div>
+                <div className="text-sm">
+                  <span className="text-zinc-400">Email: </span>
+                  <span className="text-white">{undeleteUser.email}</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsUndeleteDialogOpen(false)}
+              className="bg-zinc-900/50 border-zinc-700 text-white"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmUndelete}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              Restore
             </Button>
           </DialogFooter>
         </DialogContent>
