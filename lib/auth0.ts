@@ -1,5 +1,12 @@
 import { Auth0Client } from "@auth0/nextjs-auth0/server";
 
+// Determine if we're in production (HTTPS)
+// Check for Vercel deployment or explicit production URL
+const isProduction: boolean =
+  process.env.NODE_ENV === "production" ||
+  Boolean(process.env.APP_BASE_URL?.startsWith("https://")) ||
+  Boolean(process.env.VERCEL); // Vercel sets this automatically
+
 // Export Auth0 client with custom routes under /api/auth
 export const auth0 = new Auth0Client({
   // Auth0 configuration - SDK reads from these env vars by default:
@@ -28,16 +35,21 @@ export const auth0 = new Auth0Client({
     inactivityDuration: 24 * 60 * 60, // 24 hours of inactivity before session expires
     absoluteDuration: 7 * 24 * 60 * 60, // 7 days absolute session duration
     cookie: {
-      sameSite: "lax", // Helps with cross-site cookie issues
-      domain: undefined, // Don't set a specific domain for localhost
+      sameSite: isProduction ? "none" : "lax", // "none" for serverless environments in production
+      secure: isProduction, // Secure cookies in production (HTTPS required)
+      domain: undefined, // Don't set a specific domain
+      path: "/", // Ensure cookie is available for all paths
     },
   },
 
   // Transaction cookie configuration - critical for OAuth state parameter
+  // This cookie stores the state parameter during OAuth flow
+  // In Vercel/serverless, we need to ensure cookies are properly set and accessible
   transactionCookie: {
-    sameSite: "lax",
-    secure: false, // Set to false for localhost/development
-    domain: undefined, // Don't set a specific domain for localhost
+    sameSite: isProduction ? "none" : "lax", // "none" required for cross-site in production
+    secure: isProduction, // Must be true in production (HTTPS required)
+    domain: undefined, // Don't set a specific domain (let browser handle it)
+    path: "/", // Ensure cookie is available for all paths
   },
 
   // Authorization parameters
