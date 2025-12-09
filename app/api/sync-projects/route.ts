@@ -120,73 +120,11 @@ interface SyncResult {
 
 export async function GET() {
   try {
-    // Step 1: Fetch projects from Linear
-    const { projects: linearProjects, teamId } = await fetchLinearProjects();
-
-    // Step 2: Fetch all Toggl projects
-    const togglProjects = await fetchTogglProjects();
-
-    // Step 3: Match Linear projects with Toggl projects and find development tasks
-    const results: ProjectWithTask[] = [];
-    const developmentTaskIds: number[] = [];
-
-    for (const linearProject of linearProjects) {
-      // Find matching Toggl project by name
-      const togglProject = togglProjects.find((tp) => {
-        return tp.name.toLowerCase().includes(linearProject.name.toLowerCase());
-      });
-
-      if (togglProject) {
-        try {
-          // Fetch tasks for this Toggl project
-          const tasks = await fetchTogglProjectTasks(togglProject.id);
-
-          // Find the development task
-          const developmentTask = tasks.find(
-            (task) => task.name.toLowerCase() === "development"
-          );
-
-          results.push({
-            linearProject,
-            togglProject,
-            developmentTask: developmentTask || null,
-          });
-
-          // Collect development task ID if found
-          if (developmentTask) {
-            developmentTaskIds.push(developmentTask.id);
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching tasks for project ${togglProject.name}:`,
-            error
-          );
-          // Continue with other projects
-        }
-      }
-    }
-
-    // Step 4: Fetch time entries for all development tasks
-    let timeEntries: TogglTimeEntry[] = [];
-    if (developmentTaskIds.length > 0) {
-      try {
-        timeEntries = await fetchTogglTimeEntries(developmentTaskIds);
-      } catch (error) {
-        console.error("Error fetching time entries:", error);
-        // Continue without time entries
-      }
-    }
-
-    // Calculate total duration
-    const totalDuration = timeEntries.reduce(
-      (sum, entry) => sum + entry.duration,
-      0
-    );
-
-    // Step 5: Fetch Linear issues with labels
+    // Step 1: Fetch Linear issues with labels
+    const { teamId } = await fetchLinearProjects();
     const linearIssues = await fetchLinearIssues(teamId);
 
-    // Step 6: Extract unique labels from all issues
+    // Step 2: Extract unique labels from all issues
     const labelsMap = new Map<string, LinearLabel>();
     for (const issue of linearIssues) {
       for (const label of issue.labels.nodes) {
@@ -197,17 +135,32 @@ export async function GET() {
     }
     const uniqueLabels = Array.from(labelsMap.values());
 
+    // Step 3: Fetch time entries by developer user IDs
+    let timeEntries: TogglTimeEntry[] = [];
+    try {
+      timeEntries = await fetchTogglTimeEntriesByDevelopers();
+    } catch (error) {
+      console.error("Error fetching time entries:", error);
+      // Continue without time entries
+    }
+
+    // Calculate total duration
+    const totalDuration = timeEntries.reduce(
+      (sum, entry) => sum + entry.duration,
+      0
+    );
+
     const response: SyncResult = {
       success: true,
-      data: results,
-      developmentTaskIds,
+      data: [], // No longer needed, keeping for backward compatibility
+      developmentTaskIds: [], // No longer needed, keeping for backward compatibility
       timeEntries,
       linearIssues,
       labels: uniqueLabels,
       summary: {
-        totalLinearProjects: linearProjects.length,
-        matchedProjects: results.length,
-        projectsWithDevelopmentTask: developmentTaskIds.length,
+        totalLinearProjects: 0, // No longer fetching projects
+        matchedProjects: 0, // No longer matching projects
+        projectsWithDevelopmentTask: 0, // No longer looking for development tasks
         totalTimeEntries: timeEntries.length,
         totalDuration,
         totalIssues: linearIssues.length,
@@ -293,93 +246,23 @@ async function fetchLinearProjects(): Promise<{
   }
 }
 
-async function fetchTogglProjects(): Promise<TogglProject[]> {
+// Fetch time entries by developer user IDs from Toggl Reports API
+async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
   try {
     const workspaceId = "2404074";
     const apiToken = process.env.TOGGL_API_TOKEN;
+    const developerIds = process.env.TOGGL_DEVELOPER_IDS;
 
     if (!apiToken) {
       throw new Error("TOGGL_API_TOKEN environment variable is not set");
     }
 
-    const authString = `${apiToken}:api_token`;
-    const base64Auth = Buffer.from(authString).toString("base64");
-
-    let allProjects: TogglProject[] = [];
-    let page = 1;
-    const perPage = 200; // Max per page
-    let hasMore = true;
-
-    while (hasMore) {
-      const url = `https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/projects?page=${page}&per_page=${perPage}`;
-
-      const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${base64Auth}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Toggl API error (${response.status}): ${errorText}`);
-      }
-
-      const projects = await response.json();
-
-      if (projects.length === 0) {
-        hasMore = false;
-      } else {
-        allProjects = [...allProjects, ...projects];
-        // If we got fewer than perPage, we're on the last page
-        if (projects.length < perPage) {
-          hasMore = false;
-        } else {
-          page++;
-        }
-      }
+    if (!developerIds) {
+      throw new Error("TOGGL_DEVELOPER_IDS environment variable is not set");
     }
 
-    return allProjects;
-  } catch (error) {
-    console.error("Toggl API Error:", error);
-    throw error;
-  }
-}
-
-// Fetch tasks for a specific Toggl project
-async function fetchTogglProjectTasks(projectId: number): Promise<TogglTask[]> {
-  const workspaceId = "2404074";
-  const response = await fetch(
-    `https://api.track.toggl.com/api/v9/workspaces/${workspaceId}/projects/${projectId}/tasks`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.TOGGL_API_TOKEN}:api_token`
-        ).toString("base64")}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Toggl Tasks API error: ${response.statusText}`);
-  }
-
-  return await response.json();
-}
-
-// Fetch time entries for development tasks from Toggl Reports API
-async function fetchTogglTimeEntries(
-  taskIds: number[]
-): Promise<TogglTimeEntry[]> {
-  try {
-    const workspaceId = "2404074";
-    const apiToken = process.env.TOGGL_API_TOKEN;
-
-    if (!apiToken) {
-      throw new Error("TOGGL_API_TOKEN environment variable is not set");
-    }
+    // Parse developer IDs from comma-separated string
+    const userIds = developerIds.split(",").map((id) => parseInt(id.trim()));
 
     // Get current year date range (you can modify these as needed)
     const startDate = "2025-01-01";
@@ -402,7 +285,7 @@ async function fetchTogglTimeEntries(
             ).toString("base64")}`,
           },
           body: JSON.stringify({
-            task_ids: taskIds,
+            user_ids: userIds,
             start_date: startDate,
             end_date: endDate,
             first_row_number: firstRowNumber,
