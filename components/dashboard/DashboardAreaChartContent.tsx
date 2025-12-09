@@ -1,9 +1,22 @@
 "use client";
 
-import { ChartContainer, ChartConfig, ChartLegend, ChartLegendContent, ChartTooltipContent } from "@/components/ui/chart";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
-import type { ContentType } from "recharts/types/component/DefaultLegendContent";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { useEffect, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import type { ContentType } from "recharts/types/component/DefaultLegendContent";
 
 const chartConfig = {
   aiTasksHours: {
@@ -38,6 +51,11 @@ export default function DashboardAreaChartContent() {
     async function fetchData() {
       try {
         const response = await fetch("/api/dashboard/time-chart");
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+
         const data = await response.json();
 
         // Check if the response is an error or not an array
@@ -67,7 +85,9 @@ export default function DashboardAreaChartContent() {
   if (loading) {
     return (
       <div className="p-2 sm:p-4">
-        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">AI vs Non-AI issues</h1>
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">
+          AI vs Non-AI issues
+        </h1>
         <p className="text-white text-sm">Loading...</p>
       </div>
     );
@@ -76,10 +96,19 @@ export default function DashboardAreaChartContent() {
   return (
     <>
       <div className="p-2 sm:p-4 mb-2 sm:mb-4">
-        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">AI vs Non-AI issues</h1>
+        <h1 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">
+          AI vs Non-AI issues
+        </h1>
       </div>
-      <ChartContainer config={chartConfig} className="h-[150px] sm:h-[180px] desktop:h-[300px] w-full pb-0">
-        <AreaChart accessibilityLayer data={chartData} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
+      <ChartContainer
+        config={chartConfig}
+        className="h-[150px] sm:h-[180px] desktop:h-[300px] w-full pb-0"
+      >
+        <AreaChart
+          accessibilityLayer
+          data={chartData}
+          margin={{ left: 8, right: 8, top: 8, bottom: 0 }}
+        >
           <defs>
             <linearGradient id="gradientAiTasks" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#84B2FF" stopOpacity={0.8} />
@@ -107,9 +136,24 @@ export default function DashboardAreaChartContent() {
             className="text-xs sm:text-sm"
           />
           <Tooltip content={<ChartTooltipContent />} />
-          <ChartLegend className="text-white text-xs sm:text-sm" content={ChartLegendContent as unknown as ContentType} />
-          <Area dataKey="aiTasksHours" type="linear" fill="url(#gradientAiTasks)" stroke="var(--color-aiTasksHours)" stackId="a" />
-          <Area dataKey="nonAiTasksHours" type="linear" fill="url(#gradientNonAiTasks)" stroke="var(--color-nonAiTasksHours)" stackId="b" />
+          <ChartLegend
+            className="text-white text-xs sm:text-sm"
+            content={ChartLegendContent as unknown as ContentType}
+          />
+          <Area
+            dataKey="aiTasksHours"
+            type="linear"
+            fill="url(#gradientAiTasks)"
+            stroke="var(--color-aiTasksHours)"
+            stackId="a"
+          />
+          <Area
+            dataKey="nonAiTasksHours"
+            type="linear"
+            fill="url(#gradientNonAiTasks)"
+            stroke="var(--color-nonAiTasksHours)"
+            stackId="b"
+          />
         </AreaChart>
       </ChartContainer>
     </>
