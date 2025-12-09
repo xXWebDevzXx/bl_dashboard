@@ -1,7 +1,6 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { prisma } from "@/lib/prisma/client";
 
 export async function getDashboardStats() {
-  const prisma = new PrismaClient();
 
   try {
     // Get total tasks count
@@ -14,8 +13,7 @@ export async function getDashboardStats() {
       },
     });
 
-    const linearTasksWithTogglTimePercentage =
-      (linearTasksWithTime.length / linearTasksCount) * 100;
+    const linearTasksWithTogglTimePercentage = (linearTasksWithTime.length / linearTasksCount) * 100;
 
     // Get average Toggl time
     const averageTogglTime = await prisma.togglTime?.aggregate({
@@ -24,9 +22,7 @@ export async function getDashboardStats() {
       },
     });
 
-    const averageTogglTimeHours = averageTogglTime._avg.duration
-      ? averageTogglTime._avg.duration / 3600
-      : 0;
+    const averageTogglTimeHours = averageTogglTime._avg.duration ? averageTogglTime._avg.duration / 3600 : 0;
 
     // Get tasks with delegate
     const linearTasksWithCursor = await prisma.linearTask?.findMany({
@@ -35,8 +31,7 @@ export async function getDashboardStats() {
       },
     });
 
-    const linearTasksWithDelegatePercentage =
-      (linearTasksWithCursor.length / linearTasksCount) * 100;
+    const linearTasksWithDelegatePercentage = (linearTasksWithCursor.length / linearTasksCount) * 100;
 
     return {
       linearTasksCount,
