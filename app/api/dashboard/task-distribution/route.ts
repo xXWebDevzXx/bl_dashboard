@@ -31,15 +31,15 @@ export async function GET() {
     });
 
     // Map to { label: string, count: number } and sort by count descending
-    let allLabelCounts = labels.map(label => ({
+    let allLabelCounts = labels.map((label: { name: string; tasks: unknown[] }) => ({
       label: label.name,
       count: label.tasks.length,
     }));
     // Sort by count descending
-    allLabelCounts = allLabelCounts.sort((a, b) => b.count - a.count);
+    allLabelCounts = allLabelCounts.sort((a: { count: number }, b: { count: number }) => b.count - a.count);
     const topLabels = allLabelCounts.slice(0, 5);
     const otherLabels = allLabelCounts.slice(5);
-    const otherCount = otherLabels.reduce((sum, item) => sum + item.count, 0);
+    const otherCount = otherLabels.reduce((sum: number, item: { count: number }) => sum + item.count, 0);
     const labelTaskCounts = [...topLabels];
     if (otherCount > 0) {
       labelTaskCounts.push({ label: "Other", count: otherCount });

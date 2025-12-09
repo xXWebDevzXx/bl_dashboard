@@ -65,7 +65,7 @@ export async function getTaskDetails(taskId: string): Promise<TaskDetail | null>
   }
 
   // Calculate total tracked time
-  const totalTrackedTime = task.togglTimes.reduce((sum, entry) => sum + entry.duration, 0);
+  const totalTrackedTime = task.togglTimes.reduce((sum: number, entry: { duration: number }) => sum + entry.duration, 0);
 
   return {
     ...task,

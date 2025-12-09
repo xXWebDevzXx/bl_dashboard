@@ -25,7 +25,7 @@ export async function getTimeChartData(): Promise<TimeChartData[]> {
     // Group by date and sum durations for AI vs Non-AI tasks
     const dataByDate = new Map<string, { aiHours: number; nonAiHours: number }>();
 
-    togglTimes.forEach((entry) => {
+    togglTimes.forEach((entry: typeof togglTimes[number]) => {
       // Extract date from start timestamp (format: "2025-01-15T10:30:00Z")
       const date = entry.start.split("T")[0];
 
