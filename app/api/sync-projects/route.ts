@@ -68,6 +68,8 @@ interface LinearIssue {
   title: string;
   description: string | null;
   createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
   estimate: number | null;
   project: {
     name: string;
@@ -502,6 +504,8 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
                   title
                   description
                   createdAt
+                  startedAt
+                  completedAt
                   estimate
                   project {
                     name

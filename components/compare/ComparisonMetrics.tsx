@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface Task {
-  estimatedTime: number;
+  estimatedTime: string;
   actualTime: number;
   delegateId: string | null;
   togglEntries: unknown[];
@@ -72,13 +72,13 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-emerald-400">Task 1</span>
               <span className="text-lg font-bold text-white">
-                {task1.estimatedTime}h
+                {task1.estimatedTime}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-cyan-400">Task 2</span>
               <span className="text-lg font-bold text-white">
-                {task2.estimatedTime}h
+                {task2.estimatedTime}
               </span>
             </div>
             <div className="pt-2 border-t border-zinc-800/60">

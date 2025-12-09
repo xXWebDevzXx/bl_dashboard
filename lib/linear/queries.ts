@@ -51,6 +51,7 @@ export const GET_ISSUES = `
                 }
                 createdAt
                 updatedAt
+                startedAt
                 completedAt
                 estimate
                 labels {
@@ -112,6 +113,7 @@ export const GET_ISSUE_BY_ID = `
             }
             createdAt
             updatedAt
+            startedAt
             completedAt
             estimate
             labels {

@@ -1,4 +1,5 @@
 import { PrismaClient, LinearTask, TogglTime } from "@/app/generated/prisma/client";
+import { parseEstimateToNumber } from "./estimate-utils";
 
 interface TaskWithTogglTimes extends LinearTask {
   togglTimes: TogglTime[];
@@ -32,7 +33,7 @@ export async function getEstimationAccuracy(): Promise<EstimationAccuracyData> {
     const tasksWithTime = await prisma.linearTask.findMany({
       where: {
         togglTimes: { some: {} },
-        estimatedTime: { gt: 0 },
+        estimatedTime: { not: "" },
       },
       include: {
         togglTimes: true,
@@ -76,7 +77,8 @@ function calculateMetrics(tasks: TaskWithTogglTimes[]) {
   let totalActual = 0;
 
   tasks.forEach(task => {
-    totalEstimated += task.estimatedTime;
+    const estimatedHours = parseEstimateToNumber(task.estimatedTime);
+    totalEstimated += estimatedHours;
 
     // Sum all toggl times for this task (convert seconds to hours)
     const actualHours = task.togglTimes.reduce(

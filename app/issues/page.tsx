@@ -15,10 +15,12 @@ interface LinearIssue {
   id: string;
   name: string;
   taskId: string;
-  estimatedTime: number;
+  estimatedTime: string;
   delegateId: string | null;
   delegateName: string | null;
   projectName: string | null;
+  startedAt: number | null;
+  completedAt: number | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -74,7 +76,6 @@ export default async function IssuesPage({
                 <CardDescription>
                   {issue.name}
                 </CardDescription>
-
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     {issue.projectName && (
@@ -83,7 +84,9 @@ export default async function IssuesPage({
                     {issue.delegateName && (
                       <p><strong>Delegate:</strong> {issue.delegateName}</p>
                     )}
-                    <p><strong>Estimated Time:</strong> {issue.estimatedTime}h</p>
+                    {issue.estimatedTime && (
+                      <p><strong>Estimated Time:</strong> {issue.estimatedTime}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

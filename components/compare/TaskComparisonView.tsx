@@ -5,6 +5,7 @@ import ComparisonMetrics from "./ComparisonMetrics";
 import ComparisonChart from "./ComparisonChart";
 import TimeEntriesComparison from "./TimeEntriesComparison";
 import type { Task } from "./types";
+import { parseEstimateToNumber } from "@/lib/estimate-utils";
 
 interface Props {
   task1: Task;
@@ -18,31 +19,34 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
       return (actual / estimated) * 100;
     };
 
-    const task1Accuracy = calculateAccuracy(task1.estimatedTime, task1.actualTime);
-    const task2Accuracy = calculateAccuracy(task2.estimatedTime, task2.actualTime);
+    const task1EstimatedNum = parseEstimateToNumber(task1.estimatedTime);
+    const task2EstimatedNum = parseEstimateToNumber(task2.estimatedTime);
 
-    const task1Variance = task1.actualTime - task1.estimatedTime;
-    const task2Variance = task2.actualTime - task2.estimatedTime;
+    const task1Accuracy = calculateAccuracy(task1EstimatedNum, task1.actualTime);
+    const task2Accuracy = calculateAccuracy(task2EstimatedNum, task2.actualTime);
+
+    const task1Variance = task1.actualTime - task1EstimatedNum;
+    const task2Variance = task2.actualTime - task2EstimatedNum;
 
     return {
       task1: {
         accuracy: task1Accuracy,
         variance: task1Variance,
-        variancePercentage: task1.estimatedTime > 0 ? (task1Variance / task1.estimatedTime) * 100 : 0,
+        variancePercentage: task1EstimatedNum > 0 ? (task1Variance / task1EstimatedNum) * 100 : 0,
         entriesCount: task1.togglEntries.length,
         isAI: !!task1.delegateId,
       },
       task2: {
         accuracy: task2Accuracy,
         variance: task2Variance,
-        variancePercentage: task2.estimatedTime > 0 ? (task2Variance / task2.estimatedTime) * 100 : 0,
+        variancePercentage: task2EstimatedNum > 0 ? (task2Variance / task2EstimatedNum) * 100 : 0,
         entriesCount: task2.togglEntries.length,
         isAI: !!task2.delegateId,
       },
       comparison: {
         accuracyDiff: task1Accuracy - task2Accuracy,
         timeDiff: task1.actualTime - task2.actualTime,
-        estimateDiff: task1.estimatedTime - task2.estimatedTime,
+        estimateDiff: task1EstimatedNum - task2EstimatedNum,
         entriesDiff: task1.togglEntries.length - task2.togglEntries.length,
       },
     };

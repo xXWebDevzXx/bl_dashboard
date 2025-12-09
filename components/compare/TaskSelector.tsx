@@ -116,7 +116,7 @@ export default function TaskSelector({
                 <div>
                   <p className="text-xs text-gray-500">Estimated</p>
                   <p className="text-sm text-white font-semibold">
-                    {selectedTask.estimatedTime}h
+                    {selectedTask.estimatedTime}
                   </p>
                 </div>
                 <div>

@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   taskId: string;
   name: string;
-  estimatedTime: number;
+  estimatedTime: string;
   actualTime: number;
   delegateId: string | null;
   delegateName: string | null;
