@@ -2,11 +2,12 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { parseEstimateToNumber } from "@/lib/estimate-utils";
 
 interface Task {
   taskId: string;
   name: string;
-  estimatedTime: number;
+  estimatedTime: string;
   actualTime: number;
 }
 
@@ -37,15 +38,18 @@ const GradientBar = (props: { fill?: string; x?: number; y?: number; width?: num
 };
 
 export default function ComparisonChart({ task1, task2 }: Props) {
+  const task1EstimatedNum = parseEstimateToNumber(task1.estimatedTime);
+  const task2EstimatedNum = parseEstimateToNumber(task2.estimatedTime);
+
   const chartData = [
     {
       name: task1.taskId,
-      estimated: task1.estimatedTime,
+      estimated: task1EstimatedNum,
       actual: parseFloat(task1.actualTime.toFixed(2)),
     },
     {
       name: task2.taskId,
-      estimated: task2.estimatedTime,
+      estimated: task2EstimatedNum,
       actual: parseFloat(task2.actualTime.toFixed(2)),
     },
   ];
@@ -124,7 +128,7 @@ export default function ComparisonChart({ task1, task2 }: Props) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Estimated:</span>
-                <span className="text-white font-semibold">{task1.estimatedTime}h</span>
+                <span className="text-white font-semibold">{task1.estimatedTime}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Actual:</span>
@@ -132,9 +136,9 @@ export default function ComparisonChart({ task1, task2 }: Props) {
               </div>
               <div className="flex justify-between pt-2 border-t border-zinc-800/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${task1.actualTime > task1.estimatedTime ? "text-red-400" : "text-green-400"}`}>
-                  {task1.actualTime > task1.estimatedTime ? "+" : ""}
-                  {(task1.actualTime - task1.estimatedTime).toFixed(2)}h
+                <span className={`font-semibold ${task1.actualTime > task1EstimatedNum ? "text-red-400" : "text-green-400"}`}>
+                  {task1.actualTime > task1EstimatedNum ? "+" : ""}
+                  {(task1.actualTime - task1EstimatedNum).toFixed(2)}h
                 </span>
               </div>
             </div>
@@ -148,7 +152,7 @@ export default function ComparisonChart({ task1, task2 }: Props) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Estimated:</span>
-                <span className="text-white font-semibold">{task2.estimatedTime}h</span>
+                <span className="text-white font-semibold">{task2.estimatedTime}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Actual:</span>
@@ -156,9 +160,9 @@ export default function ComparisonChart({ task1, task2 }: Props) {
               </div>
               <div className="flex justify-between pt-2 border-t border-zinc-800/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${task2.actualTime > task2.estimatedTime ? "text-red-400" : "text-green-400"}`}>
-                  {task2.actualTime > task2.estimatedTime ? "+" : ""}
-                  {(task2.actualTime - task2.estimatedTime).toFixed(2)}h
+                <span className={`font-semibold ${task2.actualTime > task2EstimatedNum ? "text-red-400" : "text-green-400"}`}>
+                  {task2.actualTime > task2EstimatedNum ? "+" : ""}
+                  {(task2.actualTime - task2EstimatedNum).toFixed(2)}h
                 </span>
               </div>
             </div>

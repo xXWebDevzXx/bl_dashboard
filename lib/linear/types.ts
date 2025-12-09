@@ -52,6 +52,7 @@ export interface LinearIssue {
   team: LinearTeam;
   createdAt: string;
   updatedAt: string;
+  startedAt?: string;
   completedAt?: string;
   estimate?: number;
   labels: {

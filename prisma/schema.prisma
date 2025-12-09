@@ -62,10 +62,12 @@ model LinearTask {
   id            String  @id @default(cuid()) @map("linear_tasks_pk") @db.Char(36)
   taskId        String  @unique @map("linear_tasks_task_id") @db.VarChar(50)
   name          String  @map("linear_tasks_name") @db.VarChar(255)
-  estimatedTime Int     @map("linear_tasks_estimated_time")
+  estimatedTime String  @default("") @map("linear_tasks_estimated_time") @db.VarChar(50)
   delegateId    String? @map("linear_tasks_delegate_id") @db.VarChar(255)
   delegateName  String? @map("linear_tasks_delegate_name") @db.VarChar(255)
   projectName   String? @map("linear_tasks_project_name") @db.VarChar(255)
+  startedAt     Int?    @map("linear_tasks_started_at")
+  completedAt   Int?    @map("linear_tasks_completed_at")
   createdAt     Int     @map("linear_tasks_created_at")
   updatedAt     Int     @map("linear_tasks_updated_at")
 

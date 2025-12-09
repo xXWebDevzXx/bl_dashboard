@@ -4,9 +4,11 @@ export interface TaskDetail {
   id: string;
   taskId: string;
   name: string;
-  estimatedTime: number;
+  estimatedTime: string;
   delegateId: string | null;
   delegateName: string | null;
+  startedAt: number | null;
+  completedAt: number | null;
   createdAt: number;
   updatedAt: number;
   togglTimes: Array<{

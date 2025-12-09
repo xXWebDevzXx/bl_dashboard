@@ -1,6 +1,7 @@
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
 import { getTaskDetails } from "@/lib/task-details";
+import { parseEstimateToNumber } from "@/lib/estimate-utils";
 import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, User, Tag } from "lucide-react";
 
@@ -71,7 +72,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
     );
   }
 
-  const estimatedHours = task.estimatedTime;
+  const estimatedHours = parseEstimateToNumber(task.estimatedTime);
   const trackedHours = task.totalTrackedTime / 3600;
   const timeComparison = estimatedHours > 0 ? ((trackedHours / estimatedHours) * 100).toFixed(0) : null;
 
@@ -128,7 +129,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
             <Clock size={20} className="text-blue-500" />
             <h3 className="text-gray-400 text-sm">Estimated time</h3>
           </div>
-          <p className="text-3xl text-white font-semibold">{estimatedHours}h</p>
+          <p className="text-3xl text-white font-semibold">{task.estimatedTime || "Not set"}</p>
         </div>
 
         <div className="bg-[#1A1F26] p-6 rounded-sm">

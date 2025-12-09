@@ -52,6 +52,8 @@ interface LinearIssue {
   title: string;
   description: string | null;
   createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
   estimate: number | null;
   project: {
     name: string;
@@ -74,6 +76,24 @@ interface LinearLabel {
   id: string;
   name: string;
   color: string;
+}
+
+/**
+ * Extracts the estimate time from labels.
+ * Looks for labels like "Estimate: 1-2", "Estimate: 4-8", etc.
+ * Returns the estimate string (e.g., "1-2") or empty string if no estimate label is found.
+ */
+function extractEstimateFromLabels(labels: LinearLabel[]): string {
+  const estimateRegex = /^Estimate:\s*(.+)$/i;
+
+  for (const label of labels) {
+    const match = label.name.match(estimateRegex);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+
+  return "";
 }
 
 interface SyncResponse {
@@ -148,24 +168,39 @@ async function main() {
         ? issue.title.substring(0, 252) + "..."
         : issue.title;
 
+    // Extract estimate from labels
+    const estimateValue = extractEstimateFromLabels(issue.labels.nodes);
+
+    // Convert ISO date strings to Unix timestamps
+    const startedAtTimestamp = issue.startedAt
+      ? Math.floor(new Date(issue.startedAt).getTime() / 1000)
+      : null;
+    const completedAtTimestamp = issue.completedAt
+      ? Math.floor(new Date(issue.completedAt).getTime() / 1000)
+      : null;
+
     // Create or update the LinearTask using identifier as taskId
     const linearTask = await prisma.linearTask.upsert({
       where: { taskId: issue.identifier },
       update: {
         name: taskName,
-        estimatedTime: issue.estimate || 0,
+        estimatedTime: estimateValue,
         delegateId: issue.delegate?.id || null,
         delegateName: issue.delegate?.name || null,
         projectName: issue.project?.name || null,
+        startedAt: startedAtTimestamp,
+        completedAt: completedAtTimestamp,
         updatedAt: Math.floor(Date.now() / 1000),
       },
       create: {
         taskId: issue.identifier,
         name: taskName,
-        estimatedTime: issue.estimate || 0,
+        estimatedTime: estimateValue,
         delegateId: issue.delegate?.id || null,
         delegateName: issue.delegate?.name || null,
         projectName: issue.project?.name || null,
+        startedAt: startedAtTimestamp,
+        completedAt: completedAtTimestamp,
         createdAt: Math.floor(Date.now() / 1000),
         updatedAt: Math.floor(Date.now() / 1000),
       },
