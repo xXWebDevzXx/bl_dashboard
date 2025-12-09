@@ -1,6 +1,4 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma/client";
 
 interface Auth0User {
   sub: string;

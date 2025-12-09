@@ -1,5 +1,4 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-
+import { prisma } from "@/lib/prisma/client";
 export interface TimeChartData {
   date: string;
   aiTasksHours: number;
@@ -7,7 +6,6 @@ export interface TimeChartData {
 }
 
 export async function getTimeChartData(): Promise<TimeChartData[]> {
-  const prisma = new PrismaClient();
 
   try {
     // Fetch all toggl times with their associated linear tasks

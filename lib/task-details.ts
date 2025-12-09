@@ -1,5 +1,4 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma/client";
 export interface TaskDetail {
   id: string;
   taskId: string;

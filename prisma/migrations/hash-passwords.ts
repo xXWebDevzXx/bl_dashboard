@@ -1,8 +1,6 @@
 import "dotenv/config";
-import { PrismaClient } from "../../app/generated/prisma/client";
-import * as bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma/client";import * as bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
 
 async function hashExistingPasswords() {
   try {
