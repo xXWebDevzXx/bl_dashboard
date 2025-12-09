@@ -33,7 +33,9 @@ export async function getEstimationAccuracy(): Promise<EstimationAccuracyData> {
     const tasksWithTime = await prisma.linearTask.findMany({
       where: {
         togglTimes: { some: {} },
-        estimatedTime: { not: "" },
+        estimatedTime: {
+          not: { equals: "" },
+        },
       },
       include: {
         togglTimes: true,
