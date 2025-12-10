@@ -5,10 +5,13 @@ const isProduction = process.env.NODE_ENV === "production";
 // Vercel provides VERCEL_URL for preview deployments
 // It doesn't include the protocol, so we need to add it
 const getBaseUrl = () => {
+  if (process.env.NODE_ENV === "production") {
+    return "https://bl-dashboard-three.vercel.app";
+  }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  else if (process.env.APP_BASE_URL) {
+  if (process.env.APP_BASE_URL) {
     return process.env.APP_BASE_URL;
   }
   return "http://localhost:3000";
