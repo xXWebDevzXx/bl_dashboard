@@ -57,11 +57,6 @@ interface TogglReportEntry {
   }>;
 }
 
-interface LinearResponse<T> {
-  data: T;
-  errors?: Array<{ message: string }>;
-}
-
 interface LinearIssue {
   id: string;
   number: number;
@@ -274,6 +269,15 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
     const startDate = "2025-01-01";
     const endDate = "2025-12-31";
 
+    console.warn(
+      "Fetching Toggl time entries for user IDs:",
+      userIds,
+      "from",
+      startDate,
+      "to",
+      endDate
+    );
+
     let allData: TogglReportEntry[] = [];
     let firstRowNumber = 1;
     let hasMoreData = true;
@@ -321,35 +325,34 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
       } else {
         hasMoreData = false;
       }
+
+      console.warn("Fetched Toggl data length:", data.length);
     }
 
-    // Flatten the nested time entries structure
-    const flattenedEntries: TogglTimeEntry[] = [];
-    for (const entry of allData) {
-      if (entry.time_entries && Array.isArray(entry.time_entries)) {
-        for (const timeEntry of entry.time_entries) {
-          flattenedEntries.push({
+    // Flatten the nested time entries
+    const flattenedData = allData.flatMap((entry) =>
+      entry.time_entries
+        ? entry.time_entries.map((timeEntry) => ({
             id: timeEntry.id,
             start: timeEntry.start,
             stop: timeEntry.stop,
-            duration: timeEntry.seconds, // Map seconds to duration
+            duration: timeEntry.seconds,
             description: entry.description,
             task_id: entry.task_id,
             project_id: entry.project_id,
             user_id: entry.user_id,
-          });
-        }
-      }
-    }
+          }))
+        : []
+    );
 
-    return flattenedEntries;
+    return flattenedData;
   } catch (error) {
     console.error("Toggl Reports API Error:", error);
     throw error;
   }
 }
 
-// Fetch Linear issues with labels
+// Fetch issues from Linear
 async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
   try {
     const apiKey = process.env.LINEAR_API_KEY;
@@ -358,34 +361,18 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
       throw new Error("LINEAR_API_KEY environment variable is not set");
     }
 
-    // Calculate date 6 months ago
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    const dateFilter = sixMonthsAgo.toISOString();
-
-    let allIssues: LinearIssue[] = [];
-    let hasNextPage = true;
-    let endCursor: string | null = null;
-
-    while (hasNextPage) {
-      const response: Response = await fetch("https://api.linear.app/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${apiKey}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query($after: String) {
-              issues(
-                first: 100,
-                after: $after,
-                filter: {
-                  updatedAt: { gte: "${dateFilter}" }
-                  team: { id: { eq: "${teamId}" } }
-                  state: { name: { eq: "Done" } }
-                }
-              ) {
+    const response = await fetch("https://api.linear.app/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${apiKey}`,
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+            team(id: "${teamId}") {
+              id
+              issues {
                 nodes {
                   id
                   number
@@ -416,47 +403,27 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
                     }
                   }
                 }
-                pageInfo {
-                  hasNextPage
-                  endCursor
-                }
               }
             }
-          `,
-          variables: {
-            after: endCursor,
-          },
-        }),
-      });
+          }
+        `,
+      }),
+    });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Linear API error (${response.status}): ${errorText}`);
-      }
-
-      const data: LinearResponse<{
-        issues: {
-          nodes: LinearIssue[];
-          pageInfo: { hasNextPage: boolean; endCursor: string | null };
-        };
-      }> = await response.json();
-
-      if (data.errors) {
-        throw new Error(
-          `Linear GraphQL errors: ${JSON.stringify(data.errors)}`
-        );
-      }
-
-      const issues = data.data.issues.nodes;
-      allIssues = [...allIssues, ...issues];
-
-      hasNextPage = data.data.issues.pageInfo.hasNextPage;
-      endCursor = data.data.issues.pageInfo.endCursor;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Linear API error (${response.status}): ${errorText}`);
     }
 
-    return allIssues;
+    const data = await response.json();
+
+    if (data.errors) {
+      throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
+    }
+
+    return data.data.team.issues.nodes;
   } catch (error) {
-    console.error("Linear Issues API Error:", error);
+    console.error("Linear API Error:", error);
     throw error;
   }
 }
