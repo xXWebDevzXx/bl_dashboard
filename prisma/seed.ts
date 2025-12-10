@@ -138,28 +138,29 @@ async function main() {
   console.log(`Found ${syncData.labels.length} unique labels`);
   console.log(`Found ${syncData.timeEntries.length} time entries`);
 
-  // Step 1: Seed all unique labels
-  console.log("\n=== Step 1: Seeding Labels ===");
+  // Step 1: Seed all unique labels (insert only if new)
+  console.log("\n=== Step 1: Seeding Labels (insert only if new) ===");
   const labelMap = new Map<string, string>(); // Map linear label ID to prisma ID
 
   for (const label of syncData.labels) {
-    const prismaLabel = await prisma.linearLabel.upsert({
-      where: { name: label.name },
-      update: {
-        updatedAt: Math.floor(Date.now() / 1000),
-      },
-      create: {
-        name: label.name,
-        createdAt: Math.floor(Date.now() / 1000),
-        updatedAt: Math.floor(Date.now() / 1000),
-      },
-    });
-    labelMap.set(label.id, prismaLabel.id);
-    console.log(`✓ Upserted label: ${label.name}`);
+    const existingLabel = await prisma.linearLabel.findUnique({ where: { name: label.name } });
+    if (!existingLabel) {
+      const prismaLabel = await prisma.linearLabel.create({
+        data: {
+          name: label.name,
+          createdAt: Math.floor(Date.now() / 1000),
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      });
+      labelMap.set(label.id, prismaLabel.id);
+      console.log(`✓ Created label: ${label.name}`);
+    } else {
+      labelMap.set(label.id, existingLabel.id);
+    }
   }
 
-  // Step 2: Seed Linear issues as LinearTask
-  console.log("\n=== Step 2: Seeding Linear Issues ===");
+  // Step 2: Seed Linear issues as LinearTask (insert only if new)
+  console.log("\n=== Step 2: Seeding Linear Issues (insert only if new) ===");
   for (const issue of syncData.linearIssues) {
     // Truncate title if it's too long (max 255 characters)
     const taskName =
@@ -178,61 +179,49 @@ async function main() {
       ? Math.floor(new Date(issue.completedAt).getTime() / 1000)
       : null;
 
-    // Create or update the LinearTask using identifier as taskId
-    const linearTask = await prisma.linearTask.upsert({
-      where: { taskId: issue.identifier },
-      update: {
-        name: taskName,
-        estimatedTime: estimateValue,
-        delegateId: issue.delegate?.id || null,
-        delegateName: issue.delegate?.name || null,
-        projectName: issue.project?.name || null,
-        startedAt: startedAtTimestamp,
-        completedAt: completedAtTimestamp,
-        updatedAt: Math.floor(Date.now() / 1000),
-      },
-      create: {
-        taskId: issue.identifier,
-        name: taskName,
-        estimatedTime: estimateValue,
-        delegateId: issue.delegate?.id || null,
-        delegateName: issue.delegate?.name || null,
-        projectName: issue.project?.name || null,
-        startedAt: startedAtTimestamp,
-        completedAt: completedAtTimestamp,
-        createdAt: Math.floor(Date.now() / 1000),
-        updatedAt: Math.floor(Date.now() / 1000),
-      },
-    });
-
-    console.log(`✓ Upserted LinearTask: ${issue.identifier} - ${issue.title}`);
-
-    // Step 3: Connect labels to this task
-    // First, remove existing label connections for this task
-    await prisma.linearTaskLabel.deleteMany({
-      where: { linearTaskId: linearTask.id },
-    });
-
-    // Then create new connections
-    for (const label of issue.labels.nodes) {
-      const prismaLabelId = labelMap.get(label.id);
-      if (prismaLabelId) {
-        await prisma.linearTaskLabel.create({
-          data: {
-            linearTaskId: linearTask.id,
-            linearLabelId: prismaLabelId,
-          },
-        });
-      }
+    // Only create if not exists
+    const existingTask = await prisma.linearTask.findUnique({ where: { taskId: issue.identifier } });
+    let linearTask;
+    if (!existingTask) {
+      linearTask = await prisma.linearTask.create({
+        data: {
+          taskId: issue.identifier,
+          name: taskName,
+          estimatedTime: estimateValue,
+          delegateId: issue.delegate?.id || null,
+          delegateName: issue.delegate?.name || null,
+          projectName: issue.project?.name || null,
+          startedAt: startedAtTimestamp,
+          completedAt: completedAtTimestamp,
+          createdAt: Math.floor(Date.now() / 1000),
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      });
+      console.log(`✓ Created LinearTask: ${issue.identifier} - ${issue.title}`);
+    } else {
+      linearTask = existingTask;
     }
 
-    if (issue.labels.nodes.length > 0) {
+    // Step 3: Connect labels to this task (idempotent)
+    // Remove existing label connections for this task only if new labels are present
+    if (issue.labels.nodes.length > 0 && !existingTask) {
+      for (const label of issue.labels.nodes) {
+        const prismaLabelId = labelMap.get(label.id);
+        if (prismaLabelId) {
+          await prisma.linearTaskLabel.create({
+            data: {
+              linearTaskId: linearTask.id,
+              linearLabelId: prismaLabelId,
+            },
+          });
+        }
+      }
       console.log(`  ✓ Connected ${issue.labels.nodes.length} labels`);
     }
   }
 
-  // Step 4: Connect Toggl time entries to Linear tasks
-  console.log("\n=== Step 3: Connecting Toggl Time Entries ===");
+  // Step 4: Connect Toggl time entries to Linear tasks (idempotent)
+  console.log("\n=== Step 3: Connecting Toggl Time Entries (idempotent) ===");
 
   // Create a map of Linear identifiers
   const issueIdentifierMap = new Map<string, string>();
@@ -243,7 +232,7 @@ async function main() {
   // Regex to extract Linear issue identifier from description (e.g., BLE-123)
   const linearIdRegex = /([A-Z]+-\d+)/;
 
-  // Create a TogglTime entry for EACH time entry
+  // Create a TogglTime entry for EACH time entry, skip if exists
   let createdCount = 0;
   let skippedCount = 0;
   let notFoundCount = 0;
@@ -294,12 +283,14 @@ async function main() {
       if (createdCount % 100 === 0) {
         console.log(`  Created ${createdCount} time entries...`);
       }
+    } else {
+      skippedCount++;
     }
   }
 
   console.log(`\n✓ Created ${createdCount} new time entries`);
   console.log(
-    `⚠ Skipped ${skippedCount} entries (no duration or no Linear ID)`
+    `⚠ Skipped ${skippedCount} entries (already exist, no duration, or no Linear ID)`
   );
   console.log(
     `⚠ ${notFoundCount} entries couldn't be linked (Linear task not found)`
