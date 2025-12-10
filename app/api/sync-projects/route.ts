@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma/client";
 
 // Types
 interface LinearProject {
@@ -251,18 +252,23 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
   try {
     const workspaceId = "2404074";
     const apiToken = process.env.TOGGL_API_TOKEN;
-    const developerIds = process.env.TOGGL_DEVELOPER_IDS;
 
     if (!apiToken) {
       throw new Error("TOGGL_API_TOKEN environment variable is not set");
     }
 
-    if (!developerIds) {
-      throw new Error("TOGGL_DEVELOPER_IDS environment variable is not set");
+    // Get active developer IDs from database
+    const developers = await prisma.togglDeveloper.findMany({
+      where: { isActive: true },
+      select: { togglId: true },
+    });
+
+    if (developers.length === 0) {
+      console.warn("No active Toggl developers found in database");
+      return [];
     }
 
-    // Parse developer IDs from comma-separated string
-    const userIds = developerIds.split(",").map((id) => parseInt(id.trim()));
+    const userIds = developers.map((d) => d.togglId);
 
     // Get current year date range (you can modify these as needed)
     const startDate = "2025-01-01";
