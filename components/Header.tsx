@@ -26,7 +26,7 @@ function Header() {
     <>
       <header className="bg-[#161B22] border-b border-zinc-800/60 flex justify-between items-center text-white p-4 sm:p-6 desktop:p-8 col-span-full desktop:col-span-2">
         <Link href="/dashboard" className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all">
-          AITracker
+          AITrack
         </Link>
 
         <div className="flex items-center gap-4">
