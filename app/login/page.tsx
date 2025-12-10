@@ -12,7 +12,7 @@ function login() {
       <div className="flex min-h-screen items-center justify-center">
         <main className="flex flex-col items-center justify-center gap-8">
           <h1 className="text-5xl font-bold bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            AITracker
+            AITrack
           </h1>
           <LoginForm />
         </main>
