@@ -121,7 +121,8 @@ async function main() {
 
   // Fetch data from the sync API
   console.log("Fetching data from sync API...");
-  const response = await fetch("http://localhost:3000/api/sync-projects");
+  const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
+  const response = await fetch(`${apiBaseUrl}/api/sync-projects`);
 
   if (!response.ok) {
     throw new Error(`API request failed: ${response.statusText}`);
