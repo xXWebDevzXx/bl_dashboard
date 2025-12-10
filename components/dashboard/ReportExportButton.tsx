@@ -38,9 +38,13 @@ export default function ReportExportButton() {
       }.${format === "pdf" ? "pdf" : "xlsx"}`;
 
       if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
+        // Handle both quoted and unquoted filenames
+        const filenameMatch = contentDisposition.match(
+          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        );
+        if (filenameMatch && filenameMatch[1]) {
+          // Remove quotes if present
+          filename = filenameMatch[1].replace(/['"]/g, "");
         }
       }
 
