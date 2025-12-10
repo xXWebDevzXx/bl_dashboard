@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import TogglDevelopersManager from "./TogglDevelopersManager";
 
 interface User {
   id: string;
@@ -746,6 +747,9 @@ export default function AdminDashboardClient() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Toggl Developers Manager */}
+      <TogglDevelopersManager />
     </div>
   );
 }

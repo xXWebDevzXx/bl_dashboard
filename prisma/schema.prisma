@@ -97,3 +97,15 @@ model LinearTaskLabel {
   @@index([linearLabelId], map: "linear_task_label_linear_task_label_linear_labels_fk_fkey")
   @@map("linear_task_label")
 }
+
+model TogglDeveloper {
+  id        String  @id @default(cuid()) @map("toggl_developer_pk") @db.Char(36)
+  togglId   Int     @unique @map("toggl_developer_toggl_id")
+  name      String  @map("toggl_developer_name") @db.VarChar(255)
+  email     String  @unique @map("toggl_developer_email") @db.VarChar(255)
+  isActive  Boolean @default(true) @map("toggl_developer_is_active")
+  createdAt Int     @map("toggl_developer_created_at")
+  updatedAt Int     @map("toggl_developer_updated_at")
+
+  @@map("toggl_developer")
+}
