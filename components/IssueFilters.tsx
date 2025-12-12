@@ -136,7 +136,7 @@ export function IssueFilters() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={projectOpen}
-                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white"
+                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white cursor-pointer"
                 >
                   {project ? project : "All projects"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -199,7 +199,7 @@ export function IssueFilters() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={estimateOpen}
-                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white"
+                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white cursor-pointer"
                 >
                   {estimate ? estimate : "All estimates"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
