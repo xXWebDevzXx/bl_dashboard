@@ -96,6 +96,33 @@ interface ProjectWithTask {
   developmentTask: TogglTask | null;
 }
 
+interface LinearProjectsResponse {
+  data: {
+    team: {
+      id: string;
+      projects: {
+        nodes: LinearProject[];
+      };
+    };
+  };
+  errors?: unknown[];
+}
+
+interface LinearIssuesResponse {
+  data: {
+    team: {
+      issues: {
+        nodes: LinearIssue[];
+        pageInfo: {
+          hasNextPage: boolean;
+          endCursor: string | null;
+        };
+      };
+    };
+  };
+  errors?: unknown[];
+}
+
 interface SyncResult {
   success: boolean;
   data: ProjectWithTask[];
@@ -226,7 +253,7 @@ async function fetchLinearProjects(): Promise<{
       throw new Error(`Linear API error (${response.status}): ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as LinearProjectsResponse;
 
     if (data.errors) {
       throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
@@ -311,7 +338,7 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
         );
       }
 
-      const data = await response.json();
+      const data = await response.json() as TogglReportEntry[];
 
       if (data && data.length > 0) {
         allData = [...allData, ...data];
@@ -356,72 +383,92 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
 async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
   try {
     const apiKey = process.env.LINEAR_API_KEY;
-
     if (!apiKey) {
       throw new Error("LINEAR_API_KEY environment variable is not set");
     }
 
-    const response = await fetch("https://api.linear.app/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${apiKey}`,
-      },
-      body: JSON.stringify({
-        query: `
-          query {
-            team(id: "${teamId}") {
-              id
-              issues {
-                nodes {
-                  id
-                  number
-                  identifier
-                  title
-                  description
-                  createdAt
-                  startedAt
-                  completedAt
-                  estimate
-                  project {
-                    name
-                  }
-                  assignee {
+    let allIssues: LinearIssue[] = [];
+    let hasNextPage = true;
+    let endCursor: string | null = null;
+
+    // Get the start of the current year in ISO format
+    const currentYear = new Date().getFullYear();
+    const startOfYear = `${currentYear}-01-01T00:00:00Z`;
+
+    while (hasNextPage) {
+      const response = await fetch("https://api.linear.app/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${apiKey}`,
+        },
+        body: JSON.stringify({
+          query: `
+            query($after: String, $startOfYear: DateTimeOrDuration!) {
+              team(id: "${teamId}") {
+                issues(first: 100, after: $after, filter: { createdAt: { gte: $startOfYear } }) {
+                  nodes {
                     id
-                    name
-                    displayName
-                  }
-                  delegate {
-                    id
-                    name
-                  }
-                  labels {
-                    nodes {
+                    number
+                    identifier
+                    title
+                    description
+                    createdAt
+                    startedAt
+                    completedAt
+                    estimate
+                    project {
+                      name
+                    }
+                    assignee {
                       id
                       name
-                      color
+                      displayName
                     }
+                    delegate {
+                      id
+                      name
+                    }
+                    labels {
+                      nodes {
+                        id
+                        name
+                        color
+                      }
+                    }
+                  }
+                  pageInfo {
+                    hasNextPage
+                    endCursor
                   }
                 }
               }
             }
-          }
-        `,
-      }),
-    });
+          `,
+          variables: { after: endCursor, startOfYear },
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Linear API error (${response.status}): ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Linear API error (${response.status}): ${errorText}`);
+      }
+
+      const data = await response.json() as LinearIssuesResponse;
+
+      if (data.errors) {
+        throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
+      }
+
+      const issues = data.data.team.issues.nodes;
+      allIssues = [...allIssues, ...issues];
+
+      const pageInfo = data.data.team.issues.pageInfo;
+      hasNextPage = pageInfo.hasNextPage;
+      endCursor = pageInfo.endCursor;
     }
 
-    const data = await response.json();
-
-    if (data.errors) {
-      throw new Error(`Linear GraphQL errors: ${JSON.stringify(data.errors)}`);
-    }
-
-    return data.data.team.issues.nodes;
+    return allIssues;
   } catch (error) {
     console.error("Linear API Error:", error);
     throw error;
