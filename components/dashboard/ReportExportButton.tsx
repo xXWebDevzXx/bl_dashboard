@@ -76,7 +76,7 @@ export default function ReportExportButton() {
         <Button
           variant="outline"
           size="sm"
-          className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+          className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-600/5 hover:to-cyan-600/5 hover:text-white hover:border-emerald-600/10 cursor-pointer transition-all ease-in-out"
           disabled={isGenerating !== null}
         >
           {isGenerating ? (
