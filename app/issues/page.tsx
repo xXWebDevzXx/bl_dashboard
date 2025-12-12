@@ -9,6 +9,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { IssueFilters } from "@/components/IssueFilters";
+import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
@@ -114,16 +115,17 @@ const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
 
       <IssueFilters />
 
-      <Card className="bg-[#161B22] border-zinc-800/60 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.1s_both]">
+      <Card className="bg-[#161B22] border-zinc-800/60 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.1s_both] " >
         <CardHeader className="border-b border-zinc-800/60">
           <CardTitle className="text-lg sm:text-xl text-white">Results</CardTitle>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 desktop:grid-cols-3 gap-4 sm:gap-6">
             {issues.map((issue) => (
+              <Link href={`/issues/${issue.taskId}`} key={issue.taskId}>
               <Card
-                key={issue.id}
-                className="bg-[#0D1117] border-zinc-800/60 rounded-sm hover:border-zinc-700/80 transition-colors"
+                key={issue.taskId}
+                className="bg-[#0D1117] border-zinc-800/60 rounded-sm hover:border-zinc-700/80 transition-colors cursor-pointer"
               >
                 <CardHeader className="p-4 sm:p-5 pb-2">
                   <div className="flex items-start justify-between gap-2">
@@ -155,6 +157,7 @@ const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
 
