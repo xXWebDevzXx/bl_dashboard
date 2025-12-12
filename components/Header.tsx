@@ -38,7 +38,7 @@ function Header() {
           href="/dashboard"
           className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all"
         >
-          AITrack
+          AITracker
         </Link>
 
         <div className="flex items-center gap-4">
