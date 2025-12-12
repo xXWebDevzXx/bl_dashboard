@@ -24,6 +24,7 @@ export function useAuthUser() {
 
   return {
     user: user || null,
+    isAdmin: user?.isAdmin || false,
     error,
     isLoading,
     mutate,
