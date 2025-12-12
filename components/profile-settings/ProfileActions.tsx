@@ -76,7 +76,7 @@ export function ProfileActions() {
               onClick={() => setIsEditModalOpen(true)}
             >
               <Pencil className="w-4 h-4 mr-2" />
-              Update Profile
+              Update Username
             </Button>
             <Button
               variant="outline"
