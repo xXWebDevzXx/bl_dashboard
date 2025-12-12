@@ -31,11 +31,9 @@ export async function GET(request: NextRequest) {
     if (format === "pdf") {
       // Generate PDF
       const doc = generatePDF(reportData);
-      const pdfBlob = doc.output("blob");
-
-      // Convert blob to buffer for Next.js response
-      const arrayBuffer = await pdfBlob.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      // Use arraybuffer for server-side generation (more reliable than blob)
+      const pdfArrayBuffer = doc.output("arraybuffer");
+      const buffer = Buffer.from(pdfArrayBuffer);
 
       // Return PDF file
       return new NextResponse(buffer, {
@@ -49,9 +47,14 @@ export async function GET(request: NextRequest) {
     } else if (format === "excel") {
       // Generate Excel
       const excelBuffer = await generateExcel(reportData);
+      
+      // Ensure it's a proper Node.js Buffer
+      const buffer = Buffer.isBuffer(excelBuffer) 
+        ? excelBuffer 
+        : Buffer.from(excelBuffer);
 
       // Return Excel file
-      return new NextResponse(excelBuffer, {
+      return new NextResponse(buffer, {
         headers: {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
