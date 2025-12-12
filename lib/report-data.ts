@@ -28,35 +28,31 @@ export interface ReportData {
 }
 
 export async function getReportData(): Promise<ReportData> {
-  try {
-    // Fetch all dashboard data in parallel
-    const [stats, timeChartData, estimationAccuracy, taskDistribution] =
-      await Promise.all([
-        getDashboardStats(),
-        getTimeChartData(),
-        getEstimationAccuracy(),
-        getTaskDistribution(),
-      ]);
+  // Fetch all dashboard data in parallel
+  const [stats, timeChartData, estimationAccuracy, taskDistribution] =
+    await Promise.all([
+      getDashboardStats(),
+      getTimeChartData(),
+      getEstimationAccuracy(),
+      getTaskDistribution(),
+    ]);
 
-    const now = new Date();
+  const now = new Date();
 
-    return {
-      metadata: {
-        generatedAt: now.toISOString(),
-        generatedDate: now.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-      },
-      stats,
-      timeChartData,
-      estimationAccuracy,
-      taskDistribution,
-    };
-  } finally {
-    await prisma.$disconnect();
-  }
+  return {
+    metadata: {
+      generatedAt: now.toISOString(),
+      generatedDate: now.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    },
+    stats,
+    timeChartData,
+    estimationAccuracy,
+    taskDistribution,
+  };
 }
 
 async function getTaskDistribution() {

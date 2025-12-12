@@ -1,5 +1,6 @@
-import { PrismaClient, LinearTask, TogglTime } from "@prisma/client";
+import { LinearTask, TogglTime } from "@prisma/client";
 import { parseEstimateToNumber } from "./estimate-utils";
+import { prisma } from "./prisma/client";
 
 interface TaskWithTogglTimes extends LinearTask {
   togglTimes: TogglTime[];
@@ -26,43 +27,37 @@ export interface EstimationAccuracyData {
 }
 
 export async function getEstimationAccuracy(): Promise<EstimationAccuracyData> {
-  const prisma = new PrismaClient();
-
-  try {
-    // Get all tasks with both estimated time and actual toggl time
-    const tasksWithTime = await prisma.linearTask.findMany({
-      where: {
-        togglTimes: { some: {} },
-        estimatedTime: {
-          not: { equals: "" },
-        },
+  // Get all tasks with both estimated time and actual toggl time
+  const tasksWithTime = await prisma.linearTask.findMany({
+    where: {
+      togglTimes: { some: {} },
+      estimatedTime: {
+        not: { equals: "" },
       },
-      include: {
-        togglTimes: true,
-      },
-    });
+    },
+    include: {
+      togglTimes: true,
+    },
+  });
 
-    // Separate AI and Non-AI tasks
-    const aiTasks = tasksWithTime.filter(task => task.delegateId !== null);
-    const nonAiTasks = tasksWithTime.filter(task => task.delegateId === null);
+  // Separate AI and Non-AI tasks
+  const aiTasks = tasksWithTime.filter(task => task.delegateId !== null);
+  const nonAiTasks = tasksWithTime.filter(task => task.delegateId === null);
 
-    // Calculate metrics for AI tasks
-    const aiMetrics = calculateMetrics(aiTasks);
+  // Calculate metrics for AI tasks
+  const aiMetrics = calculateMetrics(aiTasks);
 
-    // Calculate metrics for Non-AI tasks
-    const nonAiMetrics = calculateMetrics(nonAiTasks);
+  // Calculate metrics for Non-AI tasks
+  const nonAiMetrics = calculateMetrics(nonAiTasks);
 
-    // Calculate overall metrics
-    const overallMetrics = calculateMetrics(tasksWithTime);
+  // Calculate overall metrics
+  const overallMetrics = calculateMetrics(tasksWithTime);
 
-    return {
-      aiTasks: aiMetrics,
-      nonAiTasks: nonAiMetrics,
-      overall: overallMetrics,
-    };
-  } finally {
-    await prisma.$disconnect();
-  }
+  return {
+    aiTasks: aiMetrics,
+    nonAiTasks: nonAiMetrics,
+    overall: overallMetrics,
+  };
 }
 
 function calculateMetrics(tasks: TaskWithTogglTimes[]) {

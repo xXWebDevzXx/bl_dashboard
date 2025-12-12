@@ -147,7 +147,5 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: `Internal server error: ${errorMessage}` }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

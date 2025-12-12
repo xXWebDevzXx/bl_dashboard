@@ -73,8 +73,6 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching toggl developers:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -136,7 +134,5 @@ export async function POST(request: NextRequest) {
     console.error("Error creating toggl developer:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

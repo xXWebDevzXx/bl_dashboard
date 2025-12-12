@@ -38,8 +38,6 @@ export async function PATCH(
     console.error("Error updating toggl developer:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -73,7 +71,5 @@ export async function DELETE(
     console.error("Error deleting toggl developer:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
