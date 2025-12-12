@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutDashboard, ListTodo, GitCompare, User } from "lucide-react";
+import { LayoutDashboard, ListTodo, GitCompare, User, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 function AsideNav() {
   const pathname = usePathname();
+  const { isAdmin } = useAuthUser();
 
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/issues", icon: ListTodo, label: "Issues" },
     { href: "/compare", icon: GitCompare, label: "Compare" },
     { href: "/profile", icon: User, label: "Profile" },
+    ...(isAdmin ? [{ href: "/admin", icon: Shield, label: "Admin" }] : []),
   ];
 
   return (

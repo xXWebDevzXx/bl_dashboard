@@ -30,6 +30,8 @@ export async function GET() {
           ...session.user,
           name: dbUser.username, // Use database username as the source of truth
           nickname: dbUser.username,
+          role: dbUser.role, // Include role for admin checks
+          isAdmin: dbUser.role === "admin", // Convenience flag for admin status
         };
         return NextResponse.json(userData);
       }

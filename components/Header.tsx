@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import {
+  GitCompare,
+  LayoutDashboard,
+  ListTodo,
+  Menu,
+  Shield,
+  User,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
-import Link from "next/link";
-import { LayoutDashboard, ListTodo, GitCompare, User, Menu, X } from "lucide-react";
-import { usePathname } from "next/navigation";
 
 function Header() {
-  const { user, isLoading } = useAuthUser();
+  const { user, isLoading, isAdmin } = useAuthUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -20,12 +28,16 @@ function Header() {
     { href: "/issues", icon: ListTodo, label: "Issues" },
     { href: "/compare", icon: GitCompare, label: "Compare" },
     { href: "/profile", icon: User, label: "Profile" },
+    ...(isAdmin ? [{ href: "/admin", icon: Shield, label: "Admin" }] : []),
   ];
 
   return (
     <>
       <header className="bg-[#161B22] border-b border-zinc-800/60 flex justify-between items-center text-white p-4 sm:p-6 desktop:p-8 col-span-full desktop:col-span-2">
-        <Link href="/dashboard" className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all">
+        <Link
+          href="/dashboard"
+          className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all"
+        >
           AITrack
         </Link>
 
@@ -45,7 +57,11 @@ function Header() {
               className="desktop:hidden p-2 hover:bg-zinc-800 rounded-md transition-colors"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           )}
         </div>
@@ -62,7 +78,9 @@ function Header() {
       {/* Mobile Menu Dropdown */}
       <div
         className={`desktop:hidden fixed top-0 right-0 bottom-0 w-64 h-screen bg-[#161B22] border-l border-zinc-800/60 z-40 transform transition-all duration-300 ease-in-out ${
-          isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          isMenuOpen
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0"
         }`}
       >
         <nav className="flex flex-col p-6 pt-20">
