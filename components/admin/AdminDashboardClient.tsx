@@ -287,12 +287,12 @@ export default function AdminDashboardClient() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-zinc-800">
+      <div className="flex gap-2 border-b border-zinc-800 overflow-x-auto">
         <button
           onClick={() => setActiveTab("active")}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === "active"
               ? "text-emerald-400 border-b-2 border-emerald-400"
               : "text-zinc-400 hover:text-white"
@@ -302,7 +302,7 @@ export default function AdminDashboardClient() {
         </button>
         <button
           onClick={() => setActiveTab("deleted")}
-          className={`px-4 py-2 font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === "deleted"
               ? "text-emerald-400 border-b-2 border-emerald-400"
               : "text-zinc-400 hover:text-white"
@@ -321,7 +321,7 @@ export default function AdminDashboardClient() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
               <Input
@@ -355,9 +355,9 @@ export default function AdminDashboardClient() {
       </Card>
 
       {/* Users Table */}
-      <Card className="bg-[#161B22] border-zinc-800/60">
+      <Card className="bg-[#161B22] border-zinc-800/60 w-full overflow-hidden">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-white">
                 {activeTab === "active" ? "Active Users" : "Deleted Users"}
@@ -367,13 +367,13 @@ export default function AdminDashboardClient() {
                 {activeTab === "active" ? "active" : "deleted"} users
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleSyncAuth0}
                 disabled={loading || isSyncing}
-                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800 w-full sm:w-auto"
               >
                 <DownloadCloud
                   className={`w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
@@ -385,7 +385,7 @@ export default function AdminDashboardClient() {
                 size="sm"
                 onClick={() => fetchUsers()}
                 disabled={loading}
-                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800 w-full sm:w-auto"
               >
                 <RefreshCw
                   className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
@@ -395,7 +395,7 @@ export default function AdminDashboardClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           {loading ? (
             <div className="text-center py-8 text-zinc-400">
               Loading users...
@@ -404,31 +404,33 @@ export default function AdminDashboardClient() {
             <div className="text-center py-8 text-zinc-400">No users found</div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto -mx-4 sm:-mx-6 lg:mx-0">
+                <div className="px-4 sm:px-6 lg:px-0">
+                  <table className="w-full min-w-[800px]">
                   <thead>
                     <tr className="border-b border-zinc-800">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[120px]">
                         User
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[180px]">
                         Email
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[80px]">
                         Role
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[100px]">
                         Status
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[100px]">
                         Created
                       </th>
                       {activeTab === "deleted" && (
-                        <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
+                        <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[100px]">
                           Deleted
                         </th>
                       )}
-                      <th className="text-right py-3 px-4 text-sm font-medium text-zinc-400">
+                      <th className="text-right py-3 px-4 text-sm font-medium text-zinc-400 min-w-[100px]">
                         Actions
                       </th>
                     </tr>
@@ -529,21 +531,111 @@ export default function AdminDashboardClient() {
                     ))}
                   </tbody>
                 </table>
+                </div>
+              </div>
+
+              {/* Tablet/Mobile Card View */}
+              <div className="lg:hidden space-y-4">
+                {users.map((user) => (
+                  <Card
+                    key={user.id}
+                    className="bg-zinc-900/30 border-zinc-800/50"
+                  >
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <UserIcon className="w-4 h-4 text-zinc-400" />
+                          <span className="text-white font-medium">
+                            {user.username}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          {activeTab === "active" ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEdit(user)}
+                                className="text-zinc-400 hover:text-white hover:bg-zinc-800 h-8 w-8 p-0"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(user)}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-8 w-8 p-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUndelete(user)}
+                              className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 h-8 w-8 p-0"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-zinc-400" />
+                        <span className="text-zinc-300 text-sm">{user.email}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge
+                          variant={
+                            user.role === "admin" ? "default" : "secondary"
+                          }
+                          className={
+                            user.role === "admin"
+                              ? "bg-emerald-600/20 text-emerald-400 border-emerald-600/30"
+                              : "bg-zinc-800 text-zinc-300 border-zinc-700"
+                          }
+                        >
+                          {user.role === "admin" && (
+                            <Shield className="w-3 h-3 mr-1" />
+                          )}
+                          {user.role}
+                        </Badge>
+                        <Badge
+                          variant={user.isVerified ? "default" : "secondary"}
+                          className={
+                            user.isVerified
+                              ? "bg-green-600/20 text-green-400 border-green-600/30"
+                              : "bg-yellow-600/20 text-yellow-400 border-yellow-600/30"
+                          }
+                        >
+                          {user.isVerified ? "Verified" : "Unverified"}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-zinc-400 space-y-1">
+                        <div>Created: {formatDate(user.createdAt)}</div>
+                        {activeTab === "deleted" && user.deletedAt && (
+                          <div>Deleted: {formatDate(user.deletedAt)}</div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-zinc-800 px-4 sm:px-0">
                   <div className="text-sm text-zinc-400">
                     Page {pagination.page} of {pagination.totalPages}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="bg-zinc-900/50 border-zinc-700 text-white"
+                      className="bg-zinc-900/50 border-zinc-700 text-white flex-1 sm:flex-initial"
                     >
                       Previous
                     </Button>
@@ -554,7 +646,7 @@ export default function AdminDashboardClient() {
                         setPage((p) => Math.min(pagination.totalPages, p + 1))
                       }
                       disabled={page === pagination.totalPages}
-                      className="bg-zinc-900/50 border-zinc-700 text-white"
+                      className="bg-zinc-900/50 border-zinc-700 text-white flex-1 sm:flex-initial"
                     >
                       Next
                     </Button>
@@ -568,7 +660,7 @@ export default function AdminDashboardClient() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -658,7 +750,7 @@ export default function AdminDashboardClient() {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -706,7 +798,7 @@ export default function AdminDashboardClient() {
         open={isUndeleteDialogOpen}
         onOpenChange={setIsUndeleteDialogOpen}
       >
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Restore User</DialogTitle>
             <DialogDescription className="text-zinc-400">
