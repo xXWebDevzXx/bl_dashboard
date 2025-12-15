@@ -98,9 +98,9 @@ export default async function Dashboard() {
           ></DashboardCard>
         </div>
         <div className="grid grid-cols-1 desktop:grid-cols-2 gap-4 sm:gap-6 desktop:gap-8">
-          <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-auto mb-4 sm:mb-6 desktop:mb-8">
-            <DashboardAreaChart className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
-            <EstimationAccuracyChart />
+          <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
+            <DashboardAreaChart className="bg-[#161B22] h-fit border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
+            <EstimationAccuracyChart className="h-fit" />
           </div>
 
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
