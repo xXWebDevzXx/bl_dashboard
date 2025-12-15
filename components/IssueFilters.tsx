@@ -108,7 +108,7 @@ export function IssueFilters() {
   const hasActiveFilters = search || project || delegate || estimate || hasTimeEntries || label;
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 mb-6">
+    <Card className="bg-[#161B22] border-zinc-800/60 mb-6 shadow-lg shadow-black/30">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white">Filters</CardTitle>
       </CardHeader>
