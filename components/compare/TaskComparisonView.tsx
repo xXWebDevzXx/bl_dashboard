@@ -5,7 +5,7 @@ import ComparisonMetrics from "./ComparisonMetrics";
 import ComparisonChart from "./ComparisonChart";
 import TimeEntriesComparison from "./TimeEntriesComparison";
 import type { Task } from "./types";
-import { parseEstimateToNumber } from "@/lib/estimate-utils";
+import { parseEstimateRange } from "@/lib/estimate-utils";
 
 interface Props {
   task1: Task;
@@ -13,44 +13,122 @@ interface Props {
 }
 
 export default function TaskComparisonView({ task1, task2 }: Props) {
+  // Parse estimate ranges to get displayFormat
+  const task1EstimateRange = useMemo(() => parseEstimateRange(task1.estimatedTime), [task1.estimatedTime]);
+  const task2EstimateRange = useMemo(() => parseEstimateRange(task2.estimatedTime), [task2.estimatedTime]);
+
   const metrics = useMemo(() => {
-    const calculateAccuracy = (estimated: number, actual: number) => {
-      if (estimated === 0) return 0;
-      return (actual / estimated) * 100;
+    /**
+     * Calculate accuracy based on estimate range.
+     * If actual time is within the range [min, max], accuracy is 100%.
+     * If below min: accuracy = (actual / min) * 100
+     * If above max: accuracy = (actual / max) * 100
+     */
+    const calculateAccuracy = (
+      estimateRange: { min: number; max: number; midpoint: number },
+      actual: number
+    ) => {
+      if (estimateRange.midpoint === 0) return 0;
+
+      // If within range, 100% accuracy
+      if (actual >= estimateRange.min && actual <= estimateRange.max) {
+        return 100;
+      }
+
+      // If below range, calculate based on min
+      if (actual < estimateRange.min) {
+        return (actual / estimateRange.min) * 100;
+      }
+
+      // If above range, calculate based on max
+      return (actual / estimateRange.max) * 100;
     };
 
-    const task1EstimatedNum = parseEstimateToNumber(task1.estimatedTime);
-    const task2EstimatedNum = parseEstimateToNumber(task2.estimatedTime);
+    /**
+     * Calculate variance based on how far outside the estimate range the actual time is.
+     * If within range: variance is 0
+     * If below min: variance is negative (actual - min)
+     * If above max: variance is positive (actual - max)
+     */
+    const calculateVariance = (
+      estimateRange: { min: number; max: number; midpoint: number },
+      actual: number
+    ) => {
+      // If within range, variance is 0
+      if (actual >= estimateRange.min && actual <= estimateRange.max) {
+        return 0;
+      }
 
-    const task1Accuracy = calculateAccuracy(task1EstimatedNum, task1.actualTime);
-    const task2Accuracy = calculateAccuracy(task2EstimatedNum, task2.actualTime);
+      // If below range, variance is negative (how far below min)
+      if (actual < estimateRange.min) {
+        return actual - estimateRange.min;
+      }
 
-    const task1Variance = task1.actualTime - task1EstimatedNum;
-    const task2Variance = task2.actualTime - task2EstimatedNum;
+      // If above range, variance is positive (how far above max)
+      return actual - estimateRange.max;
+    };
+
+    const task1Accuracy = calculateAccuracy(task1EstimateRange, task1.actualTime);
+    const task2Accuracy = calculateAccuracy(task2EstimateRange, task2.actualTime);
+
+    const task1Variance = calculateVariance(task1EstimateRange, task1.actualTime);
+    const task2Variance = calculateVariance(task2EstimateRange, task2.actualTime);
+
+    /**
+     * Calculate variance percentage based on which boundary was exceeded
+     * If above max: (variance / max) * 100
+     * If below min: (variance / min) * 100
+     * If within range: 0
+     */
+    const calculateVariancePercentage = (
+      estimateRange: { min: number; max: number; midpoint: number },
+      actual: number,
+      variance: number
+    ) => {
+      if (variance === 0) return 0;
+
+      if (actual < estimateRange.min && estimateRange.min > 0) {
+        return (variance / estimateRange.min) * 100;
+      }
+
+      if (actual > estimateRange.max && estimateRange.max > 0) {
+        return (variance / estimateRange.max) * 100;
+      }
+
+      return 0;
+    };
 
     return {
       task1: {
         accuracy: task1Accuracy,
         variance: task1Variance,
-        variancePercentage: task1EstimatedNum > 0 ? (task1Variance / task1EstimatedNum) * 100 : 0,
+        variancePercentage: calculateVariancePercentage(
+          task1EstimateRange,
+          task1.actualTime,
+          task1Variance
+        ),
         entriesCount: task1.togglEntries.length,
         isAI: !!task1.delegateId,
       },
       task2: {
         accuracy: task2Accuracy,
         variance: task2Variance,
-        variancePercentage: task2EstimatedNum > 0 ? (task2Variance / task2EstimatedNum) * 100 : 0,
+        variancePercentage: calculateVariancePercentage(
+          task2EstimateRange,
+          task2.actualTime,
+          task2Variance
+        ),
         entriesCount: task2.togglEntries.length,
         isAI: !!task2.delegateId,
       },
       comparison: {
         accuracyDiff: task1Accuracy - task2Accuracy,
         timeDiff: task1.actualTime - task2.actualTime,
-        estimateDiff: task1EstimatedNum - task2EstimatedNum,
+        estimateDiff: task1EstimateRange.midpoint - task2EstimateRange.midpoint,
         entriesDiff: task1.togglEntries.length - task2.togglEntries.length,
       },
     };
-  }, [task1, task2]);
+  }, [task1, task2, task1EstimateRange, task2EstimateRange]);
 
   return (
     <div className="space-y-6">
@@ -135,12 +213,23 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
 
       {/* Metrics Comparison */}
       <div className="animate-[fadeInScale_0.6s_ease-out_0.5s_both]">
-        <ComparisonMetrics task1={task1} task2={task2} metrics={metrics} />
+        <ComparisonMetrics
+          task1={task1}
+          task2={task2}
+          metrics={metrics}
+          task1EstimateDisplay={task1EstimateRange.displayFormat}
+          task2EstimateDisplay={task2EstimateRange.displayFormat}
+        />
       </div>
 
       {/* Visual Comparison Chart */}
       <div className="animate-[fadeInScale_0.6s_ease-out_0.6s_both]">
-        <ComparisonChart task1={task1} task2={task2} />
+        <ComparisonChart
+          task1={task1}
+          task2={task2}
+          task1EstimateDisplay={task1EstimateRange.displayFormat}
+          task2EstimateDisplay={task2EstimateRange.displayFormat}
+        />
       </div>
 
       {/* Time Entries Comparison */}
