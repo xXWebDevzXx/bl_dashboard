@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatHoursToHM, formatHoursWithSign } from "@/lib/time-format-utils";
 
 interface Task {
   estimatedTime: string;
@@ -37,9 +38,11 @@ interface Props {
   task1: Task;
   task2: Task;
   metrics: Metrics;
+  task1EstimateDisplay: string;
+  task2EstimateDisplay: string;
 }
 
-export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
+export default function ComparisonMetrics({ task1, task2, metrics, task1EstimateDisplay, task2EstimateDisplay }: Props) {
   const getComparisonIndicator = (diff: number) => {
     if (Math.abs(diff) < 0.01) {
       return { text: "Equal", color: "text-gray-400", icon: "=" };
@@ -72,13 +75,13 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-emerald-400">Task 1</span>
               <span className="text-lg font-bold text-white">
-                {task1.estimatedTime}
+                {task1EstimateDisplay}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-cyan-400">Task 2</span>
               <span className="text-lg font-bold text-white">
-                {task2.estimatedTime}
+                {task2EstimateDisplay}
               </span>
             </div>
             <div className="pt-2 border-t border-zinc-800/60">
@@ -90,7 +93,7 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
                   }`}
                 >
                   {getComparisonIndicator(metrics.comparison.estimateDiff).icon}{" "}
-                  {Math.abs(metrics.comparison.estimateDiff).toFixed(2)}h
+                  {formatHoursToHM(Math.abs(metrics.comparison.estimateDiff))}
                 </span>
               </div>
             </div>
@@ -106,13 +109,13 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-emerald-400">Task 1</span>
               <span className="text-lg font-bold text-white">
-                {task1.actualTime.toFixed(2)}h
+                {formatHoursToHM(task1.actualTime)}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
               <span className="text-sm text-cyan-400">Task 2</span>
               <span className="text-lg font-bold text-white">
-                {task2.actualTime.toFixed(2)}h
+                {formatHoursToHM(task2.actualTime)}
               </span>
             </div>
             <div className="pt-2 border-t border-zinc-800/60">
@@ -124,7 +127,7 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
                   }`}
                 >
                   {getComparisonIndicator(metrics.comparison.timeDiff).icon}{" "}
-                  {Math.abs(metrics.comparison.timeDiff).toFixed(2)}h
+                  {formatHoursToHM(Math.abs(metrics.comparison.timeDiff))}
                 </span>
               </div>
             </div>
@@ -225,20 +228,21 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
           <div className="flex items-baseline gap-2">
             <span
               className={`text-2xl font-bold ${
-                Math.abs(metrics.task1.variance) < 1
+                metrics.task1.variance === 0
                   ? "text-emerald-400"
                   : metrics.task1.variance > 0
                   ? "text-red-400"
                   : "text-green-400"
               }`}
             >
-              {metrics.task1.variance > 0 ? "+" : ""}
-              {metrics.task1.variance.toFixed(2)}h
+              {metrics.task1.variance === 0 ? "100%" : formatHoursWithSign(metrics.task1.variance)}
             </span>
-            <span className="text-sm text-gray-400">
-              ({metrics.task1.variance > 0 ? "+" : ""}
-              {metrics.task1.variancePercentage.toFixed(1)}%)
-            </span>
+            {metrics.task1.variance !== 0 && (
+              <span className="text-sm text-gray-400">
+                ({metrics.task1.variance > 0 ? "+" : ""}
+                {metrics.task1.variancePercentage.toFixed(1)}%)
+              </span>
+            )}
           </div>
           </CardContent>
         </Card>
@@ -258,20 +262,21 @@ export default function ComparisonMetrics({ task1, task2, metrics }: Props) {
           <div className="flex items-baseline gap-2">
             <span
               className={`text-2xl font-bold ${
-                Math.abs(metrics.task2.variance) < 1
+                metrics.task2.variance === 0
                   ? "text-cyan-400"
                   : metrics.task2.variance > 0
                   ? "text-red-400"
                   : "text-green-400"
               }`}
             >
-              {metrics.task2.variance > 0 ? "+" : ""}
-              {metrics.task2.variance.toFixed(2)}h
+              {metrics.task2.variance === 0 ? "100%" : formatHoursWithSign(metrics.task2.variance)}
             </span>
-            <span className="text-sm text-gray-400">
-              ({metrics.task2.variance > 0 ? "+" : ""}
-              {metrics.task2.variancePercentage.toFixed(1)}%)
-            </span>
+            {metrics.task2.variance !== 0 && (
+              <span className="text-sm text-gray-400">
+                ({metrics.task2.variance > 0 ? "+" : ""}
+                {metrics.task2.variancePercentage.toFixed(1)}%)
+              </span>
+            )}
           </div>
           </CardContent>
         </Card>

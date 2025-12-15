@@ -38,11 +38,25 @@ async function getAvailableTasks() {
     const totalTrackedSeconds = task.togglTimes.reduce((sum: number, entry: { duration: number }) => sum + entry.duration, 0);
     const totalTrackedHours = totalTrackedSeconds / 3600;
 
+    // Extract all estimate labels and combine them
+    const estimateRegex = /^Estimate:\s*(.+)$/i;
+    const estimateLabels = task.labels
+      .map((l) => {
+        const match = l.linearLabel.name.match(estimateRegex);
+        return match ? match[1].trim() : null;
+      })
+      .filter((estimate): estimate is string => estimate !== null);
+
+    // Combine multiple estimates with ", " or use the database value if no labels found
+    const combinedEstimate = estimateLabels.length > 0
+      ? estimateLabels.join(", ")
+      : task.estimatedTime;
+
     return {
       id: task.id,
       taskId: task.taskId,
       name: task.name,
-      estimatedTime: task.estimatedTime,
+      estimatedTime: combinedEstimate,
       actualTime: totalTrackedHours,
       delegateId: task.delegateId,
       delegateName: task.delegateName,

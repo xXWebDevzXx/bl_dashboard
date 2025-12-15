@@ -2,7 +2,8 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { parseEstimateToNumber } from "@/lib/estimate-utils";
+import { parseEstimateRange } from "@/lib/estimate-utils";
+import { formatHoursToHM } from "@/lib/time-format-utils";
 
 interface Task {
   taskId: string;
@@ -14,6 +15,8 @@ interface Task {
 interface Props {
   task1: Task;
   task2: Task;
+  task1EstimateDisplay: string;
+  task2EstimateDisplay: string;
 }
 
 // Custom bar shape with gradient and border - defined outside component
@@ -37,20 +40,60 @@ const GradientBar = (props: { fill?: string; x?: number; y?: number; width?: num
   );
 };
 
-export default function ComparisonChart({ task1, task2 }: Props) {
-  const task1EstimatedNum = parseEstimateToNumber(task1.estimatedTime);
-  const task2EstimatedNum = parseEstimateToNumber(task2.estimatedTime);
+// Custom tooltip component - defined outside component
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; actual: number; estimateLabel: string } }> }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-[#1A1F26] border border-[#374151] rounded-md p-3 text-xs">
+        <p className="text-white font-semibold mb-2">{data.name}</p>
+        <p className="text-[#d1d5db] mb-1">
+          <span className="text-emerald-400">Actual Time: </span>
+          {formatHoursToHM(data.actual)}
+        </p>
+        <p className="text-[#d1d5db]">
+          <span className="text-cyan-400">Estimated Time: </span>
+          {data.estimateLabel}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export default function ComparisonChart({ task1, task2, task1EstimateDisplay, task2EstimateDisplay }: Props) {
+  const task1EstimateRange = parseEstimateRange(task1.estimatedTime);
+  const task2EstimateRange = parseEstimateRange(task2.estimatedTime);
+
+  // Calculate variance based on boundaries (same logic as in TaskComparisonView)
+  const calculateVariance = (
+    estimateRange: { min: number; max: number; midpoint: number },
+    actual: number
+  ) => {
+    if (actual >= estimateRange.min && actual <= estimateRange.max) {
+      return 0;
+    }
+    if (actual < estimateRange.min) {
+      return actual - estimateRange.min;
+    }
+    return actual - estimateRange.max;
+  };
+
+  const task1Variance = calculateVariance(task1EstimateRange, task1.actualTime);
+  const task2Variance = calculateVariance(task2EstimateRange, task2.actualTime);
 
   const chartData = [
     {
       name: task1.taskId,
-      estimated: task1EstimatedNum,
+      estimated: task1EstimateRange.midpoint,
       actual: parseFloat(task1.actualTime.toFixed(2)),
+      estimateLabel: task1EstimateDisplay, // Use displayFormat for tooltip
     },
     {
       name: task2.taskId,
-      estimated: task2EstimatedNum,
+      estimated: task2EstimateRange.midpoint,
       actual: parseFloat(task2.actualTime.toFixed(2)),
+      estimateLabel: task2EstimateDisplay, // Use displayFormat for tooltip
     },
   ];
 
@@ -94,14 +137,7 @@ export default function ComparisonChart({ task1, task2 }: Props) {
 
               <Tooltip
                 cursor={{ fill: "transparent" }}
-                contentStyle={{
-                  backgroundColor: "#1A1F26",
-                  border: "1px solid #374151",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                }}
-                labelStyle={{ color: "#fff", fontWeight: 600, marginBottom: "4px" }}
-                itemStyle={{ color: "#d1d5db" }}
+                content={<CustomTooltip />}
               />
 
               <Legend
@@ -128,17 +164,24 @@ export default function ComparisonChart({ task1, task2 }: Props) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Estimated:</span>
-                <span className="text-white font-semibold">{task1.estimatedTime}</span>
+                <span className="text-white font-semibold">{task1EstimateDisplay}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Actual:</span>
-                <span className="text-white font-semibold">{task1.actualTime.toFixed(2)}h</span>
+                <span className="text-white font-semibold">{formatHoursToHM(task1.actualTime)}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-zinc-800/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${task1.actualTime > task1EstimatedNum ? "text-red-400" : "text-green-400"}`}>
-                  {task1.actualTime > task1EstimatedNum ? "+" : ""}
-                  {(task1.actualTime - task1EstimatedNum).toFixed(2)}h
+                <span className={`font-semibold ${
+                  task1Variance === 0
+                    ? "text-emerald-400"
+                    : task1Variance > 0
+                    ? "text-red-400"
+                    : "text-green-400"
+                }`}>
+                  {task1Variance === 0
+                    ? "100%"
+                    : `${task1Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task1Variance))}`}
                 </span>
               </div>
             </div>
@@ -152,17 +195,24 @@ export default function ComparisonChart({ task1, task2 }: Props) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Estimated:</span>
-                <span className="text-white font-semibold">{task2.estimatedTime}</span>
+                <span className="text-white font-semibold">{task2EstimateDisplay}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Actual:</span>
-                <span className="text-white font-semibold">{task2.actualTime.toFixed(2)}h</span>
+                <span className="text-white font-semibold">{formatHoursToHM(task2.actualTime)}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-zinc-800/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${task2.actualTime > task2EstimatedNum ? "text-red-400" : "text-green-400"}`}>
-                  {task2.actualTime > task2EstimatedNum ? "+" : ""}
-                  {(task2.actualTime - task2EstimatedNum).toFixed(2)}h
+                <span className={`font-semibold ${
+                  task2Variance === 0
+                    ? "text-cyan-400"
+                    : task2Variance > 0
+                    ? "text-red-400"
+                    : "text-green-400"
+                }`}>
+                  {task2Variance === 0
+                    ? "100%"
+                    : `${task2Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task2Variance))}`}
                 </span>
               </div>
             </div>

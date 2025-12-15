@@ -20,6 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { formatHoursToHM } from "@/lib/time-format-utils";
+import { parseEstimateRange } from "@/lib/estimate-utils";
 import type { Task } from "./types";
 
 interface Props {
@@ -41,6 +43,11 @@ export default function TaskSelector({
 }: Props) {
   const [open, setOpen] = useState(false);
   const filteredTasks = tasks.filter((task) => task.id !== excludeTaskId);
+
+  // Parse the selected task's estimate to get displayFormat
+  const selectedTaskEstimateDisplay = selectedTask
+    ? parseEstimateRange(selectedTask.estimatedTime).displayFormat
+    : "";
 
   const colorClasses = {
     emerald: {
@@ -116,13 +123,13 @@ export default function TaskSelector({
                 <div>
                   <p className="text-xs text-gray-500">Estimated</p>
                   <p className="text-sm text-white font-semibold">
-                    {selectedTask.estimatedTime}
+                    {selectedTaskEstimateDisplay}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Actual</p>
                   <p className="text-sm text-white font-semibold">
-                    {selectedTask.actualTime.toFixed(2)}h
+                    {formatHoursToHM(selectedTask.actualTime)}
                   </p>
                 </div>
               </div>
