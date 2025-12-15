@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
     // Get format from query parameter
     const searchParams = request.nextUrl.searchParams;
     const format = searchParams.get("format");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     if (!format || (format !== "pdf" && format !== "excel")) {
       return NextResponse.json(
@@ -25,8 +27,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Parse date range if provided
+    const dateRange =
+      startDate && endDate
+        ? {
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+          }
+        : undefined;
+
     // Fetch all dashboard data
-    const reportData = await getReportData();
+    const reportData = await getReportData(dateRange);
 
     if (format === "pdf") {
       // Generate PDF
@@ -47,10 +58,10 @@ export async function GET(request: NextRequest) {
     } else if (format === "excel") {
       // Generate Excel
       const excelBuffer = await generateExcel(reportData);
-      
+
       // Ensure it's a proper Node.js Buffer
-      const buffer = Buffer.isBuffer(excelBuffer) 
-        ? excelBuffer 
+      const buffer = Buffer.isBuffer(excelBuffer)
+        ? excelBuffer
         : Buffer.from(excelBuffer);
 
       // Return Excel file

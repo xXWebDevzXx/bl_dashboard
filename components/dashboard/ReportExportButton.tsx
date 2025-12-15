@@ -6,17 +6,33 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { type DateRange } from "@/components/ui/calendar";
 import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function ReportExportButton() {
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const handleExport = async (format: "pdf" | "excel") => {
     setIsGenerating(format);
     try {
-      const response = await fetch(`/api/dashboard/report?format=${format}`);
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("format", format);
+
+      if (dateRange?.from) {
+        params.append("startDate", dateRange.from.toISOString().split("T")[0]);
+      }
+      if (dateRange?.to) {
+        params.append("endDate", dateRange.to.toISOString().split("T")[0]);
+      }
+
+      const response = await fetch(
+        `/api/dashboard/report?${params.toString()}`
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -54,8 +70,13 @@ export default function ReportExportButton() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
+      const dateRangeText =
+        dateRange?.from && dateRange?.to
+          ? ` for ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+          : "";
+
       toast.success(`Report exported successfully as ${format.toUpperCase()}`, {
-        description: `Your dashboard report has been downloaded.`,
+        description: `Your dashboard report${dateRangeText} has been downloaded.`,
       });
     } catch (error) {
       console.error("Error exporting report:", error);
@@ -92,36 +113,56 @@ export default function ReportExportButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-56 bg-[#161B22] border-zinc-800/60 p-2">
-        <div className="flex flex-col gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-white hover:bg-zinc-800"
-            onClick={() => handleExport("pdf")}
-            disabled={isGenerating !== null}
-          >
-            {isGenerating === "pdf" ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <FileText className="w-4 h-4 mr-2" />
-            )}
-            Export as PDF
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-white hover:bg-zinc-800"
-            onClick={() => handleExport("excel")}
-            disabled={isGenerating !== null}
-          >
-            {isGenerating === "excel" ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <FileSpreadsheet className="w-4 h-4 mr-2" />
-            )}
-            Export as Excel
-          </Button>
+      <PopoverContent className="w-auto bg-[#161B22] border-zinc-800/80 p-5 shadow-xl">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-semibold text-white">
+                Date Range
+              </label>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Optional: Select a date range to filter the report data
+              </p>
+            </div>
+            <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+          </div>
+          <div className="border-t border-zinc-800/60 pt-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-white mb-1">
+                Export Format
+              </label>
+              <div className="flex flex-col gap-1.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-zinc-200 hover:bg-zinc-800/60 hover:text-white transition-colors"
+              onClick={() => handleExport("pdf")}
+              disabled={isGenerating !== null}
+            >
+              {isGenerating === "pdf" ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4 mr-2" />
+              )}
+              Export as PDF
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-zinc-200 hover:bg-zinc-800/60 hover:text-white transition-colors"
+              onClick={() => handleExport("excel")}
+              disabled={isGenerating !== null}
+            >
+              {isGenerating === "excel" ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+              )}
+              Export as Excel
+            </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </PopoverContent>
     </Popover>

@@ -1,5 +1,6 @@
 import { LinearTask, TogglTime } from "@prisma/client";
 import { parseEstimateToNumber } from "./estimate-utils";
+import type { DateRange } from "./report-data";
 import { prisma } from "./prisma/client";
 
 interface TaskWithTogglTimes extends LinearTask {
@@ -26,17 +27,61 @@ export interface EstimationAccuracyData {
   };
 }
 
-export async function getEstimationAccuracy(): Promise<EstimationAccuracyData> {
+export async function getEstimationAccuracy(dateRange?: DateRange): Promise<EstimationAccuracyData> {
+  // Build date filter for tasks
+  const taskDateFilter = dateRange
+    ? {
+        OR: [
+          {
+            createdAt: {
+              gte: Math.floor(dateRange.startDate.getTime() / 1000),
+              lte: Math.floor(dateRange.endDate.getTime() / 1000),
+            },
+          },
+          {
+            startedAt: {
+              gte: Math.floor(dateRange.startDate.getTime() / 1000),
+              lte: Math.floor(dateRange.endDate.getTime() / 1000),
+            },
+          },
+          {
+            completedAt: {
+              gte: Math.floor(dateRange.startDate.getTime() / 1000),
+              lte: Math.floor(dateRange.endDate.getTime() / 1000),
+            },
+          },
+        ],
+      }
+    : undefined;
+
+  // Build date filter for toggl times
+  // For string fields, we use string comparison which works for ISO date strings
+  const startDateStr = dateRange ? dateRange.startDate.toISOString().split("T")[0] : undefined;
+  const endDateStr = dateRange ? dateRange.endDate.toISOString().split("T")[0] : undefined;
+  const togglTimeDateFilter = dateRange && startDateStr && endDateStr
+    ? {
+        start: {
+          gte: startDateStr,
+          lte: endDateStr + "T23:59:59.999Z",
+        },
+      }
+    : undefined;
+
   // Get all tasks with both estimated time and actual toggl time
   const tasksWithTime = await prisma.linearTask.findMany({
     where: {
-      togglTimes: { some: {} },
+      ...taskDateFilter,
+      togglTimes: {
+        some: togglTimeDateFilter || {},
+      },
       estimatedTime: {
         not: { equals: "" },
       },
     },
     include: {
-      togglTimes: true,
+      togglTimes: {
+        where: togglTimeDateFilter,
+      },
     },
   });
 
