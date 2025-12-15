@@ -101,7 +101,7 @@ function Header() {
           ))}
 
           {/* Logout button in mobile menu */}
-          <div className="mt-6 pt-6 border-t border-zinc-800">
+          <div className="mt-6 pt-6 border-t border-zinc-800 flex justify-center">
             <LogoutButton />
           </div>
         </nav>

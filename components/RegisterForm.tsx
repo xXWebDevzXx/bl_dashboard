@@ -11,7 +11,7 @@ function RegisterForm() {
   };
 
   return (
-    <Card className="w-full min-w-md bg-[#161B22] border-zinc-800/60 shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.1s_both]">
+    <Card className="w-full min-w-0 sm:min-w-md max-w-md mx-auto px-4 sm:px-0 bg-[#161B22] border-zinc-800/60 shadow-2xl shadow-black/40 animate-[fadeInScale_0.6s_ease-out_0.1s_both]">
       <CardHeader className="space-y-2 text-center border-b border-zinc-800/60 pb-6">
         <CardTitle className="text-2xl text-white">Create Account</CardTitle>
         <CardDescription className="text-zinc-400">Create an account with your @obsidianagency.com email</CardDescription>
