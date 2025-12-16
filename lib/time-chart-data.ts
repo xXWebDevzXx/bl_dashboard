@@ -82,7 +82,9 @@ export async function getTimeChartData(
       .sort((a, b) => a.date.localeCompare(b.date));
 
     return chartData;
-  } finally {
-    await prisma.$disconnect();
+  } catch (error) {
+    console.error("Error fetching time chart data:", error);
+    // Re-throw with a user-friendly message
+    throw new Error("Failed to load time chart data. Please refresh the page.");
   }
 }

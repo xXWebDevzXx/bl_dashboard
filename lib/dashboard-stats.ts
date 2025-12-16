@@ -99,7 +99,9 @@ export async function getDashboardStats(dateRange?: DateRange) {
       averageTogglTimeHours,
       linearTasksWithDelegatePercentage,
     };
-  } finally {
-    await prisma.$disconnect();
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    // Re-throw with a user-friendly message
+    throw new Error("Failed to load dashboard statistics. Please refresh the page.");
   }
 }
