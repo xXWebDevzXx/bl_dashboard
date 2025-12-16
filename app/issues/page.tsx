@@ -115,8 +115,8 @@ const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
 
       <IssueFilters />
 
-      <Card className="bg-[#161B22] border-zinc-800/60 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.1s_both] " >
-        <CardHeader className="border-b border-zinc-800/60">
+      <Card className="bg-card border-border-zinc/60 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.1s_both] " >
+        <CardHeader className="border-b border-border-zinc/60">
           <CardTitle className="text-lg sm:text-xl text-white">Results</CardTitle>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -125,7 +125,7 @@ const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
               <Link href={`/issues/${issue.taskId}`} key={issue.taskId}>
               <Card
                 key={issue.taskId}
-                className="bg-[#0D1117] border-zinc-800/60 rounded-sm hover:border-zinc-700/80 transition-colors cursor-pointer"
+                className="bg-card-foreground border-border-zinc/60 rounded-sm hover:border-border-zinc/80 transition-colors cursor-pointer"
               >
                 <CardHeader className="p-4 sm:p-5 pb-2">
                   <div className="flex items-start justify-between gap-2">
@@ -189,7 +189,7 @@ const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
                     const showEllipsis = prevPage && page - prevPage > 1;
 
                     return (
-                      <div key={page} className="flex items-center">
+                      <div key={page} className="flex items-center text-white">
                         {showEllipsis && (
                           <PaginationItem>
                             <PaginationEllipsis />

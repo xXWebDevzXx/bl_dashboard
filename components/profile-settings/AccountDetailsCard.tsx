@@ -22,10 +22,10 @@ export function AccountDetailsCard({
   memberSince,
 }: AccountDetailsCardProps) {
   return (
-    <Card className="lg:col-span-2 bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
-      <CardHeader className="border-b border-zinc-800/60">
+    <Card className="lg:col-span-2 bg-card border-border-zinc/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
+      <CardHeader className="border-b border-border-zinc/60">
         <CardTitle className="text-white flex items-center gap-2">
-          <User className="w-5 h-5 text-emerald-500" />
+          <User className="w-5 h-5 text-emerald-normal" />
           Account Information
         </CardTitle>
         <CardDescription className="text-zinc-400">
@@ -38,15 +38,15 @@ export function AccountDetailsCard({
             icon={User}
             label="Full Name"
             value={name || "Not provided"}
-            iconColor="text-emerald-500"
-            iconBgColor="bg-emerald-500/10"
+            iconColor="text-emerald-normal"
+            iconBgColor="bg-emerald-normal/10"
           />
           <InfoItem
             icon={Mail}
             label="Email Address"
             value={email || "Not provided"}
-            iconColor="text-cyan-500"
-            iconBgColor="bg-cyan-500/10"
+            iconColor="text-cyan-normal"
+            iconBgColor="bg-cyan-normal/10"
           />
           <InfoItem
             icon={Shield}

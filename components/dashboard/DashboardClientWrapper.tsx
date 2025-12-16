@@ -36,7 +36,7 @@ export default function DashboardClientWrapper({ children }: Props) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 text-emerald-500 animate-spin" />
+          <Loader2 className="h-12 w-12 text-emerald-normal animate-spin" />
           <p className="text-gray-400 text-sm">Loading dashboard...</p>
         </div>
       </div>

@@ -72,7 +72,7 @@ export function DeleteAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="bg-[#161B22] border-red-900/60 text-white sm:max-w-md">
+      <DialogContent className="bg-card border-red-900/60 text-white sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 rounded-full bg-red-500/10">
@@ -100,7 +100,7 @@ export function DeleteAccountDialog({
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder="DELETE"
-              className="bg-zinc-900/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-red-500/50 focus-visible:border-red-500"
+              className="bg-zinc-900/50 border-border-zinc text-white placeholder:text-zinc-500 focus-visible:ring-red-500/50 focus-visible:border-red-500"
               disabled={isDeleting}
             />
           </div>
@@ -111,7 +111,7 @@ export function DeleteAccountDialog({
             type="button"
             variant="outline"
             onClick={handleClose}
-            className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            className="border-border-zinc bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"
             disabled={isDeleting}
           >
             Cancel

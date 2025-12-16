@@ -4,6 +4,7 @@ import { getTaskDetails } from "@/lib/task-details";
 import { parseEstimateToNumber } from "@/lib/estimate-utils";
 import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, User, Tag } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -64,10 +65,10 @@ export default async function TaskPage({ params }: TaskPageProps) {
           <ArrowLeft size={16} />
           Back to issues
         </Link>
-        <div className="bg-[#1A1F26] p-8 rounded-sm text-center">
+        <Card className="p-8 rounded-sm text-center">
           <h1 className="text-2xl text-white mb-2">Issue not found</h1>
           <p className="text-gray-400">Could not find issue with ID: {taskId}</p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -83,7 +84,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
         Back to issues
       </Link>
 
-      <div className="bg-[#1A1F26] p-6 rounded-sm mb-6">
+      <Card className="p-6 rounded-sm mb-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <div className="text-sm text-gray-400 mb-2">{task.taskId}</div>
@@ -121,18 +122,18 @@ export default async function TaskPage({ params }: TaskPageProps) {
             <span>Updated: {formatDate(task.updatedAt)}</span>
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-[#1A1F26] p-6 rounded-sm">
+        <Card className="p-6 rounded-sm">
           <div className="flex items-center gap-2 mb-2">
             <Clock size={20} className="text-blue-500" />
             <h3 className="text-gray-400 text-sm">Estimated time</h3>
           </div>
           <p className="text-3xl text-white font-semibold">{task.estimatedTime || "Not set"}</p>
-        </div>
+        </Card>
 
-        <div className="bg-[#1A1F26] p-6 rounded-sm">
+        <Card className="p-6 rounded-sm">
           <div className="flex items-center gap-2 mb-2">
             <Clock size={20} className="text-green-500" />
             <h3 className="text-gray-400 text-sm">Tracked time</h3>
@@ -141,9 +142,9 @@ export default async function TaskPage({ params }: TaskPageProps) {
           <p className="text-sm text-gray-400 mt-1">
             {task.timeEntriesCount} {task.timeEntriesCount === 1 ? "entry" : "entries"}
           </p>
-        </div>
+        </Card>
 
-        <div className="bg-[#1A1F26] p-6 rounded-sm">
+        <Card className="p-6 rounded-sm">
           <div className="flex items-center gap-2 mb-2">
             <Clock size={20} className="text-purple-500" />
             <h3 className="text-gray-400 text-sm">Time comparison</h3>
@@ -156,15 +157,15 @@ export default async function TaskPage({ params }: TaskPageProps) {
           ) : (
             <p className="text-gray-500">No estimation</p>
           )}
-        </div>
+        </Card>
       </div>
 
-      <div className="bg-[#1A1F26] p-6 rounded-sm">
+      <Card className="p-6 rounded-sm">
         <h2 className="text-xl text-white font-semibold mb-4">Time Entries</h2>
         {task.togglTimes.length > 0 ? (
           <div className="space-y-3">
             {task.togglTimes.map((entry) => (
-              <div key={entry.id} className="bg-[#0F1419] p-4 rounded border border-gray-800 hover:border-gray-700 transition-colors">
+              <div key={entry.id} className="bg-card-foreground p-4 rounded border border-gray-800 hover:border-gray-700 transition-colors">
                 <div className="flex justify-between items-start mb-2">
                   <p className="text-white font-medium">{entry.description || "No description"}</p>
                   <span className="text-green-500 font-semibold">{formatDuration(entry.duration)}</span>
@@ -182,7 +183,7 @@ export default async function TaskPage({ params }: TaskPageProps) {
             <p>No time entries yet</p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

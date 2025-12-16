@@ -31,7 +31,7 @@ export default function LogoutButton() {
       onClick={handleLogout}
       disabled={isLoggingOut}
       variant="outline"
-      className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-600/5 hover:to-cyan-600/5 hover:text-white hover:border-emerald-600/10 cursor-pointer transition-all ease-in-out"
+      className="border-border-zinc bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-normal/5 hover:to-cyan-normal/5 hover:text-white hover:border-emerald-normal/10 cursor-pointer transition-all ease-in-out"
     >
       {isLoggingOut ? (
         <Loader2 className="w-4 h-4 mr-2 animate-spin" />

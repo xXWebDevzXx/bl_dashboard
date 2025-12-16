@@ -108,7 +108,7 @@ export function IssueFilters() {
   const hasActiveFilters = search || project || delegate || estimate || hasTimeEntries || label;
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 mb-6 shadow-lg shadow-black/30">
+    <Card className="bg-card border-border-zinc/60 mb-6 shadow-lg shadow-black/30">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white">Filters</CardTitle>
       </CardHeader>
@@ -123,7 +123,7 @@ export function IssueFilters() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-              className="bg-[#0D1117] border-zinc-800/60 text-white"
+              className="bg-card-foreground border-border-zinc/60 text-white"
             />
           </div>
 
@@ -136,14 +136,14 @@ export function IssueFilters() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={projectOpen}
-                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white cursor-pointer"
+                  className="w-full justify-between bg-card-foreground border-border-zinc/60 text-white hover:bg-card-foreground hover:text-white cursor-pointer"
                 >
                   {project ? project : "All projects"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 bg-[#0D1117] border-zinc-800/60">
-                <Command className="bg-[#0D1117]">
+              <PopoverContent className="w-full p-0 bg-card-foreground border-border-zinc/60">
+                <Command className="bg-card-foreground">
                   <CommandInput placeholder="Search projects..." className="text-white" />
                   <CommandList>
                     <CommandEmpty className="text-gray-400">No project found.</CommandEmpty>
@@ -199,14 +199,14 @@ export function IssueFilters() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={estimateOpen}
-                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white cursor-pointer"
+                  className="w-full justify-between bg-card-foreground border-border-zinc/60 text-white hover:bg-card-foreground hover:text-white cursor-pointer"
                 >
                   {estimate ? estimate : "All estimates"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 bg-[#0D1117] border-zinc-800/60">
-                <Command className="bg-[#0D1117]">
+              <PopoverContent className="w-full p-0 bg-card-foreground border-border-zinc/60">
+                <Command className="bg-card-foreground">
                   <CommandInput placeholder="Search estimates..." className="text-white" />
                   <CommandList>
                     <CommandEmpty className="text-gray-400">No estimate found.</CommandEmpty>
@@ -262,14 +262,14 @@ export function IssueFilters() {
                   variant="outline"
                   role="combobox"
                   aria-expanded={labelOpen}
-                  className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white"
+                  className="w-full justify-between bg-card-foreground border-border-zinc/60 text-white hover:bg-card-foreground hover:text-white"
                 >
                   {label ? label : "All labels"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 bg-[#0D1117] border-zinc-800/60">
-                <Command className="bg-[#0D1117]">
+              <PopoverContent className="w-full p-0 bg-card-foreground border-border-zinc/60">
+                <Command className="bg-card-foreground">
                   <CommandInput placeholder="Search labels..." className="text-white" />
                   <CommandList>
                     <CommandEmpty className="text-gray-400">No label found.</CommandEmpty>
@@ -320,10 +320,10 @@ export function IssueFilters() {
           <div className="space-y-2">
             <Label htmlFor="hasTimeEntries" className="text-gray-300">Time Entries</Label>
             <Select value={hasTimeEntries} onValueChange={setHasTimeEntries}>
-              <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white">
+              <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white">
                 <SelectValue placeholder="All tasks" />
               </SelectTrigger>
-              <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+              <SelectContent className="bg-card-foreground border-border-zinc/60">
                 <SelectItem value="all" className="text-white">All tasks</SelectItem>
                 <SelectItem value="true" className="text-white">With time entries</SelectItem>
                 <SelectItem value="false" className="text-white">Without time entries</SelectItem>
@@ -344,7 +344,7 @@ export function IssueFilters() {
             <Button
               onClick={clearFilters}
               variant="outline"
-              className="border-zinc-800/60 text-gray-300 hover:bg-zinc-800/60"
+              className="border-border-zinc/60 text-gray-300 hover:bg-zinc-800/60"
             >
               Clear Filters
             </Button>

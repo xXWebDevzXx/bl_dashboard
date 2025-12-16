@@ -24,7 +24,7 @@ export default function ConditionalLayout({
     <div className="grid grid-rows-[auto_1fr] desktop:grid-cols-[auto_1fr] min-h-screen">
       <Header />
       <AsideNav />
-      <main className="flex-1 bg-[#161B21]">{children}</main>
+      <main className="flex-1 bg-background">{children}</main>
     </div>
   );
 }

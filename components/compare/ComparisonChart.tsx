@@ -45,14 +45,14 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-[#1A1F26] border border-[#374151] rounded-md p-3 text-xs">
+      <div className="bg-card-foreground border border-[#374151] rounded-md p-3 text-xs">
         <p className="text-white font-semibold mb-2">{data.name}</p>
         <p className="text-[#d1d5db] mb-1">
-          <span className="text-emerald-400">Actual Time: </span>
+          <span className="text-emerald-light">Actual Time: </span>
           {formatHoursToHM(data.actual)}
         </p>
         <p className="text-[#d1d5db]">
-          <span className="text-cyan-400">Estimated Time: </span>
+          <span className="text-cyan-light">Estimated Time: </span>
           {data.estimateLabel}
         </p>
       </div>
@@ -98,12 +98,12 @@ export default function ComparisonChart({ task1, task2, task1EstimateDisplay, ta
   ];
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25">
+    <Card className="bg-card border-border-zinc/60 shadow-xl shadow-black/25">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white">Time Comparison</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-80 w-full bg-[#0D1117] rounded-lg border border-zinc-800/60 shadow-inner p-4">
+        <div className="h-80 text-white w-full bg-card-foreground rounded-lg border border-border-zinc/60 shadow-inner p-4">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} barGap={15} barSize={60}>
               <defs>
@@ -135,10 +135,7 @@ export default function ComparisonChart({ task1, task2, task1EstimateDisplay, ta
                 }}
               />
 
-              <Tooltip
-                cursor={{ fill: "transparent" }}
-                content={<CustomTooltip />}
-              />
+              <Tooltip cursor={{ fill: "transparent" }} content={<CustomTooltip />} />
 
               <Legend
                 wrapperStyle={{
@@ -156,10 +153,10 @@ export default function ComparisonChart({ task1, task2, task1EstimateDisplay, ta
 
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-4">
+          <div className="bg-card-foreground border border-emerald-dark/40 rounded-lg p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-b from-emerald-400/50 to-emerald-600/15" />
-              <span className="text-sm font-medium text-emerald-400">{task1.taskId}</span>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-b from-emerald-light/50 to-emerald-normal/15" />
+              <span className="text-sm font-medium text-emerald-light">{task1.taskId}</span>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -170,27 +167,17 @@ export default function ComparisonChart({ task1, task2, task1EstimateDisplay, ta
                 <span className="text-gray-400">Actual:</span>
                 <span className="text-white font-semibold">{formatHoursToHM(task1.actualTime)}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-zinc-800/60">
+              <div className="flex justify-between pt-2 border-t border-border-zinc/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${
-                  task1Variance === 0
-                    ? "text-emerald-400"
-                    : task1Variance > 0
-                    ? "text-red-400"
-                    : "text-green-400"
-                }`}>
-                  {task1Variance === 0
-                    ? "100%"
-                    : `${task1Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task1Variance))}`}
-                </span>
+                <span className={`font-semibold ${task1Variance === 0 ? "text-emerald-light" : task1Variance > 0 ? "text-red-400" : "text-green-400"}`}>{task1Variance === 0 ? "100%" : `${task1Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task1Variance))}`}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#0D1117] border border-cyan-800/40 rounded-lg p-4">
+          <div className="bg-card-foreground border border-cyan-dark/40 rounded-lg p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-b from-cyan-400/50 to-cyan-600/15" />
-              <span className="text-sm font-medium text-cyan-400">{task2.taskId}</span>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-b from-cyan-light/50 to-cyan-normal/15" />
+              <span className="text-sm font-medium text-cyan-light">{task2.taskId}</span>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -201,19 +188,9 @@ export default function ComparisonChart({ task1, task2, task1EstimateDisplay, ta
                 <span className="text-gray-400">Actual:</span>
                 <span className="text-white font-semibold">{formatHoursToHM(task2.actualTime)}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-zinc-800/60">
+              <div className="flex justify-between pt-2 border-t border-border-zinc/60">
                 <span className="text-gray-400">Difference:</span>
-                <span className={`font-semibold ${
-                  task2Variance === 0
-                    ? "text-cyan-400"
-                    : task2Variance > 0
-                    ? "text-red-400"
-                    : "text-green-400"
-                }`}>
-                  {task2Variance === 0
-                    ? "100%"
-                    : `${task2Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task2Variance))}`}
-                </span>
+                <span className={`font-semibold ${task2Variance === 0 ? "text-cyan-light" : task2Variance > 0 ? "text-red-400" : "text-green-400"}`}>{task2Variance === 0 ? "100%" : `${task2Variance > 0 ? "+" : ""}${formatHoursToHM(Math.abs(task2Variance))}`}</span>
               </div>
             </div>
           </div>

@@ -126,16 +126,16 @@ export default function DashboardCircleChartContent({ linearTasksWithTime, track
       {/* Additional stats below the circle */}
       <div className="w-full mt-4 sm:mt-6 space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-3">
+          <div className="bg-card-foreground border border-emerald-dark/40 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <div className="w-2 h-2 rounded-full bg-emerald-normal" />
               <span className="text-xs text-gray-400">Tracked</span>
             </div>
             <p className="text-xl sm:text-2xl font-bold text-white">{trackedCount}</p>
-            <p className="text-xs text-emerald-400 mt-1">issues</p>
+            <p className="text-xs text-emerald-light mt-1">issues</p>
           </div>
 
-          <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-3">
+          <div className="bg-card-foreground border border-border-zinc/40 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
               <div className="w-2 h-2 rounded-full bg-zinc-500" />
               <span className="text-xs text-gray-400">Untracked</span>

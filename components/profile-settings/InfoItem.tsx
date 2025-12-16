@@ -16,7 +16,7 @@ export function InfoItem({
   iconBgColor,
 }: InfoItemProps) {
   return (
-    <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800/40 hover:border-zinc-700/60 transition-colors">
+    <div className="p-4 rounded-lg bg-zinc-900/50 border border-border-zinc/40 hover:border-border-zinc/60 transition-colors">
       <div className="flex items-center gap-3 mb-2">
         <div className={`p-2 rounded-md ${iconBgColor}`}>
           <Icon className={`w-4 h-4 ${iconColor}`} />
