@@ -27,14 +27,19 @@ export interface ReportData {
   };
 }
 
-export async function getReportData(): Promise<ReportData> {
+export interface DateRange {
+  startDate: Date;
+  endDate: Date;
+}
+
+export async function getReportData(dateRange?: DateRange): Promise<ReportData> {
   // Fetch all dashboard data in parallel
   const [stats, timeChartData, estimationAccuracy, taskDistribution] =
     await Promise.all([
-      getDashboardStats(),
-      getTimeChartData(),
-      getEstimationAccuracy(),
-      getTaskDistribution(),
+      getDashboardStats(dateRange),
+      getTimeChartData(dateRange),
+      getEstimationAccuracy(dateRange),
+      getTaskDistribution(dateRange),
     ]);
 
   const now = new Date();
@@ -55,7 +60,7 @@ export async function getReportData(): Promise<ReportData> {
   };
 }
 
-async function getTaskDistribution() {
+async function getTaskDistribution(dateRange?: DateRange) {
   try {
     const session = await auth0.getSession();
     if (!session?.user) {
@@ -77,18 +82,75 @@ async function getTaskDistribution() {
       };
     }
 
+    // Build date filter for tasks
+    const taskDateFilter = dateRange
+      ? {
+          OR: [
+            {
+              createdAt: {
+                gte: Math.floor(dateRange.startDate.getTime() / 1000),
+                lte: Math.floor(dateRange.endDate.getTime() / 1000),
+              },
+            },
+            {
+              startedAt: {
+                gte: Math.floor(dateRange.startDate.getTime() / 1000),
+                lte: Math.floor(dateRange.endDate.getTime() / 1000),
+              },
+            },
+            {
+              completedAt: {
+                gte: Math.floor(dateRange.startDate.getTime() / 1000),
+                lte: Math.floor(dateRange.endDate.getTime() / 1000),
+              },
+            },
+          ],
+        }
+      : undefined;
+
     // Get all labels and count tasks per label
     const labels = await prisma.linearLabel.findMany({
       include: {
-        tasks: true,
+        tasks: {
+          include: {
+            linearTask: true,
+          },
+        },
       },
     });
 
-    // Map to { label: string, count: number } and sort by count descending
-    let allLabelCounts = labels.map((label) => ({
-      label: label.name,
-      count: label.tasks.length,
-    }));
+    // Filter tasks by date range if provided, then map to { label: string, count: number }
+    let allLabelCounts = labels.map((label) => {
+      let filteredTasks = label.tasks;
+      
+      if (taskDateFilter && taskDateFilter.OR) {
+        filteredTasks = label.tasks.filter((taskLabel) => {
+          const task = taskLabel.linearTask;
+          
+          // Check if task matches any of the OR conditions
+          return taskDateFilter.OR.some((condition) => {
+            if (condition.createdAt) {
+              return task.createdAt >= condition.createdAt.gte && 
+                     task.createdAt <= condition.createdAt.lte;
+            }
+            if (condition.startedAt && task.startedAt) {
+              return task.startedAt >= condition.startedAt.gte && 
+                     task.startedAt <= condition.startedAt.lte;
+            }
+            if (condition.completedAt && task.completedAt) {
+              return task.completedAt >= condition.completedAt.gte && 
+                     task.completedAt <= condition.completedAt.lte;
+            }
+            return false;
+          });
+        });
+      }
+      
+      return {
+        label: label.name,
+        count: filteredTasks.length,
+      };
+    });
 
     // Sort by count descending
     allLabelCounts = allLabelCounts.sort((a, b) => b.count - a.count);
@@ -101,7 +163,9 @@ async function getTaskDistribution() {
     }
 
     // Get total tasks for reference
-    const totalTasks = await prisma.linearTask.count();
+    const totalTasks = await prisma.linearTask.count({
+      where: taskDateFilter,
+    });
 
     return {
       labelTaskCounts,
