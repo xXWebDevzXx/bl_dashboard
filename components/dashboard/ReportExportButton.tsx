@@ -97,7 +97,7 @@ export default function ReportExportButton() {
         <Button
           variant="outline"
           size="sm"
-          className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-600/5 hover:to-cyan-600/5 hover:text-white hover:border-emerald-600/10 cursor-pointer transition-all ease-in-out"
+          className="border-border-zinc bg-zinc-900/50 text-zinc-300 hover:bg-gradient-to-r hover:from-emerald-normal/5 hover:to-cyan-normal/5 hover:text-white hover:border-emerald-normal/10 cursor-pointer transition-all ease-in-out"
           disabled={isGenerating !== null}
         >
           {isGenerating ? (
@@ -113,7 +113,7 @@ export default function ReportExportButton() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto bg-[#161B22] border-zinc-800/80 p-5 shadow-xl">
+      <PopoverContent className="w-auto bg-card border-border-zinc/80 p-5 shadow-xl">
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
@@ -126,7 +126,7 @@ export default function ReportExportButton() {
             </div>
             <DateRangePicker date={dateRange} onDateChange={setDateRange} />
           </div>
-          <div className="border-t border-zinc-800/60 pt-4">
+          <div className="border-t border-border-zinc/60 pt-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-white mb-1">
                 Export Format

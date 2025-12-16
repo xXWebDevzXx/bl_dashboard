@@ -99,7 +99,7 @@ export default async function Dashboard() {
         </div>
         <div className="grid grid-cols-1 desktop:grid-cols-2 gap-4 sm:gap-6 desktop:gap-8">
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
-            <DashboardAreaChart className="bg-[#161B22] h-fit border border-zinc-800/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
+            <DashboardAreaChart className="bg-card h-fit border border-border-zinc/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
             <EstimationAccuracyChart className="h-fit" />
           </div>
 
@@ -108,7 +108,7 @@ export default async function Dashboard() {
               linearTasksWithTime={linearTasksWithTogglTimePercentage}
               trackedCount={linearTasksWithTogglTimeCount}
               totalCount={linearTasksCount}
-              className="bg-[#161B22] border border-zinc-800/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
+              className="bg-card border border-border-zinc/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
             ></DashboardCircleChart>
             <DashboardRadialChart />
           </div>

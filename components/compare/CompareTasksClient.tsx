@@ -67,7 +67,7 @@ export default function CompareTasksClient({ tasks }: Props) {
       {task1 && task2 ? (
         <TaskComparisonView task1={task1} task2={task2} />
       ) : (
-        <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
+        <Card className="bg-card border-border-zinc/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
           <CardContent className="pt-12 pb-12 text-center">
             <div className="max-w-md mx-auto">
               <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-600" />

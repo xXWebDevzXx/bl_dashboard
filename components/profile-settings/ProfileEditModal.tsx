@@ -86,7 +86,7 @@ export function ProfileEditModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#161B22] border-zinc-800/60 text-white sm:max-w-md">
+      <DialogContent className="bg-card border-border-zinc/60 text-white sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-white">Edit Profile</DialogTitle>
           <DialogDescription className="text-zinc-400">
@@ -105,7 +105,7 @@ export function ProfileEditModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
-                className="bg-zinc-900/50 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-emerald-500/50 focus-visible:border-emerald-500"
+                className="bg-zinc-900/50 border-border-zinc text-white placeholder:text-zinc-500 focus-visible:ring-emerald-normal/50 focus-visible:border-emerald-normal"
                 disabled={isLoading}
               />
             </div>
@@ -116,14 +116,14 @@ export function ProfileEditModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              className="border-border-zinc bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"
               disabled={isLoading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white border-0"
+              className="bg-gradient-to-r from-emerald-normal to-cyan-normal hover:from-emerald-normal hover:to-cyan-normal text-white border-0"
               disabled={isLoading}
             >
               {isLoading ? (
