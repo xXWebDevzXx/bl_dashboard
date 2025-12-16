@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Command,
   CommandEmpty,
@@ -33,6 +40,22 @@ interface Props {
   color?: "emerald" | "cyan";
 }
 
+// Helper function to normalize estimate strings (remove "hours" suffix)
+const normalizeEstimate = (estimate: string): string => {
+  return estimate.replace(/\s*hours?\s*/gi, '').trim();
+};
+
+// Helper function to split combined estimates like "1-3, 2-4" into ["1-3", "2-4"]
+const splitEstimates = (estimate: string): string[] => {
+  return estimate.split(',').map(e => normalizeEstimate(e)).filter(e => e !== '');
+};
+
+// Helper function to extract the first number from an estimate for sorting
+const getEstimateSortValue = (estimate: string): number => {
+  const match = estimate.match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : 9999;
+};
+
 export default function TaskSelector({
   label,
   tasks,
@@ -42,7 +65,125 @@ export default function TaskSelector({
   color = "emerald",
 }: Props) {
   const [open, setOpen] = useState(false);
-  const filteredTasks = tasks.filter((task) => task.id !== excludeTaskId);
+  const [aiFilter, setAiFilter] = useState<"all" | "ai" | "non-ai">("all");
+  const [estimateFilter, setEstimateFilter] = useState<string>("all");
+  const [timeEntryFilter, setTimeEntryFilter] = useState<"all" | "with" | "without">("all");
+  const [labelFilter, setLabelFilter] = useState<string>("all");
+  const [projectFilter, setProjectFilter] = useState<string>("all");
+
+  // Extract unique estimate labels from all tasks
+  const uniqueEstimates = useMemo(() => {
+    const estimates = new Set<string>();
+    const estimateRegex = /^Estimate[\s:]\s*(.+)$/i;
+
+    tasks.forEach((task) => {
+      // Extract from task.estimatedTime field
+      if (task.estimatedTime && task.estimatedTime !== "") {
+        const splitEstimatesList = splitEstimates(task.estimatedTime);
+        splitEstimatesList.forEach(est => estimates.add(est));
+      }
+
+      // Also extract from labels that start with "Estimate"
+      task.labels.forEach((label) => {
+        const match = label.name.match(estimateRegex);
+        if (match) {
+          const estimateValue = normalizeEstimate(match[1]);
+          if (estimateValue) {
+            estimates.add(estimateValue);
+          }
+        }
+      });
+    });
+
+    // Sort by the first number in the estimate
+    return Array.from(estimates).sort((a, b) => {
+      const aVal = getEstimateSortValue(a);
+      const bVal = getEstimateSortValue(b);
+      if (aVal !== bVal) return aVal - bVal;
+      // If first numbers are equal, sort alphabetically
+      return a.localeCompare(b);
+    });
+  }, [tasks]);
+
+  // Extract unique non-estimate labels from all tasks
+  const uniqueLabels = useMemo(() => {
+    const labels = new Set<string>();
+    // Match labels that start with "Estimate" (with or without colon/space)
+    const estimateRegex = /^Estimate[\s:]/i;
+    tasks.forEach((task) => {
+      task.labels.forEach((label) => {
+        // Exclude estimate labels
+        if (!estimateRegex.test(label.name)) {
+          labels.add(label.name);
+        }
+      });
+    });
+    return Array.from(labels).sort();
+  }, [tasks]);
+
+  // Extract unique projects from all tasks
+  const uniqueProjects = useMemo(() => {
+    const projects = new Set<string>();
+    tasks.forEach((task) => {
+      if (task.projectName) {
+        projects.add(task.projectName);
+      }
+    });
+    return Array.from(projects).sort();
+  }, [tasks]);
+
+  // Apply filters to tasks
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      // Exclude the other selected task
+      if (task.id === excludeTaskId) return false;
+
+      // Apply AI filter
+      if (aiFilter === "ai" && !task.delegateId) return false;
+      if (aiFilter === "non-ai" && task.delegateId) return false;
+
+      // Apply estimate filter
+      if (estimateFilter !== "all") {
+        const taskEstimates = splitEstimates(task.estimatedTime);
+
+        // Also check labels for estimate values
+        const estimateRegex = /^Estimate[\s:]\s*(.+)$/i;
+        const estimatesFromLabels: string[] = [];
+        task.labels.forEach((label) => {
+          const match = label.name.match(estimateRegex);
+          if (match) {
+            const estimateValue = normalizeEstimate(match[1]);
+            if (estimateValue) {
+              estimatesFromLabels.push(estimateValue);
+            }
+          }
+        });
+
+        // Combine estimates from both sources
+        const allEstimates = [...taskEstimates, ...estimatesFromLabels];
+
+        // Check if any of the task's estimates match the selected filter
+        if (!allEstimates.includes(estimateFilter)) return false;
+      }
+
+      // Apply time entry filter
+      if (timeEntryFilter === "with" && task.togglEntries.length === 0) return false;
+      if (timeEntryFilter === "without" && task.togglEntries.length > 0) return false;
+
+      // Apply label filter (non-estimate labels)
+      if (labelFilter !== "all") {
+        const hasLabel = task.labels.some(label => label.name === labelFilter);
+        if (!hasLabel) return false;
+      }
+
+      // Apply project filter
+      if (projectFilter !== "all") {
+        if (task.projectName !== projectFilter) return false;
+      }
+
+      return true;
+    });
+  }, [tasks, excludeTaskId, aiFilter, estimateFilter, timeEntryFilter, labelFilter, projectFilter]);
 
   // Parse the selected task's estimate to get displayFormat
   const selectedTaskEstimateDisplay = selectedTask
@@ -70,6 +211,101 @@ export default function TaskSelector({
         <Label className="text-sm font-medium text-gray-400 mb-3 block">
           {label}
         </Label>
+
+        {/* Filters - Only show when no task is selected */}
+        {!selectedTask && (
+          <div className="space-y-3 mb-4">
+            {/* First Row - Issue Type, Estimate, Time Entries */}
+            <div className="flex gap-3">
+              {/* AI Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Issue Type</Label>
+                <Select value={aiFilter} onValueChange={(value) => setAiFilter(value as "all" | "ai" | "non-ai")}>
+                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+                    <SelectItem value="all" className="text-white text-sm">All issues</SelectItem>
+                    <SelectItem value="ai" className="text-white text-sm">AI issues</SelectItem>
+                    <SelectItem value="non-ai" className="text-white text-sm">Non-AI issues</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Estimate Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Estimate</Label>
+                <Select value={estimateFilter} onValueChange={setEstimateFilter}>
+                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+                    <SelectItem value="all" className="text-white text-sm">All estimates</SelectItem>
+                    {uniqueEstimates.map((estimate) => (
+                      <SelectItem key={estimate} value={estimate} className="text-white text-sm">
+                        {estimate}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Time Entry Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Time Entries</Label>
+                <Select value={timeEntryFilter} onValueChange={(value) => setTimeEntryFilter(value as "all" | "with" | "without")}>
+                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+                    <SelectItem value="all" className="text-white text-sm">All issues</SelectItem>
+                    <SelectItem value="with" className="text-white text-sm">With time entries</SelectItem>
+                    <SelectItem value="without" className="text-white text-sm">Without time entries</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Second Row - Label, Project */}
+            <div className="flex gap-3">
+              {/* Label Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Label</Label>
+                <Select value={labelFilter} onValueChange={setLabelFilter}>
+                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+                    <SelectItem value="all" className="text-white text-sm">All labels</SelectItem>
+                    {uniqueLabels.map((label) => (
+                      <SelectItem key={label} value={label} className="text-white text-sm">
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Project Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Project</Label>
+                <Select value={projectFilter} onValueChange={setProjectFilter}>
+                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
+                    <SelectItem value="all" className="text-white text-sm">All projects</SelectItem>
+                    {uniqueProjects.map((project) => (
+                      <SelectItem key={project} value={project} className="text-white text-sm">
+                        {project}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
 
         {selectedTask ? (
           <Card className="bg-[#0D1117] border-zinc-800/60">
