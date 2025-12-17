@@ -38,7 +38,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // Public routes that don't require authentication
-  const publicRoutes = [ "/login", "/register", "/api/sync-projects", "/api/linear_issues"];
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/api/sync-projects",
+    "/api/linear_issues",
+    "/api/cron/seed", // Cron job endpoint uses secret-based auth
+  ];
   const isPublicRoute = publicRoutes.some(
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
