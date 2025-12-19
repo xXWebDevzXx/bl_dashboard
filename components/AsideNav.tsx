@@ -18,7 +18,7 @@ function AsideNav() {
   ];
 
   return (
-    <div className="hidden desktop:flex bg-[#161B22] border-r border-zinc-800/60 flex-col w-fit min-h-full p-8 text-white">
+    <div className="hidden desktop:flex bg-card border-r border-border-zinc/60 flex-col w-fit min-h-full p-8 text-white">
       <nav className="flex flex-col gap-2">
         {navItems.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;
@@ -28,7 +28,7 @@ function AsideNav() {
               href={href}
               className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
                 isActive
-                  ? "bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 text-emerald-400"
+                  ? "bg-gradient-to-r from-emerald-normal/20 to-cyan-normal/20 text-emerald-light"
                   : "text-white hover:bg-zinc-800"
               }`}
             >

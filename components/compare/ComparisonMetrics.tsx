@@ -48,18 +48,18 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
       return { text: "Equal", color: "text-gray-400", icon: "=" };
     }
     return diff > 0
-      ? { text: "Higher", color: "text-emerald-400", icon: "↑" }
-      : { text: "Lower", color: "text-cyan-400", icon: "↓" };
+      ? { text: "Higher", color: "text-emerald-light", icon: "↑" }
+      : { text: "Lower", color: "text-cyan-light", icon: "↓" };
   };
 
   const getAccuracyColor = (accuracy: number) => {
-    if (accuracy >= 90 && accuracy <= 110) return "text-emerald-400";
+    if (accuracy >= 90 && accuracy <= 110) return "text-emerald-light";
     if (accuracy >= 80 && accuracy <= 120) return "text-yellow-400";
     return "text-red-400";
   };
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25">
+    <Card className="bg-card border-border-zinc/60 shadow-xl shadow-black/25">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white">Comparison Metrics</CardTitle>
       </CardHeader>
@@ -67,24 +67,24 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Estimated Time */}
-        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+        <div className="bg-card-foreground border border-border-zinc/40 rounded-lg p-4">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
             Estimated Time
           </p>
           <div className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-sm text-emerald-light">Task 1</span>
               <span className="text-lg font-bold text-white">
                 {task1EstimateDisplay}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-sm text-cyan-light">Task 2</span>
               <span className="text-lg font-bold text-white">
                 {task2EstimateDisplay}
               </span>
             </div>
-            <div className="pt-2 border-t border-zinc-800/60">
+            <div className="pt-2 border-t border-border-zinc/60">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Difference</span>
                 <span
@@ -101,24 +101,24 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
         </div>
 
         {/* Actual Time */}
-        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+        <div className="bg-card-foreground border border-border-zinc/40 rounded-lg p-4">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
             Actual Time
           </p>
           <div className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-sm text-emerald-light">Task 1</span>
               <span className="text-lg font-bold text-white">
                 {formatHoursToHM(task1.actualTime)}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-sm text-cyan-light">Task 2</span>
               <span className="text-lg font-bold text-white">
                 {formatHoursToHM(task2.actualTime)}
               </span>
             </div>
-            <div className="pt-2 border-t border-zinc-800/60">
+            <div className="pt-2 border-t border-border-zinc/60">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Difference</span>
                 <span
@@ -135,13 +135,13 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
         </div>
 
         {/* Accuracy */}
-        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+        <div className="bg-card-foreground border border-border-zinc/40 rounded-lg p-4">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
             Accuracy
           </p>
           <div className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-sm text-emerald-light">Task 1</span>
               <span
                 className={`text-lg font-bold ${getAccuracyColor(
                   metrics.task1.accuracy
@@ -151,7 +151,7 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
               </span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-sm text-cyan-light">Task 2</span>
               <span
                 className={`text-lg font-bold ${getAccuracyColor(
                   metrics.task2.accuracy
@@ -160,7 +160,7 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
                 {metrics.task2.accuracy.toFixed(1)}%
               </span>
             </div>
-            <div className="pt-2 border-t border-zinc-800/60">
+            <div className="pt-2 border-t border-border-zinc/60">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Difference</span>
                 <span
@@ -177,24 +177,24 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
         </div>
 
         {/* Time Entries */}
-        <div className="bg-[#0D1117] border border-zinc-800/40 rounded-lg p-4">
+        <div className="bg-card-foreground border border-border-zinc/40 rounded-lg p-4">
           <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
             Time Entries
           </p>
           <div className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-emerald-400">Task 1</span>
+              <span className="text-sm text-emerald-light">Task 1</span>
               <span className="text-lg font-bold text-white">
                 {metrics.task1.entriesCount}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-cyan-400">Task 2</span>
+              <span className="text-sm text-cyan-light">Task 2</span>
               <span className="text-lg font-bold text-white">
                 {metrics.task2.entriesCount}
               </span>
             </div>
-            <div className="pt-2 border-t border-zinc-800/60">
+            <div className="pt-2 border-t border-border-zinc/60">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Difference</span>
                 <span
@@ -213,10 +213,10 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
 
       {/* Variance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <Card className="bg-linear-to-r from-emerald-900/20 to-emerald-800/10 border-emerald-800/40">
+        <Card className="bg-linear-to-r from-emerald-dark/20 to-emerald-dark/10 border-emerald-dark/40">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-emerald-400">
+              <span className="text-sm font-medium text-emerald-light">
                 Issue 1 Variance
               </span>
               {metrics.task1.isAI && (
@@ -229,7 +229,7 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
             <span
               className={`text-2xl font-bold ${
                 metrics.task1.variance === 0
-                  ? "text-emerald-400"
+                  ? "text-emerald-light"
                   : metrics.task1.variance > 0
                   ? "text-red-400"
                   : "text-green-400"
@@ -247,10 +247,10 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-r from-cyan-900/20 to-cyan-800/10 border-cyan-800/40">
+        <Card className="bg-linear-to-r from-cyan-dark/20 to-cyan-dark/10 border-cyan-dark/40">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-cyan-400">
+              <span className="text-sm font-medium text-cyan-light">
                 Issue 2 Variance
               </span>
               {metrics.task2.isAI && (
@@ -263,7 +263,7 @@ export default function ComparisonMetrics({ task1, task2, metrics, task1Estimate
             <span
               className={`text-2xl font-bold ${
                 metrics.task2.variance === 0
-                  ? "text-cyan-400"
+                  ? "text-cyan-light"
                   : metrics.task2.variance > 0
                   ? "text-red-400"
                   : "text-green-400"

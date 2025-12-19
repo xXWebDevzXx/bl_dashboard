@@ -33,10 +33,10 @@ function Header() {
 
   return (
     <>
-      <header className="bg-[#161B22] border-b border-zinc-800/60 flex justify-between items-center text-white p-4 sm:p-6 desktop:p-8 col-span-full desktop:col-span-2">
+      <header className="bg-card border-b border-border-zinc/60 flex justify-between items-center text-white p-4 sm:p-6 desktop:p-8 col-span-full desktop:col-span-2">
         <Link
           href="/dashboard"
-          className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all"
+          className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-light to-cyan-light bg-clip-text text-transparent hover:from-emerald-light hover:to-cyan-light transition-all"
         >
           AITracker
         </Link>
@@ -77,7 +77,7 @@ function Header() {
 
       {/* Mobile Menu Dropdown */}
       <div
-        className={`desktop:hidden fixed top-0 right-0 bottom-0 w-64 h-screen bg-[#161B22] border-l border-zinc-800/60 z-40 transform transition-all duration-300 ease-in-out ${
+        className={`desktop:hidden fixed top-0 right-0 bottom-0 w-64 h-screen bg-card border-l border-border-zinc/60 z-40 transform transition-all duration-300 ease-in-out ${
           isMenuOpen
             ? "translate-x-0 opacity-100"
             : "translate-x-full opacity-0"
@@ -91,7 +91,7 @@ function Header() {
               onClick={toggleMenu}
               className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
                 pathname === href
-                  ? "bg-gradient-to-r from-emerald-600/20 to-cyan-600/20 text-emerald-400"
+                  ? "bg-gradient-to-r from-emerald-normal/20 to-cyan-normal/20 text-emerald-light"
                   : "text-white hover:bg-zinc-800"
               }`}
             >
@@ -101,7 +101,7 @@ function Header() {
           ))}
 
           {/* Logout button in mobile menu */}
-          <div className="mt-6 pt-6 border-t border-zinc-800 flex justify-center">
+          <div className="mt-6 pt-6 border-t border-border-zinc flex justify-center">
             <LogoutButton />
           </div>
         </nav>

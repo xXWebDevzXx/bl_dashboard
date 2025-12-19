@@ -61,7 +61,7 @@ export function ProfileActions() {
 
   return (
     <>
-      <Card className="lg:col-span-3 bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
+      <Card className="lg:col-span-3 bg-card border-border-zinc/60 shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
         <CardHeader>
           <CardTitle className="text-white">Quick Actions</CardTitle>
           <CardDescription className="text-zinc-400">
@@ -71,7 +71,7 @@ export function ProfileActions() {
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <Button
-              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all duration-300"
+              className="bg-gradient-to-r from-emerald-normal to-cyan-normal hover:from-emerald-normal hover:to-cyan-normal text-white border-0 shadow-lg shadow-emerald-normal/20 hover:shadow-emerald-normal/30 transition-all duration-300"
               size="lg"
               onClick={() => setIsEditModalOpen(true)}
             >
@@ -80,7 +80,7 @@ export function ProfileActions() {
             </Button>
             <Button
               variant="outline"
-              className="border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-zinc-600 transition-all duration-300"
+              className="border-border-zinc bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white  transition-all duration-300"
               size="lg"
               onClick={handleChangePassword}
               disabled={isChangingPassword}
