@@ -36,7 +36,7 @@ export default function DashboardRadialChart({ className }: Props) {
 
   if (loading) {
     return (
-      <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
+      <div className={cn("bg-card border border-border-zinc/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
         <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">Issue Distribution by Label</h2>
         <p className="text-gray-400 text-sm">Loading...</p>
       </div>
@@ -50,34 +50,34 @@ export default function DashboardRadialChart({ className }: Props) {
   // Prepare data for radial chart
   // Use emerald and cyan color scheme - lightest (center) to darkest (outer)
   const colors = [
-    "#6ee7b7", // emerald-300 (lightest - center)
+    "#6ee7b7", // emerald-light (lightest - center)
     "#5eead4", // teal-300
-    "#67e8f9", // cyan-300
-    "#34d399", // emerald-400
+    "#67e8f9", // cyan-light
+    "#34d399", // emerald-light
     "#2dd4bf", // teal-400
-    "#22d3ee", // cyan-400
-    "#10b981", // emerald-500
+    "#22d3ee", // cyan-light
+    "#10b981", // emerald-normal
     "#14b8a6", // teal-500
-    "#06b6d4", // cyan-500
-    "#059669", // emerald-600
+    "#06b6d4", // cyan-normal
+    "#059669", // emerald-normal
     "#0d9488", // teal-600
-    "#0891b2", // cyan-600 (darkest - outer)
+    "#0891b2", // cyan-normal (darkest - outer)
   ];
 
   // Gradient end colors (slightly darker for each)
   const gradientEndColors = [
-    "#34d399", // emerald-400
+    "#34d399", // emerald-light
     "#2dd4bf", // teal-400
-    "#22d3ee", // cyan-400
-    "#10b981", // emerald-500
+    "#22d3ee", // cyan-light
+    "#10b981", // emerald-normal
     "#14b8a6", // teal-500
-    "#06b6d4", // cyan-500
-    "#059669", // emerald-600
+    "#06b6d4", // cyan-normal
+    "#059669", // emerald-normal
     "#0d9488", // teal-600
-    "#0891b2", // cyan-600
-    "#047857", // emerald-700
+    "#0891b2", // cyan-normal
+    "#047857", // emerald-normal
     "#0f766e", // teal-700
-    "#0e7490", // cyan-700
+    "#0e7490", // cyan-normal
   ];
 
   // Sort by largest first for better visualization
@@ -101,7 +101,7 @@ export default function DashboardRadialChart({ className }: Props) {
   }, {} as ChartConfig);
 
   return (
-    <div className={cn("bg-[#161B22] border border-zinc-800/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
+    <div className={cn("bg-card border border-border-zinc/60 p-4 sm:p-6 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.4s_both] overflow-hidden", className)}>
       <div className="mb-4">
         <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-2">Issue Distribution by Label</h2>
         <p className="text-xs sm:text-sm text-gray-400">How issues are distributed across labels</p>
@@ -112,7 +112,7 @@ export default function DashboardRadialChart({ className }: Props) {
         {chartData.map((item, idx) => (
           <div
             key={item.name}
-            className="bg-[#0D1117] p-3 sm:p-4 rounded border border-zinc-800/40 hover:border-zinc-700/60 transition-all hover:shadow-lg"
+            className="bg-card-foreground p-3 sm:p-4 rounded border border-border-zinc/40 hover:border-border-zinc/60 transition-all hover:shadow-lg"
             style={{
               boxShadow: activeIndex === idx ? `0 10px 15px -3px ${item.baseColor}20, 0 4px 6px -2px ${item.baseColor}10` : undefined,
               borderColor: activeIndex === idx ? `${item.baseColor}60` : undefined,
@@ -128,7 +128,7 @@ export default function DashboardRadialChart({ className }: Props) {
 
       {/* Pie Chart */}
       <div
-        className="h-80 sm:h-[360px] w-full bg-[#0D1117] rounded-lg border border-zinc-800/60 shadow-inner"
+        className="h-80 sm:h-[360px] w-full bg-card-foreground rounded-lg border border-border-zinc/60 shadow-inner"
         onMouseLeave={() => setActiveIndex(-1)}
       >
         <ChartContainer config={chartConfig} className="h-full w-full">
@@ -154,7 +154,7 @@ export default function DashboardRadialChart({ className }: Props) {
                 if (!active || !payload || !payload[0]) return null;
                 const sliceData = payload[0].payload;
                 return (
-                  <div className="bg-[#1A1F26] border border-zinc-700/60 rounded-lg p-3 shadow-xl">
+                  <div className="bg-card-foreground border border-border-zinc/60 rounded-lg p-3 shadow-xl">
                     <p className="text-white font-semibold mb-1">{sliceData.name}</p>
                     <div className="flex items-center gap-2">
                       <div
@@ -237,7 +237,7 @@ export default function DashboardRadialChart({ className }: Props) {
       </div>
 
       {/* Total */}
-      <div className="mt-4 p-3 sm:p-4 bg-[#0D1117] rounded-lg border border-zinc-800/40 text-center hover:border-zinc-700/60 transition-colors">
+      <div className="mt-4 p-3 sm:p-4 bg-card-foreground rounded-lg border border-border-zinc/40 text-center hover:border-border-zinc/60 transition-colors">
         <p className="text-xs sm:text-sm text-gray-400 font-medium mb-1">Total Issues</p>
         <p className="text-3xl sm:text-4xl font-bold text-white">{data.totalTasks}</p>
       </div>

@@ -289,12 +289,12 @@ export default function AdminDashboardClient() {
   return (
     <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-zinc-800 overflow-x-auto">
+      <div className="flex gap-2 border-b border-border-zinc overflow-x-auto">
         <button
           onClick={() => setActiveTab("active")}
           className={`px-3 sm:px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === "active"
-              ? "text-emerald-400 border-b-2 border-emerald-400"
+              ? "text-emerald-light border-b-2 border-emerald-light"
               : "text-zinc-400 hover:text-white"
           }`}
         >
@@ -304,7 +304,7 @@ export default function AdminDashboardClient() {
           onClick={() => setActiveTab("deleted")}
           className={`px-3 sm:px-4 py-2 font-medium transition-colors whitespace-nowrap ${
             activeTab === "deleted"
-              ? "text-emerald-400 border-b-2 border-emerald-400"
+              ? "text-emerald-light border-b-2 border-emerald-light"
               : "text-zinc-400 hover:text-white"
           }`}
         >
@@ -313,7 +313,7 @@ export default function AdminDashboardClient() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-[#161B22] border-zinc-800/60">
+      <Card className="bg-card border-border-zinc/60 shadow-lg">
         <CardHeader>
           <CardTitle className="text-white">Filters</CardTitle>
           <CardDescription className="text-zinc-400">
@@ -331,7 +331,7 @@ export default function AdminDashboardClient() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="pl-10 bg-zinc-900/50 border-zinc-700 text-white placeholder:text-zinc-500"
+                className="pl-10 bg-zinc-900/50 border-border-zinc text-white placeholder:text-zinc-500"
               />
             </div>
             <Select
@@ -341,7 +341,7 @@ export default function AdminDashboardClient() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-full sm:w-[180px] bg-zinc-900/50 border-zinc-700 text-white">
+              <SelectTrigger className="w-full sm:w-[180px] bg-zinc-900/50 border-border-zinc text-white">
                 <SelectValue placeholder="All roles" />
               </SelectTrigger>
               <SelectContent>
@@ -355,7 +355,7 @@ export default function AdminDashboardClient() {
       </Card>
 
       {/* Users Table */}
-      <Card className="bg-[#161B22] border-zinc-800/60 w-full overflow-hidden">
+      <Card className="bg-card border-border-zinc/60 w-full overflow-hidden">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -373,7 +373,7 @@ export default function AdminDashboardClient() {
                 size="sm"
                 onClick={handleSyncAuth0}
                 disabled={loading || isSyncing}
-                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800 w-full sm:w-auto"
+                className="bg-zinc-900/50 border-border-zinc text-white hover:bg-zinc-800 w-full sm:w-auto"
               >
                 <DownloadCloud
                   className={`w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
@@ -385,7 +385,7 @@ export default function AdminDashboardClient() {
                 size="sm"
                 onClick={() => fetchUsers()}
                 disabled={loading}
-                className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800 w-full sm:w-auto"
+                className="bg-zinc-900/50 border-border-zinc text-white hover:bg-zinc-800 w-full sm:w-auto"
               >
                 <RefreshCw
                   className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
@@ -409,7 +409,7 @@ export default function AdminDashboardClient() {
                 <div className="px-4 sm:px-6 lg:px-0">
                   <table className="w-full min-w-[800px]">
                   <thead>
-                    <tr className="border-b border-zinc-800">
+                    <tr className="border-b border-border-zinc">
                       <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400 min-w-[120px]">
                         User
                       </th>
@@ -439,7 +439,7 @@ export default function AdminDashboardClient() {
                     {users.map((user) => (
                       <tr
                         key={user.id}
-                        className="border-b border-zinc-800/50 hover:bg-zinc-900/30 transition-colors"
+                        className="border-b border-border-zinc/50 hover:bg-zinc-900/30 transition-colors"
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
@@ -462,8 +462,8 @@ export default function AdminDashboardClient() {
                             }
                             className={
                               user.role === "admin"
-                                ? "bg-emerald-600/20 text-emerald-400 border-emerald-600/30"
-                                : "bg-zinc-800 text-zinc-300 border-zinc-700"
+                                ? "bg-emerald-normal/20 text-emerald-light border-emerald-normal/30"
+                                : "bg-zinc-800 text-zinc-300 border-border-zinc"
                             }
                           >
                             {user.role === "admin" && (
@@ -520,7 +520,7 @@ export default function AdminDashboardClient() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleUndelete(user)}
-                                className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20"
+                                className="text-emerald-light hover:text-emerald-light hover:bg-emerald-dark/20"
                               >
                                 <RefreshCw className="w-4 h-4" />
                               </Button>
@@ -539,7 +539,7 @@ export default function AdminDashboardClient() {
                 {users.map((user) => (
                   <Card
                     key={user.id}
-                    className="bg-zinc-900/30 border-zinc-800/50"
+                    className="bg-zinc-900/30 border-border-zinc/50"
                   >
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-start justify-between">
@@ -574,7 +574,7 @@ export default function AdminDashboardClient() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleUndelete(user)}
-                              className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 h-8 w-8 p-0"
+                              className="text-emerald-light hover:text-emerald-light hover:bg-emerald-dark/20 h-8 w-8 p-0"
                             >
                               <RefreshCw className="w-4 h-4" />
                             </Button>
@@ -592,8 +592,8 @@ export default function AdminDashboardClient() {
                           }
                           className={
                             user.role === "admin"
-                              ? "bg-emerald-600/20 text-emerald-400 border-emerald-600/30"
-                              : "bg-zinc-800 text-zinc-300 border-zinc-700"
+                              ? "bg-emerald-normal/20 text-emerald-light border-emerald-normal/30"
+                              : "bg-zinc-800 text-zinc-300 border-border-zinc"
                           }
                         >
                           {user.role === "admin" && (
@@ -625,7 +625,7 @@ export default function AdminDashboardClient() {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-zinc-800 px-4 sm:px-0">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-border-zinc px-4 sm:px-0">
                   <div className="text-sm text-zinc-400">
                     Page {pagination.page} of {pagination.totalPages}
                   </div>
@@ -635,7 +635,7 @@ export default function AdminDashboardClient() {
                       size="sm"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="bg-zinc-900/50 border-zinc-700 text-white flex-1 sm:flex-initial"
+                      className="bg-zinc-900/50 border-border-zinc text-white flex-1 sm:flex-initial"
                     >
                       Previous
                     </Button>
@@ -646,7 +646,7 @@ export default function AdminDashboardClient() {
                         setPage((p) => Math.min(pagination.totalPages, p + 1))
                       }
                       disabled={page === pagination.totalPages}
-                      className="bg-zinc-900/50 border-zinc-700 text-white flex-1 sm:flex-initial"
+                      className="bg-zinc-900/50 border-border-zinc text-white flex-1 sm:flex-initial"
                     >
                       Next
                     </Button>
@@ -660,7 +660,7 @@ export default function AdminDashboardClient() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
+        <DialogContent className="bg-card border-border-zinc text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -677,7 +677,7 @@ export default function AdminDashboardClient() {
                 onChange={(e) =>
                   setEditForm({ ...editForm, username: e.target.value })
                 }
-                className="bg-zinc-900/50 border-zinc-700 text-white"
+                className="bg-zinc-900/50 border-border-zinc text-white"
               />
             </div>
             <div>
@@ -690,7 +690,7 @@ export default function AdminDashboardClient() {
                 onChange={(e) =>
                   setEditForm({ ...editForm, email: e.target.value })
                 }
-                className="bg-zinc-900/50 border-zinc-700 text-white"
+                className="bg-zinc-900/50 border-border-zinc text-white"
               />
             </div>
             <div>
@@ -703,7 +703,7 @@ export default function AdminDashboardClient() {
                   setEditForm({ ...editForm, role: value })
                 }
               >
-                <SelectTrigger className="bg-zinc-900/50 border-zinc-700 text-white">
+                <SelectTrigger className="bg-zinc-900/50 border-border-zinc text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -720,7 +720,7 @@ export default function AdminDashboardClient() {
                 onChange={(e) =>
                   setEditForm({ ...editForm, isVerified: e.target.checked })
                 }
-                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900/50"
+                className="w-4 h-4 rounded border-border-zinc bg-zinc-900/50"
               />
               <label
                 htmlFor="isVerified"
@@ -734,13 +734,13 @@ export default function AdminDashboardClient() {
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-zinc-900/50 border-border-zinc text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSaveEdit}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-normal hover:bg-emerald-normal"
             >
               Save Changes
             </Button>
@@ -750,7 +750,7 @@ export default function AdminDashboardClient() {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
+        <DialogContent className="bg-card border-border-zinc text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -778,7 +778,7 @@ export default function AdminDashboardClient() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-zinc-900/50 border-border-zinc text-white"
             >
               Cancel
             </Button>
@@ -798,7 +798,7 @@ export default function AdminDashboardClient() {
         open={isUndeleteDialogOpen}
         onOpenChange={setIsUndeleteDialogOpen}
       >
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white max-w-[95vw] sm:max-w-md">
+        <DialogContent className="bg-card border-border-zinc text-white max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Restore User</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -826,13 +826,13 @@ export default function AdminDashboardClient() {
             <Button
               variant="outline"
               onClick={() => setIsUndeleteDialogOpen(false)}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-zinc-900/50 border-border-zinc text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={handleConfirmUndelete}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-normal hover:bg-emerald-normal"
             >
               Restore
             </Button>

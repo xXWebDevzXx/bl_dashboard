@@ -63,30 +63,30 @@ export default function TimeEntriesComparison({ task1, task2 }: Props) {
   }, [task2.togglEntries]);
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25">
+    <Card className="bg-card border-border-zinc/60 shadow-xl shadow-black/25">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white">Time Entries Comparison</CardTitle>
       </CardHeader>
       <CardContent>
         {/* Stats Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-4">
-            <p className="text-xs text-emerald-400 mb-1 font-medium">Task 1 Average</p>
+          <div className="bg-card-foreground border border-emerald-dark/40 rounded-lg p-4">
+            <p className="text-xs text-emerald-light mb-1 font-medium">Task 1 Average</p>
             <p className="text-2xl font-bold text-white">{formatDuration(task1Stats.average)}</p>
           </div>
           
-          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-4">
-            <p className="text-xs text-emerald-400 mb-1 font-medium">Task 1 Longest</p>
+          <div className="bg-card-foreground border border-emerald-dark/40 rounded-lg p-4">
+            <p className="text-xs text-emerald-light mb-1 font-medium">Task 1 Longest</p>
             <p className="text-2xl font-bold text-white">{formatDuration(task1Stats.longest)}</p>
           </div>
 
-          <div className="bg-[#0D1117] border border-cyan-800/40 rounded-lg p-4">
-            <p className="text-xs text-cyan-400 mb-1 font-medium">Task 2 Average</p>
+          <div className="bg-card-foreground border border-cyan-dark/40 rounded-lg p-4">
+            <p className="text-xs text-cyan-light mb-1 font-medium">Task 2 Average</p>
             <p className="text-2xl font-bold text-white">{formatDuration(task2Stats.average)}</p>
           </div>
 
-          <div className="bg-[#0D1117] border border-cyan-800/40 rounded-lg p-4">
-            <p className="text-xs text-cyan-400 mb-1 font-medium">Task 2 Longest</p>
+          <div className="bg-card-foreground border border-cyan-dark/40 rounded-lg p-4">
+            <p className="text-xs text-cyan-light mb-1 font-medium">Task 2 Longest</p>
             <p className="text-2xl font-bold text-white">{formatDuration(task2Stats.longest)}</p>
           </div>
         </div>
@@ -94,9 +94,9 @@ export default function TimeEntriesComparison({ task1, task2 }: Props) {
         {/* Side by Side Entries */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Task 1 Entries */}
-          <div className="bg-[#0D1117] border border-emerald-800/40 rounded-lg p-4">
+          <div className="bg-card-foreground border border-emerald-dark/40 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold text-emerald-400">{task1.taskId} Entries</h4>
+              <h4 className="text-sm font-semibold text-emerald-light">{task1.taskId} Entries</h4>
               <span className="text-xs text-gray-500">{task1.togglEntries.length} entries</span>
             </div>
 
@@ -107,10 +107,10 @@ export default function TimeEntriesComparison({ task1, task2 }: Props) {
                   const stopTime = formatDateTime(entry.stop);
 
                   return (
-                    <div key={entry.id} className="bg-[#161B22] border border-zinc-800/60 rounded-lg p-3 hover:border-emerald-700/40 transition-colors">
+                    <div key={entry.id} className="bg-card border border-border-zinc/60 rounded-lg p-3 hover:border-emerald-normal/40 transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <p className="text-sm text-white font-medium flex-1 mr-2">{entry.description || "No description"}</p>
-                        <span className="text-sm font-bold text-emerald-400 whitespace-nowrap">{formatDuration(entry.duration)}</span>
+                        <span className="text-sm font-bold text-emerald-light whitespace-nowrap">{formatDuration(entry.duration)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>{startTime.date}</span>
@@ -129,9 +129,9 @@ export default function TimeEntriesComparison({ task1, task2 }: Props) {
           </div>
 
           {/* Task 2 Entries */}
-          <div className="bg-[#0D1117] border border-cyan-800/40 rounded-lg p-4">
+          <div className="bg-card-foreground border border-cyan-dark/40 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold text-cyan-400">{task2.taskId} Entries</h4>
+              <h4 className="text-sm font-semibold text-cyan-light">{task2.taskId} Entries</h4>
               <span className="text-xs text-gray-500">{task2.togglEntries.length} entries</span>
             </div>
 
@@ -142,10 +142,10 @@ export default function TimeEntriesComparison({ task1, task2 }: Props) {
                   const stopTime = formatDateTime(entry.stop);
 
                   return (
-                    <div key={entry.id} className="bg-[#161B22] border border-zinc-800/60 rounded-lg p-3 hover:border-cyan-700/40 transition-colors">
+                    <div key={entry.id} className="bg-card border border-border-zinc/60 rounded-lg p-3 hover:border-cyan-normal/40 transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <p className="text-sm text-white font-medium flex-1 mr-2">{entry.description || "No description"}</p>
-                        <span className="text-sm font-bold text-cyan-400 whitespace-nowrap">{formatDuration(entry.duration)}</span>
+                        <span className="text-sm font-bold text-cyan-light whitespace-nowrap">{formatDuration(entry.duration)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>{startTime.date}</span>

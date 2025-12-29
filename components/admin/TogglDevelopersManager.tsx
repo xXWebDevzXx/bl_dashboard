@@ -162,7 +162,7 @@ export default function TogglDevelopersManager() {
   };
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60">
+    <Card className="bg-card shadow-black/30 border-border-zinc/60">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -177,7 +177,7 @@ export default function TogglDevelopersManager() {
               size="sm"
               onClick={() => fetchDevelopers()}
               disabled={loading}
-              className="bg-zinc-900/50 border-zinc-700 text-white hover:bg-zinc-800"
+              className="bg-zinc-900/50 border-border-zinc text-white hover:bg-zinc-800"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Refresh
@@ -185,7 +185,7 @@ export default function TogglDevelopersManager() {
             <Button
               size="sm"
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-normal hover:bg-emerald-normal"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Developer
@@ -204,7 +204,7 @@ export default function TogglDevelopersManager() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-zinc-800">
+                <tr className="border-b border-border-zinc">
                   <th className="text-left py-3 px-4 text-sm font-medium text-zinc-400">
                     Developer
                   </th>
@@ -229,7 +229,7 @@ export default function TogglDevelopersManager() {
                 {developers.map((developer) => (
                   <tr
                     key={developer.id}
-                    className="border-b border-zinc-800/50 hover:bg-zinc-900/30 transition-colors"
+                    className="border-b border-border-zinc/50 hover:bg-zinc-900/30 transition-colors"
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function TogglDevelopersManager() {
                         className={
                           developer.isActive
                             ? "bg-green-600/20 text-green-400 border-green-600/30"
-                            : "bg-zinc-800 text-zinc-400 border-zinc-700"
+                            : "bg-zinc-800 text-zinc-400 border-border-zinc"
                         }
                       >
                         {developer.isActive ? "Active" : "Inactive"}
@@ -297,7 +297,7 @@ export default function TogglDevelopersManager() {
 
       {/* Add Developer Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+        <DialogContent className="bg-card border-border-zinc text-white">
           <DialogHeader>
             <DialogTitle>Add Developer</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -315,7 +315,7 @@ export default function TogglDevelopersManager() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddDeveloper()}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-card-foreground border-border-zinc text-white"
             />
           </div>
           <DialogFooter>
@@ -325,14 +325,14 @@ export default function TogglDevelopersManager() {
                 setIsAddDialogOpen(false);
                 setNewEmail("");
               }}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-zinc-900/50 border-border-zinc text-white"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAddDeveloper}
               disabled={addingDeveloper}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-normal hover:bg-emerald-normal"
             >
               {addingDeveloper ? "Adding..." : "Add Developer"}
             </Button>
@@ -342,7 +342,7 @@ export default function TogglDevelopersManager() {
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="bg-[#161B22] border-zinc-800 text-white">
+        <DialogContent className="bg-card border-border-zinc text-white">
           <DialogHeader>
             <DialogTitle>Remove Developer</DialogTitle>
             <DialogDescription className="text-zinc-400">
@@ -368,7 +368,7 @@ export default function TogglDevelopersManager() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              className="bg-zinc-900/50 border-zinc-700 text-white"
+              className="bg-zinc-900/50 border-border-zinc text-white"
             >
               Cancel
             </Button>

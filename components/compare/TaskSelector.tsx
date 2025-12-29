@@ -192,13 +192,13 @@ export default function TaskSelector({
 
   const colorClasses = {
     emerald: {
-      badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-      border: "border-emerald-800/40",
+      badge: "bg-emerald-normal/20 text-emerald-light border-emerald-normal/30",
+      border: "border-emerald-dark/40",
       scrollbar: "scrollbar-emerald",
     },
     cyan: {
-      badge: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-      border: "border-cyan-800/40",
+      badge: "bg-cyan-normal/20 text-cyan-light border-cyan-normal/30",
+      border: "border-cyan-dark/40",
       scrollbar: "scrollbar-cyan",
     },
   };
@@ -206,65 +206,14 @@ export default function TaskSelector({
   const colors = colorClasses[color];
 
   return (
-    <Card className="bg-[#161B22] border-zinc-800/60 shadow-xl shadow-black/25">
+    <Card className="bg-card border-border-zinc/60 shadow-xl shadow-black/25">
       <CardContent className="pt-6">
-        <Label className="text-sm font-medium text-gray-400 mb-3 block">
-          {label}
-        </Label>
+        <Label className="text-sm font-medium text-gray-400 mb-3 block">{label}</Label>
 
         {/* Filters - Only show when no task is selected */}
         {!selectedTask && (
           <div className="space-y-3 mb-4">
             {/* First Row - Issue Type, Estimate, Time Entries */}
-            <div className="flex gap-3">
-              {/* AI Filter */}
-              <div className="space-y-2">
-                <Label className="text-xs text-gray-500">Issue Type</Label>
-                <Select value={aiFilter} onValueChange={(value) => setAiFilter(value as "all" | "ai" | "non-ai")}>
-                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
-                    <SelectItem value="all" className="text-white text-sm">All issues</SelectItem>
-                    <SelectItem value="ai" className="text-white text-sm">AI issues</SelectItem>
-                    <SelectItem value="non-ai" className="text-white text-sm">Non-AI issues</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Estimate Filter */}
-              <div className="space-y-2">
-                <Label className="text-xs text-gray-500">Estimate</Label>
-                <Select value={estimateFilter} onValueChange={setEstimateFilter}>
-                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
-                    <SelectItem value="all" className="text-white text-sm">All estimates</SelectItem>
-                    {uniqueEstimates.map((estimate) => (
-                      <SelectItem key={estimate} value={estimate} className="text-white text-sm">
-                        {estimate}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Time Entry Filter */}
-              <div className="space-y-2">
-                <Label className="text-xs text-gray-500">Time Entries</Label>
-                <Select value={timeEntryFilter} onValueChange={(value) => setTimeEntryFilter(value as "all" | "with" | "without")}>
-                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
-                    <SelectItem value="all" className="text-white text-sm">All issues</SelectItem>
-                    <SelectItem value="with" className="text-white text-sm">With time entries</SelectItem>
-                    <SelectItem value="without" className="text-white text-sm">Without time entries</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
             {/* Second Row - Label, Project */}
             <div className="flex gap-3">
@@ -272,11 +221,13 @@ export default function TaskSelector({
               <div className="space-y-2">
                 <Label className="text-xs text-gray-500">Label</Label>
                 <Select value={labelFilter} onValueChange={setLabelFilter}>
-                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                  <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
-                    <SelectItem value="all" className="text-white text-sm">All labels</SelectItem>
+                  <SelectContent className="bg-card-foreground border-border-zinc/60">
+                    <SelectItem value="all" className="text-white text-sm">
+                      All labels
+                    </SelectItem>
                     {uniqueLabels.map((label) => (
                       <SelectItem key={label} value={label} className="text-white text-sm">
                         {label}
@@ -290,11 +241,13 @@ export default function TaskSelector({
               <div className="space-y-2">
                 <Label className="text-xs text-gray-500">Project</Label>
                 <Select value={projectFilter} onValueChange={setProjectFilter}>
-                  <SelectTrigger className="bg-[#0D1117] border-zinc-800/60 text-white h-10 text-sm">
+                  <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white h-10 text-sm">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0D1117] border-zinc-800/60">
-                    <SelectItem value="all" className="text-white text-sm">All projects</SelectItem>
+                  <SelectContent className="bg-card-foreground border-border-zinc/60">
+                    <SelectItem value="all" className="text-white text-sm">
+                      All projects
+                    </SelectItem>
                     {uniqueProjects.map((project) => (
                       <SelectItem key={project} value={project} className="text-white text-sm">
                         {project}
@@ -304,37 +257,89 @@ export default function TaskSelector({
                 </Select>
               </div>
             </div>
+            <div className="flex gap-3">
+              {/* AI Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Issue Type</Label>
+                <Select value={aiFilter} onValueChange={(value) => setAiFilter(value as "all" | "ai" | "non-ai")}>
+                  <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card-foreground border-border-zinc/60">
+                    <SelectItem value="all" className="text-white text-sm">
+                      All issues
+                    </SelectItem>
+                    <SelectItem value="ai" className="text-white text-sm">
+                      AI issues
+                    </SelectItem>
+                    <SelectItem value="non-ai" className="text-white text-sm">
+                      Non-AI issues
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Estimate Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Estimate</Label>
+                <Select value={estimateFilter} onValueChange={setEstimateFilter}>
+                  <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card-foreground border-border-zinc/60">
+                    <SelectItem value="all" className="text-white text-sm">
+                      All estimates
+                    </SelectItem>
+                    {uniqueEstimates.map((estimate) => (
+                      <SelectItem key={estimate} value={estimate} className="text-white text-sm">
+                        {estimate}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Time Entry Filter */}
+              <div className="space-y-2">
+                <Label className="text-xs text-gray-500">Time Entries</Label>
+                <Select value={timeEntryFilter} onValueChange={(value) => setTimeEntryFilter(value as "all" | "with" | "without")}>
+                  <SelectTrigger className="bg-card-foreground border-border-zinc/60 text-white h-10 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card-foreground border-border-zinc/60">
+                    <SelectItem value="all" className="text-white text-sm">
+                      All issues
+                    </SelectItem>
+                    <SelectItem value="with" className="text-white text-sm">
+                      With time entries
+                    </SelectItem>
+                    <SelectItem value="without" className="text-white text-sm">
+                      Without time entries
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         )}
 
         {selectedTask ? (
-          <Card className="bg-[#0D1117] border-zinc-800/60">
+          <Card className="bg-card-foreground border-border-zinc/60">
             <CardContent className="pt-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-gray-500 font-mono">
-                      {selectedTask.taskId}
-                    </span>
+                    <span className="text-xs text-gray-500 font-mono">{selectedTask.taskId}</span>
                     {selectedTask.delegateId && (
                       <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
                         AI
                       </Badge>
                     )}
                   </div>
-                  <h3 className="text-white font-medium text-sm mb-2">
-                    {selectedTask.name}
-                  </h3>
-                  {selectedTask.projectName && (
-                    <p className="text-xs text-gray-500">{selectedTask.projectName}</p>
-                  )}
+                  <h3 className="text-white font-medium text-sm mb-2">{selectedTask.name}</h3>
+                  {selectedTask.projectName && <p className="text-xs text-gray-500">{selectedTask.projectName}</p>}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSelect(null)}
-                  className="h-8 w-8 p-0 text-gray-500 hover:text-red-400 cursor-pointer"
-                >
+                <Button variant="ghost" size="sm" onClick={() => onSelect(null)} className="h-8 w-8 p-0 text-gray-500 hover:text-red-400 cursor-pointer">
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -343,11 +348,7 @@ export default function TaskSelector({
               {selectedTask.labels.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {selectedTask.labels.map((label) => (
-                    <Badge
-                      key={label.id}
-                      variant="outline"
-                      className={colors.badge}
-                    >
+                    <Badge key={label.id} variant="outline" className={colors.badge}>
                       {label.name}
                     </Badge>
                   ))}
@@ -355,18 +356,14 @@ export default function TaskSelector({
               )}
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-zinc-800/60">
+              <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border-zinc/60">
                 <div>
                   <p className="text-xs text-gray-500">Estimated</p>
-                  <p className="text-sm text-white font-semibold">
-                    {selectedTaskEstimateDisplay}
-                  </p>
+                  <p className="text-sm text-white font-semibold">{selectedTaskEstimateDisplay}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Actual</p>
-                  <p className="text-sm text-white font-semibold">
-                    {formatHoursToHM(selectedTask.actualTime)}
-                  </p>
+                  <p className="text-sm text-white font-semibold">{formatHoursToHM(selectedTask.actualTime)}</p>
                 </div>
               </div>
             </CardContent>
@@ -374,30 +371,16 @@ export default function TaskSelector({
         ) : (
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full justify-between bg-[#0D1117] border-zinc-800/60 text-white hover:bg-[#0D1117] hover:text-white cursor-pointer"
-              >
+              <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between bg-card-foreground border-border-zinc/60 text-white hover:bg-card-foreground hover:text-white cursor-pointer">
                 <span className="text-gray-500">Select an issue...</span>
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent
-              className="p-0 bg-[#0D1117] border-zinc-800/60 duration-100"
-              align="start"
-              style={{ width: 'var(--radix-popover-trigger-width)' }}
-            >
-              <Command className="bg-[#0D1117]">
-                <CommandInput
-                  placeholder="Search issues by name, ID, or project..."
-                  className="text-white border-zinc-800/60"
-                />
+            <PopoverContent className="p-0 bg-card-foreground border-border-zinc/60 duration-100" align="start" style={{ width: "var(--radix-popover-trigger-width)" }}>
+              <Command className="bg-card-foreground">
+                <CommandInput placeholder="Search issues by name, ID, or project..." className="text-white border-border-zinc/60" />
                 <CommandList className={cn("max-h-96 scrollbar-thin pr-2", colors.scrollbar)}>
-                  <CommandEmpty className="py-6 text-center text-sm text-gray-500">
-                    No issues found.
-                  </CommandEmpty>
+                  <CommandEmpty className="py-6 text-center text-sm text-gray-500">No issues found.</CommandEmpty>
                   <CommandGroup>
                     {filteredTasks.map((task) => (
                       <CommandItem
@@ -412,9 +395,7 @@ export default function TaskSelector({
                         <Check className="mr-2 h-4 w-4 opacity-0" />
                         <div className="flex flex-col gap-1 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 font-mono">
-                              {task.taskId}
-                            </span>
+                            <span className="text-xs text-gray-500 font-mono">{task.taskId}</span>
                             {task.delegateId && (
                               <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px] px-1 py-0">
                                 AI
@@ -422,11 +403,7 @@ export default function TaskSelector({
                             )}
                           </div>
                           <span className="text-sm text-white">{task.name}</span>
-                          {task.projectName && (
-                            <span className="text-xs text-gray-500">
-                              {task.projectName}
-                            </span>
-                          )}
+                          {task.projectName && <span className="text-xs text-gray-500">{task.projectName}</span>}
                         </div>
                       </CommandItem>
                     ))}

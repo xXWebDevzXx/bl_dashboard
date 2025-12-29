@@ -135,11 +135,11 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
       {/* Header Comparison */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Task 1 Header */}
-        <div className="bg-gradient-to-br from-emerald-900/20 to-emerald-800/10 border border-emerald-800/40 rounded-lg p-6 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
+        <div className="bg-gradient-to-br from-emerald-dark/20 to-emerald-dark/10 border border-emerald-dark/40 rounded-lg p-6 animate-[fadeInScale_0.6s_ease-out_0.3s_both]">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs text-emerald-400 font-mono font-semibold">
+                <span className="text-xs text-emerald-light font-mono font-semibold">
                   {task1.taskId}
                 </span>
                 {task1.delegateId && (
@@ -150,11 +150,11 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
               </div>
               <h2 className="text-xl font-bold text-white mb-2">{task1.name}</h2>
               {task1.projectName && (
-                <p className="text-sm text-emerald-300/70">{task1.projectName}</p>
+                <p className="text-sm text-emerald-light/70">{task1.projectName}</p>
               )}
             </div>
-            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <span className="text-emerald-400 font-bold text-lg">1</span>
+            <div className="w-12 h-12 rounded-full bg-emerald-normal/20 flex items-center justify-center">
+              <span className="text-emerald-light font-bold text-lg">1</span>
             </div>
           </div>
 
@@ -163,7 +163,7 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
               {task1.labels.map((label) => (
                 <span
                   key={label.id}
-                  className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full font-medium"
+                  className="px-3 py-1 bg-emerald-normal/20 text-emerald-light text-xs rounded-full font-medium"
                 >
                   {label.name}
                 </span>
@@ -173,11 +173,11 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
         </div>
 
         {/* Task 2 Header */}
-        <div className="bg-gradient-to-br from-cyan-900/20 to-cyan-800/10 border border-cyan-800/40 rounded-lg p-6 animate-[fadeInScale_0.6s_ease-out_0.4s_both]">
+        <div className="bg-gradient-to-br from-cyan-dark/20 to-cyan-dark/10 border border-cyan-dark/40 rounded-lg p-6 animate-[fadeInScale_0.6s_ease-out_0.4s_both]">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs text-cyan-400 font-mono font-semibold">
+                <span className="text-xs text-cyan-light font-mono font-semibold">
                   {task2.taskId}
                 </span>
                 {task2.delegateId && (
@@ -188,11 +188,11 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
               </div>
               <h2 className="text-xl font-bold text-white mb-2">{task2.name}</h2>
               {task2.projectName && (
-                <p className="text-sm text-cyan-300/70">{task2.projectName}</p>
+                <p className="text-sm text-cyan-light/70">{task2.projectName}</p>
               )}
             </div>
-            <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center">
-              <span className="text-cyan-400 font-bold text-lg">2</span>
+            <div className="w-12 h-12 rounded-full bg-cyan-normal/20 flex items-center justify-center">
+              <span className="text-cyan-light font-bold text-lg">2</span>
             </div>
           </div>
 
@@ -201,7 +201,7 @@ export default function TaskComparisonView({ task1, task2 }: Props) {
               {task2.labels.map((label) => (
                 <span
                   key={label.id}
-                  className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-full font-medium"
+                  className="px-3 py-1 bg-cyan-normal/20 text-cyan-light text-xs rounded-full font-medium"
                 >
                   {label.name}
                 </span>
