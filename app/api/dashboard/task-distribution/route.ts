@@ -37,14 +37,32 @@ export async function GET() {
     }));
     // Sort by count descending
     allLabelCounts = allLabelCounts.sort((a: { count: number }, b: { count: number }) => b.count - a.count);
-    const topLabels = allLabelCounts.slice(0, 5);
-    const otherLabels = allLabelCounts.slice(5);
+    const appLabel = allLabelCounts.find((label: { label: string }) => label.label === "APP");
+    const featureLabel = allLabelCounts.find((label: { label: string }) => label.label === "Feature");
+    const bugLabel = allLabelCounts.find((label: { label: string }) => label.label === "Bug");
+    const macRelatedLabel = allLabelCounts.find((label: { label: string }) => label.label === "Mac related");
+    const featureUpdateLabel = allLabelCounts.find((label: { label: string }) => label.label === "Feature Update");
+    const otherLabels = allLabelCounts.filter((label: { label: string }) => !label.label.startsWith("Estimate" ) && label.label !== "APP" && label.label !== "Feature" && label.label !== "Bug" && label.label !== "Mac related" && label.label !== "Feature Update");
     const otherCount = otherLabels.reduce((sum: number, item: { count: number }) => sum + item.count, 0);
-    const labelTaskCounts = [...topLabels];
+    const labelTaskCounts = [];
     if (otherCount > 0) {
       labelTaskCounts.push({ label: "Other", count: otherCount });
     }
-
+    if (appLabel && !labelTaskCounts.find((label) => label.label === "App")) {
+      labelTaskCounts.push(appLabel);
+    }
+    if (featureLabel && !labelTaskCounts.find((label) => label.label === "Feature")) {
+      labelTaskCounts.push(featureLabel);
+    }
+    if (bugLabel && !labelTaskCounts.find((label) => label.label === "Bug")) {
+      labelTaskCounts.push(bugLabel);
+    }
+    if (macRelatedLabel && !labelTaskCounts.find((label) => label.label === "Mac related")) {
+      labelTaskCounts.push(macRelatedLabel);
+    }
+    if (featureUpdateLabel && !labelTaskCounts.find((label) => label.label === "Feature Update")) {
+      labelTaskCounts.push(featureUpdateLabel);
+    }
     // Optionally, get total tasks for reference
     const totalTasks = await prisma.linearTask.count();
 
