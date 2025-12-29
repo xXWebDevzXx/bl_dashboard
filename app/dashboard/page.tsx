@@ -79,7 +79,7 @@ export default async function Dashboard() {
             className="rounded-sm"
             bigText={`${linearTasksWithTogglTimePercentage.toFixed(2)}`}
             unit="%"
-            smallText="AI issues vs non-AI issues"
+            smallText="issues with time tracked"
           ></DashboardCard>
           <DashboardCard
             className="rounded-sm"
