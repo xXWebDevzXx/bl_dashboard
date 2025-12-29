@@ -85,7 +85,7 @@ export default async function Dashboard() {
             className="rounded-sm"
             bigText={`${averageTogglTimeHours.toFixed(2)}`}
             unit="hrs"
-            smallText="average time per issue"
+            smallText="average time per entry"
             chartData={totalHoursChartData}
             lineColor="#4876DE"
             showChart={true}
