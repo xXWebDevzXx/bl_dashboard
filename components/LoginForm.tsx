@@ -33,7 +33,7 @@ function LoginForm() {
             <div className="w-full border-t border-border-zinc"></div>
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-card text-zinc-500">New to AITracker?</span>
+            <span className="px-2 bg-card text-zinc-500">New to Delegate?</span>
           </div>
         </div>
 
