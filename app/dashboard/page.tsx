@@ -1,4 +1,5 @@
 import DashboardAreaChart from "@/components/dashboard/DashboardAreaChart";
+import BoxPlotCard from "@/components/dashboard/BoxPlotCard";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import DashboardCircleChart from "@/components/dashboard/DashboardCircleChart";
 import DashboardClientWrapper from "@/components/dashboard/DashboardClientWrapper";
@@ -112,6 +113,9 @@ export default async function Dashboard() {
             ></DashboardCircleChart>
             <DashboardRadialChart />
           </div>
+        </div>
+        <div className="mt-4 sm:mt-6 desktop:mt-8">
+          <BoxPlotCard className="h-fit" />
         </div>
       </div>
     </DashboardClientWrapper>

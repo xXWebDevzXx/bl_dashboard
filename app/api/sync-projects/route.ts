@@ -391,9 +391,8 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
     let hasNextPage = true;
     let endCursor: string | null = null;
 
-    // Get the start of the current year in ISO format
-    const currentYear = new Date().getFullYear();
-    const startOfYear = `${currentYear}-01-01T00:00:00Z`;
+    // Get the start of 2025 in ISO format
+    const startOfYear = "2025-01-01T00:00:00Z";
 
     while (hasNextPage) {
       const response = await fetch("https://api.linear.app/graphql", {
