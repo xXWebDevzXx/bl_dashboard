@@ -292,9 +292,10 @@ async function fetchTogglTimeEntriesByDevelopers(): Promise<TogglTimeEntry[]> {
 
     const userIds = developers.map((d) => d.togglId);
 
-    // Get current year date range (you can modify these as needed)
-    const startDate = "2025-01-01";
-    const endDate = "2025-12-31";
+    const endDate = new Date().toISOString().split('T')[0];
+    const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0];
+    console.warn("Fetching Toggl time entries from", startDate, "to", endDate);
+
 
     console.warn(
       "Fetching Toggl time entries for user IDs:",
