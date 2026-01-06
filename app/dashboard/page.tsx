@@ -1,5 +1,5 @@
-import DashboardAreaChart from "@/components/dashboard/DashboardAreaChart";
 import BoxPlotCard from "@/components/dashboard/BoxPlotCard";
+import DashboardAreaChart from "@/components/dashboard/DashboardAreaChart";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import DashboardCircleChart from "@/components/dashboard/DashboardCircleChart";
 import DashboardClientWrapper from "@/components/dashboard/DashboardClientWrapper";
@@ -102,6 +102,7 @@ export default async function Dashboard() {
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
             <DashboardAreaChart className="bg-card h-fit border border-border-zinc/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
             <EstimationAccuracyChart className="h-fit" />
+            <BoxPlotCard />
           </div>
 
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
@@ -114,9 +115,7 @@ export default async function Dashboard() {
             <DashboardRadialChart />
           </div>
         </div>
-        <div className="mt-4 sm:mt-6 desktop:mt-8">
-          <BoxPlotCard className="h-fit" />
-        </div>
+        <div className="mt-2 sm:mt-4 desktop:mt-6"></div>
       </div>
     </DashboardClientWrapper>
   );
