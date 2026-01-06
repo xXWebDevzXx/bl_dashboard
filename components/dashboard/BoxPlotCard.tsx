@@ -30,10 +30,8 @@ interface Props {
 
 // Pure SVG Boxplot Component
 const BoxplotSVG = ({
-  data,
   x,
   width,
-  height,
   yScale,
   q1,
   median,
@@ -47,10 +45,8 @@ const BoxplotSVG = ({
   onHover,
   onLeave,
 }: {
-  data: { name: string; unit: string };
   x: number;
   width: number;
-  height: number;
   yScale: (value: number) => number;
   q1: number;
   median: number;
@@ -165,7 +161,7 @@ export default function BoxPlotCard({ className }: Props) {
   const [metric, setMetric] = useState<"actual" | "accuracy" | "leadTime">("actual");
   const [showOutliers, setShowOutliers] = useState(true);
   const [tooltip, setTooltip] = useState<{ stats: ExtendedBoxplotStats; name: string; x: number; y: number } | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: string; to: string }>(() => {
+  const [dateRange] = useState<{ from: string; to: string }>(() => {
     // Default to last 30 days
     const to = new Date();
     const from = new Date();
@@ -439,10 +435,8 @@ export default function BoxPlotCard({ className }: Props) {
 
                     {/* Boxplots */}
                     <BoxplotSVG
-                      data={{ name: "AI", unit: data.unit }}
                       x={paddingLeft + plotWidth * 0.1}
                       width={plotWidth * 0.35}
-                      height={plotHeight}
                       yScale={yScale}
                       q1={data.ai.q1}
                       median={data.ai.median}
@@ -467,10 +461,8 @@ export default function BoxPlotCard({ className }: Props) {
                     />
 
                     <BoxplotSVG
-                      data={{ name: "Non-AI", unit: data.unit }}
                       x={paddingLeft + plotWidth * 0.55}
                       width={plotWidth * 0.35}
-                      height={plotHeight}
                       yScale={yScale}
                       q1={data.nonAi.q1}
                       median={data.nonAi.median}

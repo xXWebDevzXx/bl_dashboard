@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma/client";
 import { parseEstimateToHours } from "@/lib/boxplot-utils";
 import { computeBoxplotStats, type BoxplotStats } from "@/lib/stats/boxplot";
+import { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
     };
 
     // Build base where clause based on metric
-    let baseWhere: any = { ...taskDateFilter };
+    const baseWhere: Prisma.LinearTaskWhereInput = { ...taskDateFilter };
     
     if (metric === "leadTime") {
       // Lead time requires completedAt
