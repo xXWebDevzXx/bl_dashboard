@@ -182,7 +182,7 @@ export default function BoxPlotCard({ className }: Props) {
     x: number;
     y: number;
   } | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: string; to: string }>(
+  const [dateRange] = useState<{ from: string; to: string }>(
     () => {
       // Default to entire year (2025)
       return {
@@ -403,7 +403,7 @@ export default function BoxPlotCard({ className }: Props) {
           </div>
 
           {/* Boxplot Chart */}
-          <div className="h-[280px] sm:h-[320px] desktop:h-[380px] w-full bg-card-foreground rounded-lg border border-border-zinc/60 p-2 sm:p-3 mb-3 sm:mb-4 relative">
+          <div className="h-[280px] sm:h-80 desktop:h-[380px] w-full bg-card-foreground rounded-lg border border-border-zinc/60 p-2 sm:p-3 mb-3 sm:mb-4 relative">
             <svg
               viewBox={`0 0 ${chartWidth} ${chartHeight}`}
               className="w-full h-full"
