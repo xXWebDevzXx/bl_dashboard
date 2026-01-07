@@ -199,6 +199,7 @@ export async function seedDatabase(
     const estimateValue = extractEstimateFromLabels(issue.labels.nodes);
 
     // Convert ISO date strings to Unix timestamps
+    const createdAtTimestamp = Math.floor(new Date(issue.createdAt).getTime() / 1000);
     const startedAtTimestamp = issue.startedAt
       ? Math.floor(new Date(issue.startedAt).getTime() / 1000)
       : null;
@@ -206,7 +207,7 @@ export async function seedDatabase(
       ? Math.floor(new Date(issue.completedAt).getTime() / 1000)
       : null;
 
-    // Only create if not exists
+    // Upsert: create if not exists, update if exists (to fix createdAt/completedAt)
     const existingTask = await prisma.linearTask.findUnique({
       where: { taskId: issue.identifier },
     });
@@ -222,7 +223,7 @@ export async function seedDatabase(
           projectName: issue.project?.name || null,
           startedAt: startedAtTimestamp,
           completedAt: completedAtTimestamp,
-          createdAt: Math.floor(Date.now() / 1000),
+          createdAt: createdAtTimestamp,
           updatedAt: Math.floor(Date.now() / 1000),
         },
       });
@@ -231,7 +232,19 @@ export async function seedDatabase(
         console.warn(`✓ Created LinearTask: ${issue.identifier} - ${issue.title}`);
       }
     } else {
-      linearTask = existingTask;
+      // Update existing task with correct timestamps from Linear
+      linearTask = await prisma.linearTask.update({
+        where: { taskId: issue.identifier },
+        data: {
+          createdAt: createdAtTimestamp,
+          startedAt: startedAtTimestamp,
+          completedAt: completedAtTimestamp,
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      });
+      if (logProgress) {
+        console.warn(`↻ Updated LinearTask timestamps: ${issue.identifier}`);
+      }
     }
 
     // Step 3: Connect labels to this task (idempotent)
