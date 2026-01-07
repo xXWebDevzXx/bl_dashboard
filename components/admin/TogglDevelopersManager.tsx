@@ -22,10 +22,10 @@ import {
   Mail,
   Plus,
   RefreshCw,
-  Trash2,
-  User as UserIcon,
   ToggleLeft,
   ToggleRight,
+  Trash2,
+  User as UserIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -45,7 +45,9 @@ export default function TogglDevelopersManager() {
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deleteDeveloper, setDeleteDeveloper] = useState<TogglDeveloper | null>(null);
+  const [deleteDeveloper, setDeleteDeveloper] = useState<TogglDeveloper | null>(
+    null
+  );
   const [newEmail, setNewEmail] = useState("");
   const [addingDeveloper, setAddingDeveloper] = useState(false);
 
@@ -101,7 +103,9 @@ export default function TogglDevelopersManager() {
       fetchDevelopers();
     } catch (error) {
       console.error("Error adding developer:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to add developer");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add developer"
+      );
     } finally {
       setAddingDeveloper(false);
     }
@@ -109,22 +113,29 @@ export default function TogglDevelopersManager() {
 
   const handleToggleActive = async (developer: TogglDeveloper) => {
     try {
-      const response = await fetch(`/api/admin/toggl-developers/${developer.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !developer.isActive }),
-      });
+      const response = await fetch(
+        `/api/admin/toggl-developers/${developer.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isActive: !developer.isActive }),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to update developer");
       }
 
-      toast.success(`Developer ${developer.isActive ? "deactivated" : "activated"}`);
+      toast.success(
+        `Developer ${developer.isActive ? "deactivated" : "activated"}`
+      );
       fetchDevelopers();
     } catch (error) {
       console.error("Error updating developer:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to update developer");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update developer"
+      );
     }
   };
 
@@ -137,9 +148,12 @@ export default function TogglDevelopersManager() {
     if (!deleteDeveloper) return;
 
     try {
-      const response = await fetch(`/api/admin/toggl-developers/${deleteDeveloper.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/toggl-developers/${deleteDeveloper.id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -152,7 +166,9 @@ export default function TogglDevelopersManager() {
       fetchDevelopers();
     } catch (error) {
       console.error("Error deleting developer:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete developer");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete developer"
+      );
     }
   };
 
@@ -179,7 +195,9 @@ export default function TogglDevelopersManager() {
               disabled={loading}
               className="bg-zinc-900/50 border-border-zinc text-white hover:bg-zinc-800 w-full sm:w-auto"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
             <Button
@@ -195,10 +213,13 @@ export default function TogglDevelopersManager() {
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         {loading ? (
-          <div className="text-center py-8 text-zinc-400">Loading developers...</div>
+          <div className="text-center py-8 text-zinc-400">
+            Loading developers...
+          </div>
         ) : developers.length === 0 ? (
           <div className="text-center py-8 text-zinc-400">
-            No developers configured. Add a developer to start syncing time entries.
+            No developers configured. Add a developer to start syncing time
+            entries.
           </div>
         ) : (
           <>
@@ -237,13 +258,17 @@ export default function TogglDevelopersManager() {
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <UserIcon className="w-4 h-4 text-zinc-400" />
-                            <span className="text-white font-medium">{developer.name}</span>
+                            <span className="text-white font-medium">
+                              {developer.name}
+                            </span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <Mail className="w-4 h-4 text-zinc-400" />
-                            <span className="text-zinc-300">{developer.email}</span>
+                            <span className="text-zinc-300">
+                              {developer.email}
+                            </span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
@@ -272,7 +297,9 @@ export default function TogglDevelopersManager() {
                               size="sm"
                               onClick={() => handleToggleActive(developer)}
                               className="text-zinc-400 hover:text-white hover:bg-zinc-800"
-                              title={developer.isActive ? "Deactivate" : "Activate"}
+                              title={
+                                developer.isActive ? "Deactivate" : "Activate"
+                              }
                             >
                               {developer.isActive ? (
                                 <ToggleRight className="w-4 h-4 text-green-400" />
@@ -338,7 +365,9 @@ export default function TogglDevelopersManager() {
                     </div>
                     <div className="flex items-center gap-2 min-w-0">
                       <Mail className="w-4 h-4 text-zinc-400 flex-shrink-0" />
-                      <span className="text-zinc-300 text-sm truncate">{developer.email}</span>
+                      <span className="text-zinc-300 text-sm truncate">
+                        {developer.email}
+                      </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Badge
@@ -371,8 +400,8 @@ export default function TogglDevelopersManager() {
           <DialogHeader>
             <DialogTitle>Add Developer</DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Enter the email address of a Toggl user in your workspace. Their name and
-              Toggl ID will be fetched automatically.
+              Enter the email address of a Toggl user in your workspace. Their
+              name and Toggl ID will be fetched automatically.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -416,8 +445,8 @@ export default function TogglDevelopersManager() {
           <DialogHeader>
             <DialogTitle>Remove Developer</DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Are you sure you want to remove this developer? Their time entries will no
-              longer be synced.
+              Are you sure you want to remove this developer? Their time entries
+              will no longer be synced.
             </DialogDescription>
           </DialogHeader>
           {deleteDeveloper && (
@@ -425,7 +454,9 @@ export default function TogglDevelopersManager() {
               <div className="bg-zinc-900/50 rounded-md p-4 space-y-2">
                 <div className="text-sm break-words">
                   <span className="text-zinc-400">Name: </span>
-                  <span className="text-white font-medium">{deleteDeveloper.name}</span>
+                  <span className="text-white font-medium">
+                    {deleteDeveloper.name}
+                  </span>
                 </div>
                 <div className="text-sm break-words">
                   <span className="text-zinc-400">Email: </span>
