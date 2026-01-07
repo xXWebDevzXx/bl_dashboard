@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import type { BoxplotStats } from "@/lib/stats/boxplot";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface TopOutlier {
   identifier: string;
@@ -21,7 +27,11 @@ interface BoxplotData {
   unit: "hours" | "percent" | "days";
   ai: ExtendedBoxplotStats;
   nonAi: ExtendedBoxplotStats;
-  issueData: Array<{ identifier: string; group: "AI" | "Non-AI"; value: number }>;
+  issueData: Array<{
+    identifier: string;
+    group: "AI" | "Non-AI";
+    value: number;
+  }>;
 }
 
 interface Props {
@@ -61,7 +71,10 @@ const BoxplotSVG = ({
   showOutliers: boolean;
   color: string;
   stats: ExtendedBoxplotStats;
-  onHover?: (e: React.MouseEvent<SVGGElement>, stats: ExtendedBoxplotStats) => void;
+  onHover?: (
+    e: React.MouseEvent<SVGGElement>,
+    stats: ExtendedBoxplotStats
+  ) => void;
   onLeave?: () => void;
 }) => {
   const boxWidth = 45;
@@ -140,21 +153,22 @@ const BoxplotSVG = ({
       />
 
       {/* Outliers - only show if toggle is on */}
-      {showOutliers && outliers.map((outlier, idx) => {
-        const outlierY = yScale(outlier);
-        return (
-          <circle
-            key={idx}
-            cx={centerX}
-            cy={outlierY}
-            r={4}
-            fill={color}
-            fillOpacity={0.8}
-            stroke={color}
-            strokeWidth={2}
-          />
-        );
-      })}
+      {showOutliers &&
+        outliers.map((outlier, idx) => {
+          const outlierY = yScale(outlier);
+          return (
+            <circle
+              key={idx}
+              cx={centerX}
+              cy={outlierY}
+              r={4}
+              fill={color}
+              fillOpacity={0.8}
+              stroke={color}
+              strokeWidth={2}
+            />
+          );
+        })}
     </g>
   );
 };
@@ -162,19 +176,25 @@ const BoxplotSVG = ({
 export default function BoxPlotCard({ className }: Props) {
   const [data, setData] = useState<BoxplotData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [metric, setMetric] = useState<"actual" | "accuracy" | "leadTime">("actual");
+  const [metric, setMetric] = useState<"actual" | "accuracy" | "leadTime">(
+    "actual"
+  );
   const [showOutliers, setShowOutliers] = useState(true);
-  const [tooltip, setTooltip] = useState<{ stats: ExtendedBoxplotStats; name: string; x: number; y: number } | null>(null);
-  const [dateRange, setDateRange] = useState<{ from: string; to: string }>(() => {
-    // Default to last 30 days
-    const to = new Date();
-    const from = new Date();
-    from.setDate(from.getDate() - 30);
-    return {
-      from: from.toISOString().split("T")[0],
-      to: to.toISOString().split("T")[0],
-    };
-  });
+  const [tooltip, setTooltip] = useState<{
+    stats: ExtendedBoxplotStats;
+    name: string;
+    x: number;
+    y: number;
+  } | null>(null);
+  const [dateRange, setDateRange] = useState<{ from: string; to: string }>(
+    () => {
+      // Default to entire year (2025)
+      return {
+        from: "2025-01-01",
+        to: "2025-12-31",
+      };
+    }
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -185,7 +205,9 @@ export default function BoxPlotCard({ className }: Props) {
           to: dateRange.to,
           metric: metric,
         });
-        const response = await fetch(`/api/dashboard/boxplot?${params.toString()}`);
+        const response = await fetch(
+          `/api/dashboard/boxplot?${params.toString()}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch boxplot data");
         }
@@ -210,7 +232,12 @@ export default function BoxPlotCard({ className }: Props) {
         )}
       >
         <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white mb-4">
-          Distribution: {metric === "actual" ? "Actual time per issue" : metric === "accuracy" ? "Accuracy per issue" : "Lead time per issue"}
+          Distribution:{" "}
+          {metric === "actual"
+            ? "Actual time per issue"
+            : metric === "accuracy"
+            ? "Accuracy per issue"
+            : "Lead time per issue"}
         </h2>
         <p className="text-gray-400 text-sm">Loading...</p>
       </div>
@@ -224,20 +251,44 @@ export default function BoxPlotCard({ className }: Props) {
   const hasEnoughData = data.ai.n >= 5 && data.nonAi.n >= 5;
 
   // Calculate overall min/max for Y axis scale
-  const allValues = [
-    data.ai.min,
-    data.ai.max,
-    data.ai.q1,
-    data.ai.q3,
-    data.nonAi.min,
-    data.nonAi.max,
-    data.nonAi.q1,
-    data.nonAi.q3,
-    ...data.ai.outliers,
-    ...data.nonAi.outliers,
-  ];
+  // Use P95 as a reasonable cap to keep the main boxplot visible
+  // Outliers beyond this will still be shown but compressed at the top
+  const maxWhisker = Math.max(data.ai.whiskerHigh, data.nonAi.whiskerHigh);
+  const maxP95 = Math.max(data.ai.p95, data.nonAi.p95);
+
+  // When showing outliers: cap at P95 * 1.3 to show most data clearly
+  // When hiding outliers: zoom in to whisker range only
+  const smartMax = showOutliers
+    ? Math.max(maxP95 * 1.3, maxWhisker * 1.2)
+    : Math.max(data.ai.whiskerHigh, data.nonAi.whiskerHigh);
+
+  const allValues = showOutliers
+    ? [
+        data.ai.whiskerLow,
+        data.ai.whiskerHigh,
+        data.ai.q1,
+        data.ai.q3,
+        data.nonAi.whiskerLow,
+        data.nonAi.whiskerHigh,
+        data.nonAi.q1,
+        data.nonAi.q3,
+        // Include outliers but they'll be capped by smartMax
+        ...data.ai.outliers,
+        ...data.nonAi.outliers,
+      ]
+    : [
+        // Only use whisker bounds when zoomed in (outliers hidden)
+        data.ai.whiskerLow,
+        data.ai.whiskerHigh,
+        data.ai.q1,
+        data.ai.q3,
+        data.nonAi.whiskerLow,
+        data.nonAi.whiskerHigh,
+        data.nonAi.q1,
+        data.nonAi.q3,
+      ];
   const globalMin = Math.min(...allValues);
-  const globalMax = Math.max(...allValues);
+  const globalMax = showOutliers ? smartMax : Math.max(...allValues);
   const padding = (globalMax - globalMin) * 0.1 || 1;
   const yMin = Math.max(0, globalMin - padding);
   const yMax = globalMax + padding;
@@ -249,8 +300,8 @@ export default function BoxPlotCard({ className }: Props) {
   const nonAiWhiskerMax = data.nonAi.whiskerHigh;
 
   // Responsive chart dimensions (viewBox coordinates)
-  const chartHeight = 180;
-  const chartWidth = 300;
+  const chartHeight = 300;
+  const chartWidth = 400;
   const paddingLeft = 35;
   const paddingRight = 15;
   const paddingTop = 15;
@@ -297,9 +348,19 @@ export default function BoxPlotCard({ className }: Props) {
       <div className="mb-3 sm:mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
           <h2 className="text-lg sm:text-xl desktop:text-2xl font-bold text-white">
-            Distribution: {metric === "actual" ? "Actual time per issue" : metric === "accuracy" ? "Accuracy per issue" : "Lead time per issue"}
+            Distribution:{" "}
+            {metric === "actual"
+              ? "Actual time per issue"
+              : metric === "accuracy"
+              ? "Accuracy per issue"
+              : "Lead time per issue"}
           </h2>
-          <Select value={metric} onValueChange={(value) => setMetric(value as "actual" | "accuracy" | "leadTime")}>
+          <Select
+            value={metric}
+            onValueChange={(value) =>
+              setMetric(value as "actual" | "accuracy" | "leadTime")
+            }
+          >
             <SelectTrigger className="w-full sm:w-[180px] bg-card-foreground border-border-zinc/60 text-white h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -337,20 +398,27 @@ export default function BoxPlotCard({ className }: Props) {
               checked={showOutliers}
               onCheckedChange={setShowOutliers}
             />
-            <Label htmlFor="show-outliers" className="text-sm text-gray-300 cursor-pointer">
-              Show outliers
+            <Label
+              htmlFor="show-outliers"
+              className="text-sm text-gray-300 cursor-pointer"
+            >
+              {showOutliers ? "Show outliers" : "Zoom in (outliers hidden)"}
             </Label>
           </div>
 
           {/* Boxplot Chart */}
-          <div className="h-[180px] sm:h-[220px] desktop:h-[250px] w-full bg-card-foreground rounded-lg border border-border-zinc/60 p-2 sm:p-3 mb-3 sm:mb-4 relative">
-            <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+          <div className="h-[280px] sm:h-[320px] desktop:h-[380px] w-full bg-card-foreground rounded-lg border border-border-zinc/60 p-2 sm:p-3 mb-3 sm:mb-4 relative">
+            <svg
+              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+              className="w-full h-full"
+              preserveAspectRatio="xMidYMid meet"
+            >
               {/* Calculate plot dimensions based on viewBox */}
               {(() => {
                 const plotWidth = chartWidth - paddingLeft - paddingRight;
                 const plotHeight = chartHeight - paddingTop - paddingBottom;
                 const yScale = createYScale(plotHeight);
-                
+
                 return (
                   <>
                     {/* Y axis */}
@@ -396,7 +464,9 @@ export default function BoxPlotCard({ className }: Props) {
                       fill="#9CA3AF"
                       fontSize="10"
                       textAnchor="middle"
-                      transform={`rotate(-90, 12, ${paddingTop + plotHeight / 2})`}
+                      transform={`rotate(-90, 12, ${
+                        paddingTop + plotHeight / 2
+                      })`}
                     >
                       {getUnitLabel()}
                     </text>
@@ -412,30 +482,32 @@ export default function BoxPlotCard({ className }: Props) {
                     />
 
                     {/* Reference line at 100% for accuracy metric */}
-                    {data.metric === "accuracy" && yMin <= 100 && yMax >= 100 && (
-                      <>
-                        <line
-                          x1={paddingLeft}
-                          y1={paddingTop + yScale(100)}
-                          x2={paddingLeft + plotWidth}
-                          y2={paddingTop + yScale(100)}
-                          stroke="#ef4444"
-                          strokeWidth={1.5}
-                          strokeDasharray="4 4"
-                          opacity={0.6}
-                        />
-                        <text
-                          x={paddingLeft + plotWidth - 5}
-                          y={paddingTop + yScale(100) - 5}
-                          fill="#ef4444"
-                          fontSize="10"
-                          textAnchor="end"
-                          fontWeight="500"
-                        >
-                          100%
-                        </text>
-                      </>
-                    )}
+                    {data.metric === "accuracy" &&
+                      yMin <= 100 &&
+                      yMax >= 100 && (
+                        <>
+                          <line
+                            x1={paddingLeft}
+                            y1={paddingTop + yScale(100)}
+                            x2={paddingLeft + plotWidth}
+                            y2={paddingTop + yScale(100)}
+                            stroke="#ef4444"
+                            strokeWidth={1.5}
+                            strokeDasharray="4 4"
+                            opacity={0.6}
+                          />
+                          <text
+                            x={paddingLeft + plotWidth - 5}
+                            y={paddingTop + yScale(100) - 5}
+                            fill="#ef4444"
+                            fontSize="10"
+                            textAnchor="end"
+                            fontWeight="500"
+                          >
+                            100%
+                          </text>
+                        </>
+                      )}
 
                     {/* Boxplots */}
                     <BoxplotSVG
@@ -455,7 +527,8 @@ export default function BoxPlotCard({ className }: Props) {
                       stats={data.ai}
                       onHover={(e, stats) => {
                         const boxplotX = paddingLeft + plotWidth * 0.1;
-                        const boxplotCenterX = boxplotX + plotWidth * 0.35 / 2;
+                        const boxplotCenterX =
+                          boxplotX + (plotWidth * 0.35) / 2;
                         setTooltip({
                           stats,
                           name: "AI",
@@ -483,7 +556,8 @@ export default function BoxPlotCard({ className }: Props) {
                       stats={data.nonAi}
                       onHover={(e, stats) => {
                         const boxplotX = paddingLeft + plotWidth * 0.55;
-                        const boxplotCenterX = boxplotX + plotWidth * 0.35 / 2;
+                        const boxplotCenterX =
+                          boxplotX + (plotWidth * 0.35) / 2;
                         setTooltip({
                           stats,
                           name: "Non-AI",
@@ -519,49 +593,128 @@ export default function BoxPlotCard({ className }: Props) {
                 );
               })()}
             </svg>
-            
+
             {/* Tooltip - positioned outside SVG for better readability */}
             {tooltip && (
               <div
                 className="absolute bg-[#1A1F26] border-2 border-[#374151] rounded-lg p-4 shadow-2xl text-white z-50 pointer-events-none"
                 style={{
-                  left: tooltip.name === "AI" 
-                    ? "15%" 
-                    : "55%",
+                  left: tooltip.name === "AI" ? "15%" : "55%",
                   top: "10%",
                   transform: "translateX(-50%)",
                   minWidth: "240px",
                 }}
               >
-                <p className="font-bold text-sm mb-3 text-white">{tooltip.name} Issues</p>
+                <p className="font-bold text-sm mb-3 text-white">
+                  {tooltip.name} Issues
+                </p>
                 <div className="space-y-1.5 text-gray-200 text-sm">
-                  <p className="font-medium">n: <span className="text-white">{tooltip.stats.n}</span></p>
+                  <p className="font-medium">
+                    n: <span className="text-white">{tooltip.stats.n}</span>
+                  </p>
                   <div className="pt-1 border-t border-gray-600">
-                    <p className="font-semibold text-xs text-gray-400 mb-1">Quartiles (Report Focus)</p>
-                    <p>Q1: <span className="text-white font-medium">{formatTooltip(tooltip.stats.q1)}</span> {getUnitLabel()}</p>
-                    <p>Median: <span className="text-white font-medium">{formatTooltip(tooltip.stats.median)}</span> {getUnitLabel()}</p>
-                    <p>Q3: <span className="text-white font-medium">{formatTooltip(tooltip.stats.q3)}</span> {getUnitLabel()}</p>
-                    <p>IQR: <span className="text-white font-medium">{formatTooltip(tooltip.stats.iqr)}</span> {getUnitLabel()}</p>
+                    <p className="font-semibold text-xs text-gray-400 mb-1">
+                      Quartiles (Report Focus)
+                    </p>
+                    <p>
+                      Q1:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.q1)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      Median:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.median)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      Q3:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.q3)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      IQR:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.iqr)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
                   </div>
                   <div className="pt-1 border-t border-gray-600">
-                    <p className="font-semibold text-xs text-gray-400 mb-1">Range & Whiskers</p>
-                    <p>Min: <span className="text-white font-medium">{formatTooltip(tooltip.stats.min)}</span> {getUnitLabel()}</p>
-                    <p>Max: <span className="text-white font-medium">{formatTooltip(tooltip.stats.max)}</span> {getUnitLabel()}</p>
-                    <p>Whisker Low: <span className="text-white font-medium">{formatTooltip(tooltip.stats.whiskerLow)}</span> {getUnitLabel()}</p>
-                    <p>Whisker High: <span className="text-white font-medium">{formatTooltip(tooltip.stats.whiskerHigh)}</span> {getUnitLabel()}</p>
+                    <p className="font-semibold text-xs text-gray-400 mb-1">
+                      Range & Whiskers
+                    </p>
+                    <p>
+                      Min:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.min)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      Max:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.max)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      Whisker Low:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.whiskerLow)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      Whisker High:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.whiskerHigh)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
                   </div>
                   <div className="pt-1 border-t border-gray-600">
-                    <p className="font-semibold text-xs text-gray-400 mb-1">Additional Stats</p>
-                    <p>Mean: <span className="text-white font-medium">{formatTooltip(tooltip.stats.mean)}</span> {getUnitLabel()}</p>
-                    <p>P95: <span className="text-white font-medium">{formatTooltip(tooltip.stats.p95)}</span> {getUnitLabel()}</p>
-                    <p className="font-medium">Outliers: <span className="text-white">{tooltip.stats.outlierCount}</span></p>
+                    <p className="font-semibold text-xs text-gray-400 mb-1">
+                      Additional Stats
+                    </p>
+                    <p>
+                      Mean:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.mean)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p>
+                      P95:{" "}
+                      <span className="text-white font-medium">
+                        {formatTooltip(tooltip.stats.p95)}
+                      </span>{" "}
+                      {getUnitLabel()}
+                    </p>
+                    <p className="font-medium">
+                      Outliers:{" "}
+                      <span className="text-white">
+                        {tooltip.stats.outlierCount}
+                      </span>
+                    </p>
                   </div>
                   {tooltip.stats.topOutliers.length > 0 && (
                     <div className="pt-1 border-t border-gray-600">
-                      <p className="font-semibold text-xs text-gray-400 mb-1">Top 3 Outliers</p>
+                      <p className="font-semibold text-xs text-gray-400 mb-1">
+                        Top 3 Outliers
+                      </p>
                       {tooltip.stats.topOutliers.map((outlier, idx) => (
                         <p key={idx} className="text-xs">
-                          {outlier.identifier}: <span className="text-white font-medium">{formatTooltip(outlier.value)}</span> {getUnitLabel()}
+                          {outlier.identifier}:{" "}
+                          <span className="text-white font-medium">
+                            {formatTooltip(outlier.value)}
+                          </span>{" "}
+                          {getUnitLabel()}
                         </p>
                       ))}
                     </div>
@@ -573,11 +726,25 @@ export default function BoxPlotCard({ className }: Props) {
 
           {/* Sample sizes and stats */}
           <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3">
-            <div 
+            <div
               className="bg-card-foreground p-2 sm:p-3 rounded-lg border border-border-zinc/40 hover:border-cyan-normal/30 transition-all cursor-help"
-              title={`n: ${data.ai.n}\nQ1: ${formatTooltip(data.ai.q1)} ${getUnitLabel()}\nMedian: ${formatTooltip(data.ai.median)} ${getUnitLabel()}\nQ3: ${formatTooltip(data.ai.q3)} ${getUnitLabel()}\nIQR: ${formatTooltip(data.ai.iqr)} ${getUnitLabel()}\nWhisker Low: ${formatTooltip(data.ai.whiskerLow)} ${getUnitLabel()}\nWhisker High: ${formatTooltip(data.ai.whiskerHigh)} ${getUnitLabel()}\nOutliers: ${data.ai.outlierCount}`}
+              title={`n: ${data.ai.n}\nQ1: ${formatTooltip(
+                data.ai.q1
+              )} ${getUnitLabel()}\nMedian: ${formatTooltip(
+                data.ai.median
+              )} ${getUnitLabel()}\nQ3: ${formatTooltip(
+                data.ai.q3
+              )} ${getUnitLabel()}\nIQR: ${formatTooltip(
+                data.ai.iqr
+              )} ${getUnitLabel()}\nWhisker Low: ${formatTooltip(
+                data.ai.whiskerLow
+              )} ${getUnitLabel()}\nWhisker High: ${formatTooltip(
+                data.ai.whiskerHigh
+              )} ${getUnitLabel()}\nOutliers: ${data.ai.outlierCount}`}
             >
-              <p className="text-[10px] sm:text-xs text-gray-400 mb-1">AI Issues</p>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-1">
+                AI Issues
+              </p>
               <p className="text-sm sm:text-base font-semibold text-cyan-light">
                 n = {data.ai.n}
               </p>
@@ -597,11 +764,25 @@ export default function BoxPlotCard({ className }: Props) {
                 Outliers: {data.ai.outlierCount}
               </p>
             </div>
-            <div 
+            <div
               className="bg-card-foreground p-2 sm:p-3 rounded-lg border border-border-zinc/40 hover:border-emerald-normal/30 transition-all cursor-help"
-              title={`n: ${data.nonAi.n}\nQ1: ${formatTooltip(data.nonAi.q1)} ${getUnitLabel()}\nMedian: ${formatTooltip(data.nonAi.median)} ${getUnitLabel()}\nQ3: ${formatTooltip(data.nonAi.q3)} ${getUnitLabel()}\nIQR: ${formatTooltip(data.nonAi.iqr)} ${getUnitLabel()}\nWhisker Low: ${formatTooltip(data.nonAi.whiskerLow)} ${getUnitLabel()}\nWhisker High: ${formatTooltip(data.nonAi.whiskerHigh)} ${getUnitLabel()}\nOutliers: ${data.nonAi.outlierCount}`}
+              title={`n: ${data.nonAi.n}\nQ1: ${formatTooltip(
+                data.nonAi.q1
+              )} ${getUnitLabel()}\nMedian: ${formatTooltip(
+                data.nonAi.median
+              )} ${getUnitLabel()}\nQ3: ${formatTooltip(
+                data.nonAi.q3
+              )} ${getUnitLabel()}\nIQR: ${formatTooltip(
+                data.nonAi.iqr
+              )} ${getUnitLabel()}\nWhisker Low: ${formatTooltip(
+                data.nonAi.whiskerLow
+              )} ${getUnitLabel()}\nWhisker High: ${formatTooltip(
+                data.nonAi.whiskerHigh
+              )} ${getUnitLabel()}\nOutliers: ${data.nonAi.outlierCount}`}
             >
-              <p className="text-[10px] sm:text-xs text-gray-400 mb-1">Non-AI Issues</p>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-1">
+                Non-AI Issues
+              </p>
               <p className="text-sm sm:text-base font-semibold text-emerald-light">
                 n = {data.nonAi.n}
               </p>
@@ -626,7 +807,8 @@ export default function BoxPlotCard({ className }: Props) {
           {/* Info text */}
           <div className="bg-card-foreground p-2 sm:p-3 rounded-lg border border-border-zinc/40">
             <p className="text-[10px] sm:text-xs text-gray-400 leading-relaxed">
-              ℹ Box = Q1–Q3, linje = median, whiskers = 1.5×IQR, prikker = outliers
+              ℹ Box = Q1–Q3, linje = median, whiskers = 1.5×IQR, prikker =
+              outliers
             </p>
           </div>
         </>
