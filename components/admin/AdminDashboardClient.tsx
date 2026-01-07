@@ -543,13 +543,13 @@ export default function AdminDashboardClient() {
                   >
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <UserIcon className="w-4 h-4 text-zinc-400" />
-                          <span className="text-white font-medium">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <UserIcon className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                          <span className="text-white font-medium truncate">
                             {user.username}
                           </span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 flex-shrink-0">
                           {activeTab === "active" ? (
                             <>
                               <Button
@@ -581,9 +581,9 @@ export default function AdminDashboardClient() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-zinc-400" />
-                        <span className="text-zinc-300 text-sm">{user.email}</span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Mail className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                        <span className="text-zinc-300 text-sm truncate">{user.email}</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Badge
