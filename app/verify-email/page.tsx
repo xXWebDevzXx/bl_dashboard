@@ -27,29 +27,29 @@ export default async function VerifyEmailPage({
   const params = await searchParams;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-card-foreground font-sans">
       <VerifyEmailToast status={params.status} />
       <main className="flex flex-col items-center justify-center gap-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-col items-center justify-center">
-            <CardTitle>Verify Your Email</CardTitle>
+        <Card className="w-full max-w-md bg-card border-border-zinc/60 shadow-2xl shadow-black/40">
+          <CardHeader className="space-y-2 text-center border-b border-border-zinc/60 pb-6">
+            <CardTitle className="text-2xl text-white">Verify Your Email</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center gap-4">
+          <CardContent className="pt-6 space-y-6">
             <div className="text-center space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-zinc-400">
                 We&apos;ve sent a verification email to:
               </p>
-              <p className="font-semibold text-lg">{session.user.email}</p>
+              <p className="font-semibold text-lg text-white">{session.user.email}</p>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-emerald-normal/10 border border-emerald-normal/30 rounded-lg p-4 mt-4">
+                <p className="text-sm text-emerald-light">
                   Please check your inbox and click the verification link to
                   continue.
                 </p>
               </div>
 
-              <div className="text-sm text-gray-500 space-y-2 mt-6">
-                <p>Can&apos;t find the email?</p>
+              <div className="text-sm text-zinc-500 space-y-2 mt-6">
+                <p className="text-zinc-400">Can&apos;t find the email?</p>
                 <ul className="list-disc list-inside text-left">
                   <li>Check your spam/junk folder</li>
                   <li>Make sure the email address is correct</li>
@@ -57,12 +57,12 @@ export default async function VerifyEmailPage({
                 </ul>
               </div>
 
-              <div className="mt-6 pt-4 border-t space-y-3">
-                <p className="text-sm text-gray-600">
+              <div className="mt-6 pt-4 border-t border-border-zinc space-y-3">
+                <p className="text-sm text-zinc-400">
                   After verifying your email, click the button below:
                 </p>
                 <VerifyEmailButton />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-zinc-500">
                   This will refresh your session and redirect you to the
                   dashboard
                 </p>
