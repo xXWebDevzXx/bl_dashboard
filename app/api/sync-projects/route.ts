@@ -406,7 +406,7 @@ async function fetchLinearIssues(teamId: string): Promise<LinearIssue[]> {
           query: `
             query($after: String, $startOfYear: DateTimeOrDuration!) {
               team(id: "${teamId}") {
-                issues(first: 100, after: $after, filter: { createdAt: { gte: $startOfYear } }) {
+                issues(first: 100, after: $after, filter: { createdAt: { gte: $startOfYear }, state: { name: { eq: "Done"} } }) {
                   nodes {
                     id
                     number
