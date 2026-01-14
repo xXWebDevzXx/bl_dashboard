@@ -29,7 +29,11 @@ export async function GET(
     }
 
     // Construct file path
-    const storageDir = join(process.cwd(), "storage", "reports");
+    // Use /tmp in production (serverless environments have read-only filesystems except /tmp)
+    const isProduction = process.env.NODE_ENV === "production";
+    const storageDir = isProduction
+      ? join("/tmp", "storage", "reports")
+      : join(process.cwd(), "storage", "reports");
     const filePath = join(storageDir, filename);
 
     // Check if file exists

@@ -62,7 +62,11 @@ export async function GET(request: NextRequest) {
     const filename = `dashboard-report-${dateStr}-${timestamp}.${fileExtension}`;
 
     // Ensure storage directory exists
-    const storageDir = join(process.cwd(), "storage", "reports");
+    // Use /tmp in production (serverless environments have read-only filesystems except /tmp)
+    const isProduction = process.env.NODE_ENV === "production";
+    const storageDir = isProduction
+      ? join("/tmp", "storage", "reports")
+      : join(process.cwd(), "storage", "reports");
     if (!existsSync(storageDir)) {
       await mkdir(storageDir, { recursive: true });
     }
