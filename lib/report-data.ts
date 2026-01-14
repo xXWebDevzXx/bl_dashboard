@@ -135,48 +135,58 @@ export async function getTaskDistribution(dateRange?: DateRange) {
       },
     });
 
+    // Define specific labels to show
+    const specificLabels = ["Bug", "Editor approved", "Mac related", "Updated", "Feature Update"];
+
     // Filter tasks by date range if provided, then map to { label: string, count: number }
-    let allLabelCounts = labels.map((label) => {
+    const allLabelCounts = labels.map((label) => {
       let filteredTasks = label.tasks;
-      
+
       if (taskDateFilter && taskDateFilter.OR) {
         filteredTasks = label.tasks.filter((taskLabel) => {
           const task = taskLabel.linearTask;
-          
+
           // Check if task matches any of the OR conditions
           return taskDateFilter.OR.some((condition) => {
-            if (condition.createdAt) {
-              return task.createdAt >= condition.createdAt.gte && 
-                     task.createdAt <= condition.createdAt.lte;
-            }
             if (condition.startedAt && task.startedAt) {
-              return task.startedAt >= condition.startedAt.gte && 
+              return task.startedAt >= condition.startedAt.gte &&
                      task.startedAt <= condition.startedAt.lte;
             }
             if (condition.completedAt && task.completedAt) {
-              return task.completedAt >= condition.completedAt.gte && 
+              return task.completedAt >= condition.completedAt.gte &&
                      task.completedAt <= condition.completedAt.lte;
             }
             return false;
           });
         });
       }
-      
+
       return {
         label: label.name,
         count: filteredTasks.length,
       };
     });
 
-    // Sort by count descending
-    allLabelCounts = allLabelCounts.sort((a, b) => b.count - a.count);
-    const topLabels = allLabelCounts.slice(0, 5);
-    const otherLabels = allLabelCounts.slice(5);
-    const otherCount = otherLabels.reduce((sum, item) => sum + item.count, 0);
-    const labelTaskCounts = [...topLabels];
-    if (otherCount > 0) {
-      labelTaskCounts.push({ label: "Other", count: otherCount });
+    // Group into specific labels + "Others" (excluding Estimate labels)
+    const labelTaskCounts: { label: string; count: number }[] = [];
+    let othersCount = 0;
+
+    for (const item of allLabelCounts) {
+      if (specificLabels.includes(item.label) && item.count > 0) {
+        labelTaskCounts.push(item);
+      } else if (!item.label.toLowerCase().includes("estimate")) {
+        // Add to "Others" if not an Estimate label
+        othersCount += item.count;
+      }
     }
+
+    // Add "Others" category if there are any
+    if (othersCount > 0) {
+      labelTaskCounts.push({ label: "Others", count: othersCount });
+    }
+
+    // Sort by count descending
+    labelTaskCounts.sort((a, b) => b.count - a.count);
 
     // Get total tasks for reference
     const totalTasks = await prisma.linearTask.count({

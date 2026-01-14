@@ -6,6 +6,7 @@ import DashboardClientWrapper from "@/components/dashboard/DashboardClientWrappe
 import DashboardRadialChart from "@/components/dashboard/DashboardRadialChart";
 import EstimationAccuracyChart from "@/components/dashboard/EstimationAccuracyChart";
 import ReportExportButton from "@/components/dashboard/ReportExportButton";
+import TimePeriodFilter from "@/components/dashboard/TimePeriodFilter";
 import { auth0 } from "@/lib/auth0";
 import { getBoxplotData } from "@/lib/boxplot-data";
 import { getDashboardStats } from "@/lib/dashboard-stats";
@@ -18,7 +19,48 @@ import { redirect } from "next/navigation";
 // Force dynamic rendering for auth and database operations
 export const dynamic = "force-dynamic";
 
-export default async function Dashboard() {
+type TimePeriod = "1w" | "2w" | "1m" | "3m" | "6m" | "1y" | "all";
+
+function getDateRangeFromPeriod(period: TimePeriod | null): { startDate: Date; endDate: Date } | undefined {
+  if (!period || period === "all") {
+    return undefined;
+  }
+
+  const endDate = new Date();
+  const startDate = new Date();
+
+  switch (period) {
+    case "1w":
+      startDate.setDate(endDate.getDate() - 7);
+      break;
+    case "2w":
+      startDate.setDate(endDate.getDate() - 14);
+      break;
+    case "1m":
+      startDate.setMonth(endDate.getMonth() - 1);
+      break;
+    case "3m":
+      startDate.setMonth(endDate.getMonth() - 3);
+      break;
+    case "6m":
+      startDate.setMonth(endDate.getMonth() - 6);
+      break;
+    case "1y":
+      startDate.setFullYear(endDate.getFullYear() - 1);
+      break;
+  }
+
+  return { startDate, endDate };
+}
+
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const params = await searchParams;
+  const period = params.period as TimePeriod | undefined;
+  const dateRange = getDateRangeFromPeriod(period || null);
   const session = await auth0.getSession();
 
   // If user is not authenticated, redirect to login
@@ -52,11 +94,17 @@ export default async function Dashboard() {
     taskDistribution,
     boxplotData,
   ] = await Promise.all([
-    getDashboardStats(),
-    getTimeChartData(),
-    getEstimationAccuracy(),
-    getTaskDistribution(),
-    getBoxplotData("2025-01-01", "2025-12-31", "actual"), // Default boxplot data
+    getDashboardStats(dateRange),
+    getTimeChartData(dateRange),
+    getEstimationAccuracy(dateRange),
+    getTaskDistribution(dateRange),
+    dateRange
+      ? getBoxplotData(
+          dateRange.startDate.toISOString().split("T")[0],
+          dateRange.endDate.toISOString().split("T")[0],
+          "actual"
+        )
+      : getBoxplotData("2025-01-01", "2025-12-31", "actual"), // Default boxplot data
   ]);
 
   const {
@@ -78,7 +126,8 @@ export default async function Dashboard() {
   return (
     <DashboardClientWrapper>
       <div className="p-4 sm:p-6 desktop:p-8">
-        <div className="flex justify-end mb-4 sm:mb-6 desktop:mb-8">
+        <div className="flex justify-end gap-2 mb-4 sm:mb-6 desktop:mb-8">
+          <TimePeriodFilter />
           <ReportExportButton />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 desktop:grid-cols-4 gap-4 sm:gap-6 desktop:gap-8 mb-4 sm:mb-6 desktop:mb-8">
@@ -88,19 +137,19 @@ export default async function Dashboard() {
             unit={
               <SquareCheckBig className="inline-block mb-[5.6px]" size={25} />
             }
-            smallText="issues last year"
+            smallText="Issues"
           ></DashboardCard>
           <DashboardCard
             className="rounded-sm"
             bigText={`${linearTasksWithTogglTimePercentage.toFixed(2)}`}
             unit="%"
-            smallText="issues with time tracked"
+            smallText="Issues with time tracked"
           ></DashboardCard>
           <DashboardCard
             className="rounded-sm"
             bigText={`${averageTogglTimeHours.toFixed(2)}`}
             unit="hrs"
-            smallText="average time per entry"
+            smallText="Average time per entry"
             chartData={totalHoursChartData}
             lineColor="#4876DE"
             showChart={true}
