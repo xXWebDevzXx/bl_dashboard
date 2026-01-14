@@ -606,6 +606,122 @@ export function generatePDF(data: ReportData): jsPDF {
     false
   );
 
+  yPosition = timeChartCardEndY + 15;
+
+  // Distribution Statistics Section (Boxplot Data)
+  checkPageBreak(120);
+  const boxplotCardStartY = yPosition;
+  drawCard(margin, yPosition, pageWidth - 2 * margin, 1); // Temporary height
+
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+  doc.text("Distribution Statistics", margin + cardPadding, yPosition + 12);
+
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(lightTextColor[0], lightTextColor[1], lightTextColor[2]);
+  doc.text(
+    "Statistical distribution of metrics (AI vs Non-AI)",
+    margin + cardPadding,
+    yPosition + 20
+  );
+
+  yPosition += 28;
+
+  // Helper to format boxplot table rows
+  const formatBoxplotRows = (
+    metricName: string,
+    unit: string,
+    aiStats: typeof data.boxplotStats.actualTime.ai,
+    nonAiStats: typeof data.boxplotStats.actualTime.nonAi
+  ) => [
+    [
+      `${metricName} - AI`,
+      aiStats.n.toString(),
+      `${aiStats.median.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${aiStats.q1.toFixed(unit === "hours" ? 2 : 1)} - ${aiStats.q3.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${aiStats.mean.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${aiStats.p95.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+    ],
+    [
+      `${metricName} - Non-AI`,
+      nonAiStats.n.toString(),
+      `${nonAiStats.median.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${nonAiStats.q1.toFixed(unit === "hours" ? 2 : 1)} - ${nonAiStats.q3.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${nonAiStats.mean.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+      `${nonAiStats.p95.toFixed(unit === "hours" ? 2 : 1)} ${unit}`,
+    ],
+  ];
+
+  const boxplotBody = [
+    ...formatBoxplotRows(
+      "Actual Time",
+      "hrs",
+      data.boxplotStats.actualTime.ai,
+      data.boxplotStats.actualTime.nonAi
+    ),
+    ...formatBoxplotRows(
+      "Accuracy",
+      "%",
+      data.boxplotStats.accuracy.ai,
+      data.boxplotStats.accuracy.nonAi
+    ),
+    ...formatBoxplotRows(
+      "Lead Time",
+      "days",
+      data.boxplotStats.leadTime.ai,
+      data.boxplotStats.leadTime.nonAi
+    ),
+  ];
+
+  autoTable(doc, {
+    startY: yPosition,
+    head: [["Metric", "Count (n)", "Median", "IQR (Q1-Q3)", "Mean", "P95"]],
+    body: boxplotBody,
+    theme: "plain",
+    headStyles: {
+      fillColor: [
+        innerCardBackground[0],
+        innerCardBackground[1],
+        innerCardBackground[2],
+      ],
+      textColor: textColor,
+      fontStyle: "bold",
+      lineColor: borderColor,
+      lineWidth: 0.5,
+    },
+    bodyStyles: {
+      textColor: textColor,
+      lineColor: borderColor,
+      lineWidth: 0.3,
+      fontSize: 7,
+    },
+    alternateRowStyles: {
+      fillColor: [
+        innerCardBackground[0],
+        innerCardBackground[1],
+        innerCardBackground[2],
+      ],
+    },
+    styles: {
+      cellPadding: 3,
+      fontSize: 7,
+    },
+    margin: { left: margin + cardPadding, right: margin + cardPadding, top: 0 },
+  });
+
+  // Redraw the boxplot card with correct height
+  const boxplotCardEndY = (doc.lastAutoTable?.finalY ?? yPosition) + 5;
+  const boxplotCardHeight = boxplotCardEndY - boxplotCardStartY;
+  drawCard(
+    margin,
+    boxplotCardStartY,
+    pageWidth - 2 * margin,
+    boxplotCardHeight,
+    false
+  );
+
   // Footer on each page
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {

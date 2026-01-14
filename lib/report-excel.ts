@@ -294,6 +294,144 @@ export async function generateExcel(data: ReportData): Promise<ExcelJS.Buffer> {
     currentRow++;
   });
 
+  // Distribution Statistics Sheet (Boxplot Data)
+  const boxplotSheet = workbook.addWorksheet("Distribution Statistics");
+  boxplotSheet.columns = [
+    { width: 25 },
+    { width: 12 },
+    { width: 15 },
+    { width: 15 },
+    { width: 20 },
+    { width: 15 },
+    { width: 15 },
+    { width: 15 },
+    { width: 15 },
+    { width: 15 },
+  ];
+
+  currentRow = 1;
+  const boxplotHeader = boxplotSheet.getRow(currentRow);
+  const boxplotHeaders = [
+    "Metric",
+    "Count (n)",
+    "Min",
+    "Q1",
+    "Median",
+    "Q3",
+    "Max",
+    "Mean",
+    "P95",
+    "IQR",
+  ];
+
+  boxplotHeaders.forEach((header, idx) => {
+    const col = idx + 1;
+    boxplotHeader.getCell(col).value = header;
+    boxplotHeader.getCell(col).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: accentColor },
+    };
+    boxplotHeader.getCell(col).font = {
+      bold: true,
+      color: { argb: "FFFFFFFF" },
+    };
+    boxplotHeader.getCell(col).alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+  });
+
+  // Helper to format boxplot row data
+  const formatBoxplotRow = (
+    metricName: string,
+    unit: string,
+    stats: typeof data.boxplotStats.actualTime.ai
+  ) => {
+    const decimals = unit === "hours" ? 2 : 1;
+    return [
+      `${metricName} (${unit})`,
+      stats.n,
+      stats.min,
+      stats.q1,
+      stats.median,
+      stats.q3,
+      stats.max,
+      stats.mean,
+      stats.p95,
+      stats.iqr,
+    ];
+  };
+
+  const boxplotData = [
+    formatBoxplotRow("Actual Time - AI", "hrs", data.boxplotStats.actualTime.ai),
+    formatBoxplotRow("Actual Time - Non-AI", "hrs", data.boxplotStats.actualTime.nonAi),
+    formatBoxplotRow("Accuracy - AI", "%", data.boxplotStats.accuracy.ai),
+    formatBoxplotRow("Accuracy - Non-AI", "%", data.boxplotStats.accuracy.nonAi),
+    formatBoxplotRow("Lead Time - AI", "days", data.boxplotStats.leadTime.ai),
+    formatBoxplotRow("Lead Time - Non-AI", "days", data.boxplotStats.leadTime.nonAi),
+  ];
+
+  currentRow++;
+  boxplotData.forEach((rowData, index) => {
+    const row = boxplotSheet.getRow(currentRow);
+    rowData.forEach((value, col) => {
+      row.getCell(col + 1).value = value;
+      // Format numbers (skip first column which is text)
+      if (col > 0 && typeof value === "number") {
+        row.getCell(col + 1).numFmt = col === 1 ? "0" : "0.00";
+      }
+    });
+
+    // Alternating row colors
+    if (index % 2 === 0) {
+      boxplotHeaders.forEach((_, col) => {
+        row.getCell(col + 1).fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "F3F4F6" },
+        };
+      });
+    }
+
+    currentRow++;
+  });
+
+  // Add a summary section below the main data
+  currentRow += 2;
+  const summaryTitleRow = boxplotSheet.getRow(currentRow);
+  summaryTitleRow.getCell(1).value = "Summary Notes";
+  summaryTitleRow.getCell(1).font = { size: 12, bold: true };
+  boxplotSheet.mergeCells(currentRow, 1, currentRow, 5);
+
+  currentRow++;
+  const noteRow1 = boxplotSheet.getRow(currentRow);
+  noteRow1.getCell(1).value =
+    "• Actual Time: Hours spent per issue (tracked via Toggl)";
+  noteRow1.getCell(1).font = { size: 10, color: { argb: lightGray } };
+  boxplotSheet.mergeCells(currentRow, 1, currentRow, 10);
+
+  currentRow++;
+  const noteRow2 = boxplotSheet.getRow(currentRow);
+  noteRow2.getCell(1).value =
+    "• Accuracy: (Actual / Estimated) × 100% - values above 100% indicate underestimation";
+  noteRow2.getCell(1).font = { size: 10, color: { argb: lightGray } };
+  boxplotSheet.mergeCells(currentRow, 1, currentRow, 10);
+
+  currentRow++;
+  const noteRow3 = boxplotSheet.getRow(currentRow);
+  noteRow3.getCell(1).value =
+    "• Lead Time: Days from issue creation to completion";
+  noteRow3.getCell(1).font = { size: 10, color: { argb: lightGray } };
+  boxplotSheet.mergeCells(currentRow, 1, currentRow, 10);
+
+  currentRow++;
+  const noteRow4 = boxplotSheet.getRow(currentRow);
+  noteRow4.getCell(1).value =
+    "• IQR (Interquartile Range): Q3 - Q1, represents the middle 50% of data";
+  noteRow4.getCell(1).font = { size: 10, color: { argb: lightGray } };
+  boxplotSheet.mergeCells(currentRow, 1, currentRow, 10);
+
   // Generate buffer
   const buffer = await workbook.xlsx.writeBuffer();
   return buffer as ExcelJS.Buffer;
