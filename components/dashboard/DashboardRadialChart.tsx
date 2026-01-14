@@ -12,14 +12,23 @@ interface RadialChartData {
 
 interface Props {
   className?: string;
+  initialData?: RadialChartData;
 }
 
-export default function DashboardRadialChart({ className }: Props) {
-  const [data, setData] = useState<RadialChartData | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function DashboardRadialChart({ className, initialData }: Props) {
+  const [data, setData] = useState<RadialChartData | null>(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
+    // If initial data is provided, use it
+    if (initialData) {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch from API (fallback for backward compatibility)
     async function fetchData() {
       try {
         const response = await fetch("/api/dashboard/task-distribution");
@@ -32,7 +41,7 @@ export default function DashboardRadialChart({ className }: Props) {
       }
     }
     fetchData();
-  }, []);
+  }, [initialData]);
 
   if (loading) {
     return (

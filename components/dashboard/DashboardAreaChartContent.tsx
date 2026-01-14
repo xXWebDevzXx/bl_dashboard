@@ -36,9 +36,13 @@ interface ChartData {
   formattedDate?: string;
 }
 
-export default function DashboardAreaChartContent() {
+interface Props {
+  initialData?: ChartData[];
+}
+
+export default function DashboardAreaChartContent({ initialData }: Props) {
   const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialData);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -48,6 +52,18 @@ export default function DashboardAreaChartContent() {
   };
 
   useEffect(() => {
+    // If initial data is provided, use it and format dates
+    if (initialData) {
+      const formattedData = initialData.map((item: ChartData) => ({
+        ...item,
+        formattedDate: formatDate(item.date),
+      }));
+      setChartData(formattedData);
+      setLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch from API (fallback for backward compatibility)
     async function fetchData() {
       try {
         const response = await fetch("/api/dashboard/time-chart");
@@ -80,7 +96,7 @@ export default function DashboardAreaChartContent() {
     }
 
     fetchData();
-  }, []);
+  }, [initialData]);
 
   if (loading) {
     return (

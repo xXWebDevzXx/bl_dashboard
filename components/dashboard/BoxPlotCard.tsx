@@ -36,6 +36,7 @@ interface BoxplotData {
 
 interface Props {
   className?: string;
+  initialData?: BoxplotData;
 }
 
 // Pure SVG Boxplot Component
@@ -169,11 +170,11 @@ const BoxplotSVG = ({
   );
 };
 
-export default function BoxPlotCard({ className }: Props) {
-  const [data, setData] = useState<BoxplotData | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function BoxPlotCard({ className, initialData }: Props) {
+  const [data, setData] = useState<BoxplotData | null>(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
   const [metric, setMetric] = useState<"actual" | "accuracy" | "leadTime">(
-    "actual"
+    initialData?.metric || "actual"
   );
   const [showOutliers, setShowOutliers] = useState(true);
   const [tooltip, setTooltip] = useState<{
@@ -193,6 +194,19 @@ export default function BoxPlotCard({ className }: Props) {
   );
 
   useEffect(() => {
+    // Check if we should use initial data (only for default metric and date range)
+    const isDefaultParams = 
+      metric === "actual" && 
+      dateRange.from === "2025-01-01" && 
+      dateRange.to === "2025-12-31";
+
+    if (initialData && isDefaultParams && initialData.metric === "actual") {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch from API (when metric or date range changes)
     async function fetchData() {
       setLoading(true);
       try {
@@ -217,7 +231,7 @@ export default function BoxPlotCard({ className }: Props) {
     }
 
     fetchData();
-  }, [dateRange.from, dateRange.to, metric]);
+  }, [dateRange.from, dateRange.to, metric, initialData]);
 
   if (loading) {
     return (

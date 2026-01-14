@@ -7,8 +7,11 @@ import DashboardRadialChart from "@/components/dashboard/DashboardRadialChart";
 import EstimationAccuracyChart from "@/components/dashboard/EstimationAccuracyChart";
 import ReportExportButton from "@/components/dashboard/ReportExportButton";
 import { auth0 } from "@/lib/auth0";
+import { getBoxplotData } from "@/lib/boxplot-data";
 import { getDashboardStats } from "@/lib/dashboard-stats";
 import { ensureUserSynced } from "@/lib/ensure-user-synced";
+import { getEstimationAccuracy } from "@/lib/estimation-accuracy";
+import { getTaskDistribution } from "@/lib/report-data";
 import { getTimeChartData } from "@/lib/time-chart-data";
 import { SquareCheckBig } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -41,17 +44,28 @@ export default async function Dashboard() {
     throw error;
   }
 
-  // Fetch dashboard stats
+  // Fetch all dashboard data in parallel
+  const [
+    dashboardStats,
+    timeChartData,
+    estimationAccuracy,
+    taskDistribution,
+    boxplotData,
+  ] = await Promise.all([
+    getDashboardStats(),
+    getTimeChartData(),
+    getEstimationAccuracy(),
+    getTaskDistribution(),
+    getBoxplotData("2025-01-01", "2025-12-31", "actual"), // Default boxplot data
+  ]);
+
   const {
     linearTasksCount,
     linearTasksWithTogglTimePercentage,
     linearTasksWithTogglTimeCount,
     averageTogglTimeHours,
     linearTasksWithDelegatePercentage,
-  } = await getDashboardStats();
-
-  // Fetch time chart data for the mini line charts
-  const timeChartData = await getTimeChartData();
+  } = dashboardStats;
 
   // Calculate total hours and prepare trend data (last 30 days)
   const last30Days = timeChartData.slice(-30);
@@ -100,9 +114,15 @@ export default async function Dashboard() {
         </div>
         <div className="grid grid-cols-1 desktop:grid-cols-2 gap-4 sm:gap-6 desktop:gap-8">
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
-            <DashboardAreaChart className="bg-card h-fit border border-border-zinc/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"></DashboardAreaChart>
-            <EstimationAccuracyChart className="h-fit" />
-            <BoxPlotCard />
+            <DashboardAreaChart 
+              className="bg-card h-fit border border-border-zinc/60 p-2 sm:p-4 rounded-sm shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.2s_both] overflow-hidden"
+              initialData={timeChartData}
+            />
+            <EstimationAccuracyChart 
+              className="h-fit"
+              initialData={estimationAccuracy}
+            />
+            <BoxPlotCard initialData={boxplotData} />
           </div>
 
           <div className="grid gap-4 sm:gap-6 desktop:gap-8 auto-rows-min">
@@ -112,7 +132,7 @@ export default async function Dashboard() {
               totalCount={linearTasksCount}
               className="bg-card border border-border-zinc/60 p-2 sm:p-4 rounded-sm flex items-center max-h-fit shadow-xl shadow-black/25 animate-[fadeInScale_0.6s_ease-out_0.3s_both] overflow-hidden"
             ></DashboardCircleChart>
-            <DashboardRadialChart />
+            <DashboardRadialChart initialData={taskDistribution} />
           </div>
         </div>
         <div className="mt-2 sm:mt-4 desktop:mt-6"></div>

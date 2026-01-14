@@ -3,29 +3,11 @@
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
-
-interface EstimationData {
-  aiTasks: {
-    averageEstimated: number;
-    averageActual: number;
-    accuracyPercentage: number;
-    taskCount: number;
-  };
-  nonAiTasks: {
-    averageEstimated: number;
-    averageActual: number;
-    accuracyPercentage: number;
-    taskCount: number;
-  };
-  overall: {
-    averageEstimated: number;
-    averageActual: number;
-    accuracyPercentage: number;
-  };
-}
+import type { EstimationAccuracyData } from "@/lib/estimation-accuracy";
 
 interface Props {
   className?: string;
+  initialData?: EstimationAccuracyData;
 }
 
 // Custom bar shape with gradient and border (top and sides only, no bottom) - defined outside component
@@ -59,11 +41,19 @@ const GradientBar = (props: { fill?: string; x?: number; y?: number; width?: num
   );
 };
 
-export default function EstimationAccuracyChart({ className }: Props) {
-  const [data, setData] = useState<EstimationData | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function EstimationAccuracyChart({ className, initialData }: Props) {
+  const [data, setData] = useState<EstimationAccuracyData | null>(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
 
   useEffect(() => {
+    // If initial data is provided, use it
+    if (initialData) {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch from API (fallback for backward compatibility)
     async function fetchData() {
       try {
         const response = await fetch("/api/dashboard/estimation-accuracy");
@@ -77,7 +67,7 @@ export default function EstimationAccuracyChart({ className }: Props) {
     }
 
     fetchData();
-  }, []);
+  }, [initialData]);
 
   if (loading) {
     return (

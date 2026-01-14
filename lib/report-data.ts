@@ -76,7 +76,7 @@ export async function getReportData(dateRange?: DateRange): Promise<ReportData> 
   };
 }
 
-async function getTaskDistribution(dateRange?: DateRange) {
+export async function getTaskDistribution(dateRange?: DateRange) {
   try {
     const session = await auth0.getSession();
     if (!session?.user) {
