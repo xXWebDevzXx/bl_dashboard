@@ -202,33 +202,39 @@ async function getBoxplotStats(dateRange?: DateRange): Promise<{
   leadTime: BoxplotReportData;
 }> {
   try {
-    // Default to current year if no date range provided
-    const startDate = dateRange?.startDate ?? new Date(new Date().getFullYear(), 0, 1);
-    const endDate = dateRange?.endDate ?? new Date(new Date().getFullYear(), 11, 31);
-    
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-    const endTimestamp = Math.floor(endDate.getTime() / 1000);
-    const startDateStr = startDate.toISOString().split("T")[0];
-    const endDateStr = endDate.toISOString().split("T")[0] + "T23:59:59.999Z";
+    // Build date filters only if date range is provided
+    let taskDateFilter: object | undefined;
+    let togglTimeDateFilter: object | undefined;
+    let completedAtFilter: object | undefined;
 
-    // Build date filters
-    const taskDateFilter = {
-      OR: [
-        { createdAt: { gte: startTimestamp, lte: endTimestamp } },
-        { startedAt: { gte: startTimestamp, lte: endTimestamp } },
-        { completedAt: { gte: startTimestamp, lte: endTimestamp } },
-      ],
-    };
+    if (dateRange) {
+      const startTimestamp = Math.floor(dateRange.startDate.getTime() / 1000);
+      const endTimestamp = Math.floor(dateRange.endDate.getTime() / 1000);
+      const startDateStr = dateRange.startDate.toISOString().split("T")[0];
+      const endDateStr = dateRange.endDate.toISOString().split("T")[0] + "T23:59:59.999Z";
 
-    const togglTimeDateFilter = {
-      start: { gte: startDateStr, lte: endDateStr },
-    };
+      taskDateFilter = {
+        OR: [
+          { createdAt: { gte: startTimestamp, lte: endTimestamp } },
+          { startedAt: { gte: startTimestamp, lte: endTimestamp } },
+          { completedAt: { gte: startTimestamp, lte: endTimestamp } },
+        ],
+      };
+
+      togglTimeDateFilter = {
+        start: { gte: startDateStr, lte: endDateStr },
+      };
+
+      completedAtFilter = { not: null, gte: startTimestamp, lte: endTimestamp };
+    } else {
+      completedAtFilter = { not: null };
+    }
 
     // Fetch tasks for actual time and accuracy metrics
     const tasksWithToggl = await prisma.linearTask.findMany({
       where: {
         ...taskDateFilter,
-        togglTimes: { some: togglTimeDateFilter },
+        togglTimes: { some: togglTimeDateFilter || {} },
       },
       select: {
         taskId: true,
@@ -246,7 +252,7 @@ async function getBoxplotStats(dateRange?: DateRange): Promise<{
     const tasksWithCompletion = await prisma.linearTask.findMany({
       where: {
         ...taskDateFilter,
-        completedAt: { not: null, gte: startTimestamp, lte: endTimestamp },
+        completedAt: completedAtFilter,
       },
       select: {
         taskId: true,
