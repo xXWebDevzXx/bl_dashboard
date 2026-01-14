@@ -204,6 +204,9 @@ export default function DashboardRadialChart({ className, initialData }: Props) 
                 const y = cy + radius * Math.sin(-midAngle * RADIAN);
                 const entry = chartData[index];
 
+                // Safety check: if entry is undefined, return null
+                if (!entry || !entry.baseColor) return null;
+
                 return (
                   <text
                     x={x}
