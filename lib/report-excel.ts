@@ -348,7 +348,6 @@ export async function generateExcel(data: ReportData): Promise<ExcelJS.Buffer> {
     unit: string,
     stats: typeof data.boxplotStats.actualTime.ai
   ) => {
-    const decimals = unit === "hours" ? 2 : 1;
     return [
       `${metricName} (${unit})`,
       stats.n,
@@ -364,12 +363,28 @@ export async function generateExcel(data: ReportData): Promise<ExcelJS.Buffer> {
   };
 
   const boxplotData = [
-    formatBoxplotRow("Actual Time - AI", "hrs", data.boxplotStats.actualTime.ai),
-    formatBoxplotRow("Actual Time - Non-AI", "hrs", data.boxplotStats.actualTime.nonAi),
+    formatBoxplotRow(
+      "Actual Time - AI",
+      "hrs",
+      data.boxplotStats.actualTime.ai
+    ),
+    formatBoxplotRow(
+      "Actual Time - Non-AI",
+      "hrs",
+      data.boxplotStats.actualTime.nonAi
+    ),
     formatBoxplotRow("Accuracy - AI", "%", data.boxplotStats.accuracy.ai),
-    formatBoxplotRow("Accuracy - Non-AI", "%", data.boxplotStats.accuracy.nonAi),
+    formatBoxplotRow(
+      "Accuracy - Non-AI",
+      "%",
+      data.boxplotStats.accuracy.nonAi
+    ),
     formatBoxplotRow("Lead Time - AI", "days", data.boxplotStats.leadTime.ai),
-    formatBoxplotRow("Lead Time - Non-AI", "days", data.boxplotStats.leadTime.nonAi),
+    formatBoxplotRow(
+      "Lead Time - Non-AI",
+      "days",
+      data.boxplotStats.leadTime.nonAi
+    ),
   ];
 
   currentRow++;
