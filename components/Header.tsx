@@ -34,26 +34,22 @@ function Header() {
   return (
     <>
       <header className="bg-card border-b border-border-zinc/60 flex justify-between items-center text-white p-4 sm:p-6 desktop:p-8 col-span-full desktop:col-span-2">
-        <Link href="/dashboard" className="flex items-center gap-2 group">
-          <svg width="40" height="40" viewBox="0 0 125 129" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <Link href="/dashboard" className="flex items-center group ">
+          
+          <svg width="56" height="56" viewBox="0 0 139 133" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="logo-gradient" x1="0" y1="0" x2="125" y2="0" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" style={{ stopColor: 'var(--emerald-light)', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: 'var(--cyan-light)', stopOpacity: 1 }} />
+              <linearGradient id="logo-gradient-2" x1="0" y1="0" x2="139" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" style={{ stopColor: "var(--emerald-light)", stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: "var(--cyan-light)", stopOpacity: 1 }} />
               </linearGradient>
             </defs>
-            <g fill="url(#logo-gradient)">
-              <rect y="60" width="21" height="69" />
-              <path d="M70 107L57.4961 129L-7.23232e-07 129L2.38418e-07 107L70 107Z" />
-              <rect x="125" y="69" width="21" height="69" transform="rotate(-180 125 69)" />
-              <path d="M55 22L67.5039 -1.99141e-06L125 7.22676e-06L125 22L55 22Z" />
-              <path d="M67.5 1.14618e-05L55 22C41.8991 23.9552 27.0184 36.8439 21 60H0C4.44256 30.4839 33.5216 -0.0215865 67.5 1.14618e-05Z" />
-              <path d="M57 129L69.5 107C82.6009 105.045 97.9816 92.1561 104 69L125 69C120.557 98.5161 90.9784 129.022 57 129Z" />
+            <g fill="url(#logo-gradient-2)">
+              <path d="M130.653 2.15015L108.153 23.1502C115.514 119.402 75.5144 108.148 6.15298 112.65L6.15298 130.65L41.657 130.851C109.334 130.851 146.978 97.4487 130.653 2.15015Z" />
+              <path d="M130.653 2.15015L109.153 23.65C12.6563 21.0346 27.2359 61.1518 26.153 130.65L6.15295 130.65L5.88781 97.0106C2.55701 29.4165 34.6669 -9.46459 130.653 2.15015Z" />
             </g>
           </svg>
-          <span className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-light p-2 to-cyan-light bg-clip-text text-transparent group-hover:from-emerald-light group-hover:to-cyan-light transition-all">
-            Delegate
-          </span>
+
+          <span className="text-2xl sm:text-3xl desktop:text-4xl font-bold bg-gradient-to-r from-emerald-light p-2 to-cyan-light bg-clip-text text-transparent group-hover:from-emerald-light group-hover:to-cyan-light transition-all">Delegate</span>
         </Link>
         <div className="flex items-center gap-4">
           {/* Desktop logout button */}
