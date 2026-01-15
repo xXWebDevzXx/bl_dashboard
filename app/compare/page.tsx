@@ -3,8 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma/client";
 import CompareTasksClient from "@/components/compare/CompareTasksClient";
 
-// Force dynamic rendering for auth and database operations
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getAvailableTasks() {
   const tasks = await prisma.linearTask.findMany({

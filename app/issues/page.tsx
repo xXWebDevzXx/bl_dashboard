@@ -11,7 +11,8 @@ import {
 import { IssueFilters } from "@/components/IssueFilters";
 import Link from "next/link";
 
-export const dynamic = 'force-dynamic';
+
+export const revalidate = 60;
 
 interface LinearIssue {
   id: string;
@@ -83,7 +84,7 @@ export default async function IssuesPage({
   if (params.hasTimeEntries) queryParams.set('hasTimeEntries', params.hasTimeEntries);
   if (params.label) queryParams.set('label', params.label);
 const apiBaseUrl = process.env.APP_BASE_URL || "http://localhost:3000";
-  const response = await fetch(`${apiBaseUrl}/api/linear_issues/all?${queryParams.toString()}`, { cache: "no-store" });
+  const response = await fetch(`${apiBaseUrl}/api/linear_issues/all?${queryParams.toString()}`, { next: { revalidate: 60 } });
 
   if (!response.ok) {
     const text = await response.text();

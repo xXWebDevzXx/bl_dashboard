@@ -16,8 +16,9 @@ import { getTaskDistribution } from "@/lib/report-data";
 import { getTimeChartData } from "@/lib/time-chart-data";
 import { SquareCheckBig } from "lucide-react";
 import { redirect } from "next/navigation";
-// Force dynamic rendering for auth and database operations
-export const dynamic = "force-dynamic";
+
+
+export const revalidate = 60;
 
 type TimePeriod = "1w" | "2w" | "1m" | "3m" | "6m" | "1y" | "all";
 

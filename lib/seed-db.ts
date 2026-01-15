@@ -106,6 +106,7 @@ export interface SeedResult {
   timeEntries: {
     total: number;
     created: number;
+    addedToExistingTasks: number;
     skipped: number;
     notFound: number;
   };
@@ -279,22 +280,24 @@ export async function seedDatabase(
     }
   }
 
-  // Step 4: Connect Toggl time entries to Linear tasks (idempotent)
+  // Step 4: Connect Toggl time entries to Linear tasks
+  // This will add new time entries to both new AND existing Linear tasks
   if (logProgress) {
-    console.warn("\n=== Step 3: Connecting Toggl Time Entries (idempotent) ===");
+    console.warn("\n=== Step 3: Connecting Toggl Time Entries ===");
   }
 
-  // Create a map of Linear identifiers
-  const issueIdentifierMap = new Map<string, string>();
+  // Create a map of Linear identifiers to check if task exists in sync data
+  const issueIdentifierSet = new Set<string>();
   for (const issue of syncData.linearIssues) {
-    issueIdentifierMap.set(issue.identifier, issue.identifier);
+    issueIdentifierSet.add(issue.identifier);
   }
 
   // Regex to extract Linear issue identifier from description (e.g., BLE-123)
   const linearIdRegex = /([A-Z]+-\d+)/;
 
-  // Create a TogglTime entry for EACH time entry, skip if exists
+  // Create a TogglTime entry for EACH time entry
   let createdCount = 0;
+  let updatedExistingTaskCount = 0;
   let skippedCount = 0;
   let notFoundCount = 0;
 
@@ -313,10 +316,17 @@ export async function seedDatabase(
     }
 
     const identifier = match[1];
-    const linearTaskId = issueIdentifierMap.get(identifier);
 
-    if (!linearTaskId) {
-      notFoundCount++;
+    // Check if the Linear task exists in the database (not just in sync data)
+    const linearTask = await prisma.linearTask.findUnique({
+      where: { taskId: identifier },
+    });
+
+    if (!linearTask) {
+      // Task doesn't exist in DB - check if it's in the sync data
+      if (!issueIdentifierSet.has(identifier)) {
+        notFoundCount++;
+      }
       continue;
     }
 
@@ -326,11 +336,15 @@ export async function seedDatabase(
     });
 
     if (!existing) {
+      // Check if this is being added to an existing task (task was created in a previous seed)
+      const isExistingTask = !issueIdentifierSet.has(identifier) ||
+        (await prisma.togglTime.count({ where: { linearTasksId: identifier } })) > 0;
+
       // Create a new TogglTime entry for this specific time entry
       await prisma.togglTime.create({
         data: {
           togglEntryId: entry.id,
-          linearTasksId: linearTaskId,
+          linearTasksId: identifier,
           duration: entry.duration,
           start: entry.start,
           stop: entry.stop,
@@ -340,6 +354,10 @@ export async function seedDatabase(
         },
       });
       createdCount++;
+
+      if (isExistingTask) {
+        updatedExistingTaskCount++;
+      }
 
       if (logProgress && createdCount % 100 === 0) {
         console.warn(`  Created ${createdCount} time entries...`);
@@ -351,11 +369,14 @@ export async function seedDatabase(
 
   if (logProgress) {
     console.warn(`\n✓ Created ${createdCount} new time entries`);
+    if (updatedExistingTaskCount > 0) {
+      console.warn(`  ↳ ${updatedExistingTaskCount} added to existing Linear tasks`);
+    }
     console.warn(
       `⚠ Skipped ${skippedCount} entries (already exist, no duration, or no Linear ID)`
     );
     console.warn(
-      `⚠ ${notFoundCount} entries couldn't be linked (Linear task not found)`
+      `⚠ ${notFoundCount} entries couldn't be linked (Linear task not found in DB)`
     );
 
     console.warn("\n=== Seed Summary ===");
@@ -378,6 +399,7 @@ export async function seedDatabase(
     timeEntries: {
       total: syncData.timeEntries.length,
       created: createdCount,
+      addedToExistingTasks: updatedExistingTaskCount,
       skipped: skippedCount,
       notFound: notFoundCount,
     },

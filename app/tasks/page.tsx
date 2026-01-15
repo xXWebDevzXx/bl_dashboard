@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiClient } from "@/lib/api/client";
 
-// Force dynamic rendering to avoid build-time data fetching issues
-export const dynamic = "force-dynamic";
+
+export const revalidate = 60;
 
 export default async function TasksPage() {
   const issues = await apiClient.getIssues();

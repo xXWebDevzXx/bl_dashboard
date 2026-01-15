@@ -6,7 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, User, Tag } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-export const dynamic = "force-dynamic";
+
+export const revalidate = 60;
 
 interface TaskPageProps {
   params: Promise<{

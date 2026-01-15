@@ -54,6 +54,7 @@ model TogglTime {
   linearTask LinearTask @relation(fields: [linearTasksId], references: [taskId])
 
   @@index([linearTasksId])
+  @@index([start])
   @@map("toggl_time")
 }
 
@@ -73,6 +74,11 @@ model LinearTask {
   togglTimes TogglTime[]
   labels     LinearTaskLabel[]
 
+  @@index([createdAt])
+  @@index([startedAt])
+  @@index([completedAt])
+  @@index([updatedAt])
+  @@index([delegateId])
   @@map("linear_tasks")
 }
 
