@@ -257,7 +257,7 @@ export default function TaskSelector({
                 </Select>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {/* AI Filter */}
               <div className="space-y-2">
                 <Label className="text-xs text-gray-500">Issue Type</Label>
